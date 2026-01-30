@@ -22,9 +22,21 @@ export interface Analysis {
 }
 
 export interface AnalysisSummary {
-    resumen_ejecutivo: string
+    resumen_ejecutivo: {
+        veredicto: string
+        justificacion: string
+        clausulas_criticas_totales: number
+        mayor_riesgo_identificado: string
+    }
     nivel_riesgo_general: 'Alto' | 'Medio' | 'Bajo'
+    metricas: {
+        total_rojas: number
+        total_amarillas: number
+        total_verdes: number
+        porcentaje_clausulas_analizadas: string
+    }
     hallazgos: Hallazgo[]
+    clausulas_no_clasificadas?: string[]
 }
 
 export interface Hallazgo {
@@ -33,6 +45,8 @@ export interface Hallazgo {
     explicacion: string
     clausula?: string
     cita_textual?: string
+    riesgo_real?: string
+    mitigacion?: string
 }
 
 export interface Transaction {

@@ -48,7 +48,7 @@
     </p>
 
     <!-- Details (Expandable) -->
-    <div v-if="props.clausula || props.citaTextual || props.details">
+    <div v-if="props.clausula || props.citaTextual || props.riesgoReal || props.mitigacion || props.details">
       <button
         @click="isExpanded = !isExpanded"
         class="flex items-center gap-2 text-accent-indigo hover:text-accent-purple font-medium text-sm transition-colors"
@@ -66,11 +66,21 @@
 
       <div 
         v-if="isExpanded"
-        class="mt-4 p-4 bg-primary-50 rounded-lg border border-primary-200 animate-slide-up space-y-3"
+        class="mt-4 p-4 bg-primary-50 rounded-lg border border-primary-200 animate-slide-up space-y-4"
       >
         <div v-if="props.clausula">
           <span class="text-xs font-bold text-primary-500 uppercase tracking-wider">Ubicación</span>
           <p class="text-sm text-primary-800 font-medium">{{ props.clausula }}</p>
+        </div>
+
+        <div v-if="props.riesgoReal">
+          <span class="text-xs font-bold text-risk-high uppercase tracking-wider">Riesgo Real</span>
+          <p class="text-sm text-primary-800">{{ props.riesgoReal }}</p>
+        </div>
+
+        <div v-if="props.mitigacion">
+          <span class="text-xs font-bold text-risk-low uppercase tracking-wider">Cómo Mitigar</span>
+          <p class="text-sm text-primary-800">{{ props.mitigacion }}</p>
         </div>
         
         <div v-if="props.citaTextual">
@@ -102,6 +112,8 @@ const props = defineProps<{
   risk: RiskLevel
   clausula?: string
   citaTextual?: string
+  riesgoReal?: string
+  mitigacion?: string
   details?: string
 }>()
 

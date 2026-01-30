@@ -50,18 +50,57 @@
             </div>
           </div>
 
-          <!-- Summary -->
-          <div class="p-6 bg-primary-50 rounded-lg border border-primary-200">
-            <h2 class="text-lg font-semibold text-primary-900 mb-3">Resumen Ejecutivo</h2>
-            <p class="text-primary-700 leading-relaxed">
-              {{ summary.resumen_ejecutivo }}
-            </p>
+          <!-- Summary & Metrics -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div class="md:col-span-2 p-6 bg-primary-50 rounded-lg border border-primary-200">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="text-sm font-bold uppercase tracking-wider text-primary-500">Veredicto:</span>
+                <span :class="[
+                  'px-3 py-1 rounded-md text-sm font-bold',
+                  summary.resumen_ejecutivo.veredicto?.includes('Rechazar') ? 'bg-risk-high text-white' :
+                  summary.resumen_ejecutivo.veredicto?.includes('Negociar') ? 'bg-risk-medium text-white' :
+                  'bg-risk-low text-white'
+                ]">
+                  {{ summary.resumen_ejecutivo.veredicto }}
+                </span>
+              </div>
+              <h2 class="text-lg font-semibold text-primary-900 mb-2">Análisis Forense</h2>
+              <p class="text-primary-700 leading-relaxed mb-4">
+                {{ summary.resumen_ejecutivo.justificacion }}
+              </p>
+              <div v-if="summary.resumen_ejecutivo.mayor_riesgo_identificado" class="p-3 bg-white rounded border-l-4 border-risk-high">
+                <span class="text-xs font-bold text-risk-high uppercase">Riesgo Crítico Principal:</span>
+                <p class="text-sm text-primary-800 italic">{{ summary.resumen_ejecutivo.mayor_riesgo_identificado }}</p>
+              </div>
+            </div>
+
+            <div class="p-6 bg-white rounded-lg border border-primary-200">
+              <h3 class="text-sm font-bold text-primary-900 uppercase tracking-wider mb-4 text-center">Métricas de Auditoría</h3>
+              <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                  <span class="text-primary-600">Puntos Críticos</span>
+                  <span class="px-2 py-1 bg-risk-high text-white rounded-full text-xs font-bold">{{ summary.metricas.total_rojas }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-primary-600">Advertencias</span>
+                  <span class="px-2 py-1 bg-risk-medium text-white rounded-full text-xs font-bold">{{ summary.metricas.total_amarillas }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-primary-600">Puntos Favorables</span>
+                  <span class="px-2 py-1 bg-risk-low text-white rounded-full text-xs font-bold">{{ summary.metricas.total_verdes }}</span>
+                </div>
+                <div class="pt-2 border-t border-primary-100 flex justify-between items-center">
+                  <span class="text-xs font-bold text-primary-400 uppercase">Cobertura</span>
+                  <span class="text-sm font-bold text-primary-700">{{ summary.metricas.porcentaje_clausulas_analizadas }}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
         <!-- Hallazgos -->
         <div class="mb-8">
-          <h2 class="text-2xl font-bold text-primary-900 mb-6">Puntos Clave del Análisis</h2>
+          <h2 class="text-2xl font-bold text-primary-900 mb-6">Hallazgos Detallados</h2>
           <div class="space-y-4">
             <RiskCard
               v-for="(hallazgo, index) in summary.hallazgos"
@@ -71,8 +110,25 @@
               :risk="hallazgo.color === 'rojo' ? 'high' : hallazgo.color === 'amarillo' ? 'medium' : 'low'"
               :clausula="hallazgo.clausula"
               :cita-textual="hallazgo.cita_textual"
+              :riesgo-real="hallazgo.riesgo_real"
+              :mitigacion="hallazgo.mitigacion"
             />
           </div>
+        </div>
+
+        <!-- Cláusulas No Clasificadas -->
+        <div v-if="summary.clausulas_no_clasificadas?.length" class="mb-8 p-6 bg-white rounded-xl border-2 border-dashed border-primary-200">
+          <h3 class="text-lg font-bold text-primary-800 mb-4 flex items-center gap-2">
+            <svg class="w-5 h-5 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Cláusulas no categorizadas
+          </h3>
+          <ul class="list-disc list-inside space-y-2">
+            <li v-for="(item, i) in summary.clausulas_no_clasificadas" :key="i" class="text-sm text-primary-600">
+              {{ item }}
+            </li>
+          </ul>
         </div>
 
 
@@ -111,9 +167,21 @@ const loading = ref(true)
 
 const summary = computed<AnalysisSummary>(() => {
   return analysis.value?.summary_json || {
-    resumen_ejecutivo: '',
+    resumen_ejecutivo: {
+      veredicto: 'Bajo análisis',
+      justificacion: '',
+      clausulas_criticas_totales: 0,
+      mayor_riesgo_identificado: ''
+    },
     nivel_riesgo_general: 'Bajo',
+    metricas: {
+      total_rojas: 0,
+      total_amarillas: 0,
+      total_verdes: 0,
+      porcentaje_clausulas_analizadas: '0%'
+    },
     hallazgos: [],
+    clausulas_no_clasificadas: []
   }
 })
 
