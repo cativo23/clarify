@@ -74,6 +74,7 @@ export default defineEventHandler(async (event): Promise<AnalysisResponse> => {
 
         // Analyze with OpenAI
         const analysisSummary = await analyzeContract(contractText)
+        console.log('OpenAI Analysis Result:', JSON.stringify(analysisSummary, null, 2))
 
         // Map risk level for database indexing
         const riskMapping: Record<string, string> = {

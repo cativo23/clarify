@@ -31,6 +31,8 @@ export interface Hallazgo {
     color: 'rojo' | 'amarillo' | 'verde'
     titulo: string
     explicacion: string
+    clausula?: string
+    cita_textual?: string
 }
 
 export interface Transaction {

@@ -48,7 +48,7 @@
     </p>
 
     <!-- Details (Expandable) -->
-    <div v-if="details">
+    <div v-if="props.clausula || props.citaTextual || props.details">
       <button
         @click="isExpanded = !isExpanded"
         class="flex items-center gap-2 text-accent-indigo hover:text-accent-purple font-medium text-sm transition-colors"
@@ -66,21 +66,42 @@
 
       <div 
         v-if="isExpanded"
-        class="mt-4 p-4 bg-primary-50 rounded-lg border border-primary-200 animate-slide-up"
+        class="mt-4 p-4 bg-primary-50 rounded-lg border border-primary-200 animate-slide-up space-y-3"
       >
-        <p class="text-sm text-primary-700 leading-relaxed">{{ details }}</p>
+        <div v-if="props.clausula">
+          <span class="text-xs font-bold text-primary-500 uppercase tracking-wider">Ubicación</span>
+          <p class="text-sm text-primary-800 font-medium">{{ props.clausula }}</p>
+        </div>
+        
+        <div v-if="props.citaTextual">
+          <span class="text-xs font-bold text-primary-500 uppercase tracking-wider">Referencia Textual</span>
+          <div class="relative mt-1">
+            <svg class="absolute -left-1 -top-1 w-6 h-6 text-primary-200 opacity-50" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M14.017 21L14.017 18C14.017 16.899 14.899 16 16.017 16L19.017 16C19.562 16 20.017 15.545 20.017 15L20.017 11C20.017 10.455 19.562 10 19.017 10L15.017 10C14.472 10 14.017 9.545 14.017 9L14.017 6C14.017 5.455 14.472 5 15.017 5L18.017 5C19.135 5 20.017 5.881 20.017 7L20.017 8.5C20.017 8.776 20.241 9 20.517 9L21.517 9C21.793 9 22.017 8.776 22.017 8.5L22.017 7C22.017 4.791 20.226 3 18.017 3L15.017 3C12.808 3 11.017 4.791 11.017 7L11.017 9C11.017 11.209 12.808 13 15.017 13L19.017 13L19.017 15L16.017 15C14.363 15 13.017 16.346 13.017 18L13.017 21L14.017 21ZM4.017 21L4.017 18C4.017 16.899 4.899 16 6.017 16L9.017 16C9.562 16 10.017 15.545 10.017 15L10.017 11C10.017 10.455 9.562 10 9.017 10L5.017 10C4.472 10 4.017 9.545 4.017 9L4.017 6C4.017 5.455 4.472 5 5.017 5L8.017 5C9.135 5 10.017 5.881 10.017 7L10.017 8.5C10.017 8.776 10.241 9 10.517 9L11.517 9C11.793 9 12.017 8.776 12.017 8.5L12.017 7C12.017 4.791 10.226 3 8.017 3L5.017 3C2.808 3 1.017 4.791 1.017 7L1.017 9C1.017 11.209 2.808 13 5.017 13L9.017 13L9.017 15L6.017 15C4.363 15 3.017 16.346 3.017 18L3.017 21L4.017 21Z" />
+            </svg>
+            <p class="text-sm text-primary-600 italic pl-6">{{ props.citaTextual }}</p>
+          </div>
+        </div>
+
+        <div v-if="props.details">
+          <span class="text-xs font-bold text-primary-500 uppercase tracking-wider">Notas Adicionales</span>
+          <p class="text-sm text-primary-700 leading-relaxed">{{ props.details }}</p>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, computed } from 'vue'
 import type { RiskLevel } from '~/types'
 
 const props = defineProps<{
   category: string
   description: string
   risk: RiskLevel
+  clausula?: string
+  citaTextual?: string
   details?: string
 }>()
 

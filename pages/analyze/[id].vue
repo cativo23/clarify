@@ -69,7 +69,8 @@
               :category="hallazgo.titulo"
               :description="hallazgo.explicacion"
               :risk="hallazgo.color === 'rojo' ? 'high' : hallazgo.color === 'amarillo' ? 'medium' : 'low'"
-              :details="''"
+              :clausula="hallazgo.clausula"
+              :cita-textual="hallazgo.cita_textual"
             />
           </div>
         </div>
