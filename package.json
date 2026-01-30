@@ -1,0 +1,29 @@
+{
+  "name": "clarify",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "typecheck": "nuxt typecheck"
+  },
+  "dependencies": {
+    "@nuxtjs/supabase": "^1.4.0",
+    "@nuxtjs/tailwindcss": "^6.12.2",
+    "@stripe/stripe-js": "^4.8.0",
+    "nuxt": "^3.15.1",
+    "openai": "^4.77.3",
+    "pdf-parse": "^1.1.1",
+    "stripe": "^17.5.0",
+    "vue": "latest"
+  },
+  "devDependencies": {
+    "@types/pdf-parse": "^1.1.4",
+    "typescript": "^5.7.3"
+  }
+}
