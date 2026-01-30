@@ -1,75 +1,122 @@
-# Nuxt Minimal Starter
+# ✨ Clarify - Auditoría de Contratos con IA
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+> **Clarify** es una plataforma impulsada por IA diseñada para democratizar el acceso a la asesoría legal. Permite a los usuarios cargar contratos complejos y recibir una auditoría detallada en lenguaje sencillo, identificando riesgos, beneficios y puntos críticos en segundos.
 
-## Setup
+![Nuxt 3](https://img.shields.io/badge/Nuxt%203-00DC82?style=for-the-badge&logo=nuxtdotjs&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
+![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white)
+![Stripe](https://img.shields.io/badge/Stripe-008CDD?style=for-the-badge&logo=stripe&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
-Make sure to install dependencies:
+---
+
+## 🚀 Características Principales
+
+- 📄 **Análisis de PDF:** Extracción de texto y procesamiento de documentos legales.
+- 👨‍⚖️ **Auditoría Legal con IA:** Prompt dinámico especializado en protección al consumidor y detección de cláusulas abusivas.
+- 📊 **Dashboard de Usuario:** Historial de análisis realizados y gestión de documentos.
+- 💳 **Sistema de Créditos:** Pago por análisis integrado con Stripe.
+- 🔐 **Autenticación Robusta:** Gestión de usuarios y sesiones vía Supabase Auth.
+- 🐳 **Entorno Dockerizado:** Configuración lista para producción con Docker Compose.
+
+---
+
+## 🛠️ Stack Tecnológico
+
+- **Framework:** [Nuxt 3](https://nuxt.com/) (Vue 3, TypeScript)
+- **Base de Datos & Auth:** [Supabase](https://supabase.com/)
+- **IA:** [OpenAI API](https://openai.com/) (GPT-4o)
+- **Pasarela de Pagos:** [Stripe](https://stripe.com/)
+- **Estilos:** Tailwind CSS con estética Premium.
+- **Infraestructura:** Docker / Docker Compose.
+
+---
+
+## 🏁 Inicio Rápido
+
+### Requisitos Previos
+
+- Node.js (v18+) o Docker Desktop.
+- Cuentas en OpenAI, Stripe y Supabase.
+
+### 1. Clonar y Configurar
 
 ```bash
-# npm
+git clone <repository-url>
+cd clarify
+```
+
+### 2. Variables de Entorno
+
+Copia el archivo `.env.example` a `.env` y rellena las credenciales:
+
+```bash
+# OpenAI
+OPENAI_API_KEY=sk-...
+
+# Supabase
+SUPABASE_URL=https://...
+SUPABASE_KEY=...
+SUPABASE_SERVICE_KEY=...
+
+# Stripe
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+NUXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+```
+
+### 3. Ejecutar con Docker (Recomendado)
+
+El proyecto está configurado para levantar todo el entorno con un solo comando:
+
+```bash
+docker compose up -d --build
+```
+La aplicación estará disponible en `http://localhost:3001`.
+
+### 4. Ejecución Local (Desarrollo)
+
+```bash
 npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
 npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
 
-## Production
+---
 
-Build the application for production:
+## 📂 Estructura del Proyecto
 
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
+```text
+├── components/          # Componentes de UI reutilizables (AppHeader, RiskCard, etc)
+├── docs/                # Documentación técnica detallada
+├── pages/               # Vistas de la aplicación (Dashboard, Login, Análisis)
+├── server/
+│   ├── api/             # Endpoints (Analyze, Upload, Stripe Webhooks)
+│   ├── prompts/         # Prompts de IA configurables (análisis legal)
+│   └── utils/           # Utilidades de servidor (OpenAI, Stripe, PDF Parser)
+├── types/               # Definiciones de TypeScript
+└── public/              # Assets estáticos
 ```
 
-Locally preview production build:
+---
 
-```bash
-# npm
-npm run preview
+## 📚 Documentación Detallada
 
-# pnpm
-pnpm preview
+Para una configuración más profunda, consulta nuestras guías para desarrolladores:
 
-# yarn
-yarn preview
+1. 💳 [Configuración de Stripe](file:///home/cativo23/projects/personal/clarify/docs/STRIPE_SETUP.md)
+2. 🗄️ [Configuración de Supabase](file:///home/cativo23/projects/personal/clarify/docs/SUPABASE_SETUP.md)
+3. 📖 [Manual de Usuario / Walkthrough](file:///home/cativo23/projects/personal/clarify/docs/WALKTHROUGH_FINAL.md)
 
-# bun
-bun run preview
-```
+---
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+## 🤝 Contribución
+
+1. Crea un fork del proyecto.
+2. Crea una rama para tu función (`git checkout -b feature/AmazingFeature`).
+3. Haz commit de tus cambios (`git commit -m 'Add some AmazingFeature'`).
+4. Haz push a la rama (`git push origin feature/AmazingFeature`).
+5. Abre un Pull Request.
+
+---
+
+Desarrollado con ❤️ para simplificar el mundo legal.
