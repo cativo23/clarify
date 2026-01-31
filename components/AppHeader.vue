@@ -123,7 +123,7 @@
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 const showUserMenu = ref(false)
-const userCredits = ref(0)
+const userCredits = useCreditsState()
 
 const userInitials = computed(() => {
   const email = user.value?.email || ''
@@ -132,18 +132,8 @@ const userInitials = computed(() => {
 
 const userEmail = computed(() => user.value?.email || '')
 
-const fetchUserCredits = async () => {
-  if (!user.value?.id) return
-  
-  const { data } = await supabase
-    .from('users')
-    .select('credits')
-    .eq('id', user.value.id)
-    .single()
-
-  if (data) {
-    userCredits.value = data.credits
-  }
+const refreshCredits = async () => {
+  await fetchUserProfile()
 }
 
 const handleSignOut = async () => {
@@ -171,6 +161,6 @@ const vClickOutside = {
 }
 
 onMounted(() => {
-  fetchUserCredits()
+  refreshCredits()
 })
 </script>
