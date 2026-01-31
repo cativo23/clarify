@@ -1,6 +1,7 @@
 import OpenAI from 'openai'
-import fs from 'fs'
+import fs from 'fs/promises'
 import path from 'path'
+import { getEncoding } from 'js-tiktoken'
 
 export const createOpenAIClient = () => {
     const config = useRuntimeConfig()
@@ -12,16 +13,28 @@ export const createOpenAIClient = () => {
     return openai
 }
 
+const MAX_TOKENS_INPUT = 120000 // gpt-4o-mini has 128k, leave room for prompt
+
 export const analyzeContract = async (contractText: string) => {
     const openai = createOpenAIClient()
 
-    // Read custom prompt from file
+    // Read custom prompt from file - Asyncly
     const promptPath = path.resolve(process.cwd(), 'server/prompts/analysis-prompt.txt')
-    const systemPrompt = fs.readFileSync(promptPath, 'utf-8')
+    const systemPrompt = await fs.readFile(promptPath, 'utf-8')
+
+    // Token counting and truncation
+    const enc = getEncoding('cl100k_base')
+    const tokens = enc.encode(contractText)
+
+    let processedText = contractText
+    if (tokens.length > MAX_TOKENS_INPUT) {
+        console.warn(`Contract text too long (${tokens.length} tokens). Truncating to ${MAX_TOKENS_INPUT} tokens.`)
+        processedText = enc.decode(tokens.slice(0, MAX_TOKENS_INPUT))
+    }
 
     const userPrompt = `
 Texto del contrato a analizar:
-${contractText}
+${processedText}
 `
 
     try {
@@ -37,8 +50,8 @@ ${contractText}
                     content: userPrompt,
                 },
             ],
-            temperature: 0.2,
-            max_tokens: 3000,
+            temperature: 0.1, // Lower temperature for more consistency in legal analysis
+            max_tokens: 4000,
             response_format: { type: 'json_object' },
         })
 

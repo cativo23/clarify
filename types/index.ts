@@ -15,9 +15,11 @@ export interface Analysis {
     user_id: string
     contract_name: string
     file_url: string
-    summary_json: AnalysisSummary
-    risk_level: RiskLevel
+    summary_json: AnalysisSummary | null
+    risk_level: RiskLevel | null
     credits_used: number
+    status: 'pending' | 'processing' | 'completed' | 'failed'
+    error_message?: string
     created_at: string
 }
 

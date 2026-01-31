@@ -27,6 +27,8 @@ export default defineNuxtConfig({
     stripeSecretKey: process.env.STRIPE_SECRET_KEY,
     stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
     supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY,
+    redisHost: process.env.REDIS_HOST || 'localhost',
+    redisPort: parseInt(process.env.REDIS_PORT || '6379'),
 
     // Public keys (exposed to client)
     public: {
