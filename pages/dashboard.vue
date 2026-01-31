@@ -76,9 +76,10 @@
           <button
             @click="handleAnalyze"
             :disabled="analyzing || !contractName || (userProfile?.credits || 0) < 1"
-            class="px-10 py-4 bg-secondary text-white rounded-2xl font-black text-lg hover:shadow-glow hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+            class="px-10 py-4 bg-secondary text-white rounded-2xl font-black text-lg hover:shadow-glow hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex items-center gap-3"
           >
-            {{ analyzing ? 'Analizando...' : 'Analizar contrato' }}
+            <span v-if="analyzing" class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+            {{ analyzing ? 'Iniciando...' : 'Analizar contrato' }}
           </button>
         </div>
 
@@ -127,20 +128,38 @@
                   {{ formatDate(analysis.created_at) }}
                 </p>
                 <div class="flex items-center gap-2">
-                  <span 
-                    :class="[
-                      'px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-wider',
-                      analysis.risk_level === 'high' ? 'bg-risk-high/10 text-risk-high' :
-                      analysis.risk_level === 'medium' ? 'bg-risk-medium/10 text-risk-medium' :
-                      'bg-risk-low/10 text-risk-low'
-                    ]"
-                  >
-                    {{ 
-                      analysis.risk_level === 'high' ? 'Riesgo Alto' :
-                      analysis.risk_level === 'medium' ? 'Precaución' :
-                      'Seguro'
-                    }}
-                  </span>
+                  <template v-if="analysis.status === 'completed'">
+                    <span 
+                      :class="[
+                        'px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-wider',
+                        analysis.risk_level === 'high' ? 'bg-risk-high/10 text-risk-high' :
+                        analysis.risk_level === 'medium' ? 'bg-risk-medium/10 text-risk-medium' :
+                        'bg-risk-low/10 text-risk-low'
+                      ]"
+                    >
+                      {{ 
+                        analysis.risk_level === 'high' ? 'Riesgo Alto' :
+                        analysis.risk_level === 'medium' ? 'Precaución' :
+                        'Seguro'
+                      }}
+                    </span>
+                  </template>
+                  <template v-else-if="analysis.status === 'processing'">
+                    <span class="px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-secondary/10 text-secondary flex items-center gap-2">
+                      <span class="w-2 h-2 bg-secondary rounded-full animate-pulse"></span>
+                      Analizando...
+                    </span>
+                  </template>
+                  <template v-else-if="analysis.status === 'failed'">
+                    <span class="px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-risk-high/10 text-risk-high">
+                      Error en análisis
+                    </span>
+                  </template>
+                  <template v-else>
+                    <span class="px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-200 dark:bg-slate-800 text-slate-500">
+                      En cola...
+                    </span>
+                  </template>
                 </div>
               </div>
               <div class="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex items-center justify-center text-slate-400 group-hover/item:text-secondary group-hover/item:border-secondary/30 transition-all">
@@ -212,10 +231,61 @@ const fetchUserData = async () => {
   }
 }
 
-// Watch for user changes to fetch data
+// Realtime subscription
+let realtimeChannel: any = null
+
+const setupRealtimeSubscription = () => {
+  if (realtimeChannel || !user.value?.id) return
+
+  realtimeChannel = supabase
+    .channel('analyses-updates')
+    .on(
+      'postgres_changes',
+      {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'analyses',
+        filter: `user_id=eq.${user.value.id}`
+      },
+      async (payload) => {
+        const updatedAnalysis = payload.new as Analysis
+        console.log('Realtime update received:', updatedAnalysis)
+
+        // Find and update the analysis in the list
+        const index = analyses.value.findIndex(a => a.id === updatedAnalysis.id)
+        if (index !== -1) {
+          analyses.value[index] = updatedAnalysis
+        } else {
+          // If not in our current page list, we could choose to add it or ignore
+          // Unshift if it's new (though we usually handle insertions manually or on refresh)
+          analyses.value.unshift(updatedAnalysis)
+        }
+
+        // If job completed or failed, refresh user profile to ensure credits are correct
+        if (updatedAnalysis.status === 'completed' || updatedAnalysis.status === 'failed') {
+          try {
+            const profile = await $fetch('/api/user/profile')
+            if (profile) userProfile.value = profile
+          } catch (e) {
+            console.error('Error refreshing profile after realtime update:', e)
+          }
+        }
+      }
+    )
+    .subscribe()
+}
+
+onUnmounted(() => {
+  if (realtimeChannel) {
+    supabase.removeChannel(realtimeChannel)
+  }
+})
+
+// Watch for user changes to fetch data and setup realtime
 watch(() => user.value, (newUser) => {
   if (newUser?.id) {
     fetchUserData()
+    setupRealtimeSubscription()
   }
 }, { immediate: true })
 
@@ -272,7 +342,7 @@ const handleAnalyze = async () => {
     }
 
     // Analyze contract
-    const analyzeResponse = await $fetch('/api/analyze', {
+    const analyzeResponse = await $fetch<{ success: boolean, analysisId: string, error?: string }>('/api/analyze', {
       method: 'POST',
       body: {
         file_url: uploadResponse.file_url,
@@ -280,12 +350,30 @@ const handleAnalyze = async () => {
       },
     })
 
-    if (!analyzeResponse.success || !analyzeResponse.analysis) {
-      throw new Error(analyzeResponse.error || 'Error al analizar contrato')
+    if (!analyzeResponse.success || !analyzeResponse.analysisId) {
+      throw new Error(analyzeResponse.error || 'Error al iniciar análisis')
     }
 
-    // Redirect to results page
-    navigateTo(`/analyze/${analyzeResponse.analysis.id}`)
+    // Add as a placeholder to the list and let polling handle the rest
+    const newAnalysis: any = {
+      id: analyzeResponse.analysisId,
+      contract_name: contractName.value,
+      status: 'pending',
+      created_at: new Date().toISOString(),
+      risk_level: null,
+      summary_json: null
+    }
+    
+    analyses.value.unshift(newAnalysis)
+    
+    // Clear form
+    selectedFile.value = null
+    contractName.value = ''
+    
+    // Refresh profile to reflect credit deduction
+    const profile = await $fetch('/api/user/profile')
+    if (profile) userProfile.value = profile
+
   } catch (error: any) {
     analyzeError.value = error.message || 'Ocurrió un error durante el análisis'
   } finally {
