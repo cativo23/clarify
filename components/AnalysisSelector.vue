@@ -65,7 +65,7 @@
           <SearchIcon class="w-6 h-6" />
         </div>
         <div class="text-right">
-          <span class="block text-xs font-black uppercase tracking-widest text-slate-400">2 Créditos</span>
+          <span class="block text-xs font-black uppercase tracking-widest text-slate-400">3 Créditos</span>
           <span v-if="!hasCreditsForPremium" class="text-[10px] text-risk-high font-bold">Faltan créditos</span>
         </div>
       </div>
@@ -102,7 +102,7 @@ const props = defineProps<{
   userCredits: number
 }>()
 
-const hasCreditsForPremium = computed(() => props.userCredits >= 2)
+const hasCreditsForPremium = computed(() => props.userCredits >= 3)
 
 defineEmits(['update:modelValue'])
 </script>

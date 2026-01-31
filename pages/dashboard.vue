@@ -88,7 +88,7 @@
             />
             <button
               @click="handleAnalyze"
-              :disabled="analyzing || !contractName || (userProfile?.credits || 0) < (analysisType === 'premium' ? 2 : 1)"
+              :disabled="analyzing || !contractName || (userProfile?.credits || 0) < (analysisType === 'premium' ? 3 : 1)"
               class="px-10 py-4 bg-secondary text-white rounded-2xl font-black text-lg hover:shadow-glow hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex items-center gap-3"
             >
               <span v-if="analyzing" class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
@@ -98,7 +98,7 @@
 
           <p class="text-center text-xs font-bold text-slate-400">
             Créditos después de este análisis: 
-            <span class="text-secondary">{{ (userProfile?.credits || 0) - (analysisType === 'premium' ? 2 : 1) }}</span>
+            <span class="text-secondary">{{ (userProfile?.credits || 0) - (analysisType === 'premium' ? 3 : 1) }}</span>
           </p>
         </div>
 
