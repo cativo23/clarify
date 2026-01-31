@@ -7,6 +7,7 @@ export default {
         "./plugins/**/*.{js,ts}",
         "./app.vue",
     ],
+    darkMode: 'class',
     theme: {
         extend: {
             colors: {
@@ -23,6 +24,21 @@ export default {
                     700: '#334155',
                     800: '#1e293b',
                     900: '#0f172a',
+                    950: '#020617',
+                },
+                secondary: {
+                    DEFAULT: '#00dc82', // Nuxt Green
+                    50: '#effef6',
+                    100: '#d7fee9',
+                    200: '#b2fcd6',
+                    300: '#79f8ba',
+                    400: '#3bed98',
+                    500: '#00dc82',
+                    600: '#00af67',
+                    700: '#008a54',
+                    800: '#066d45',
+                    900: '#075a3b',
+                    950: '#033222',
                 },
                 // Traffic light colors
                 risk: {
@@ -37,16 +53,18 @@ export default {
                 },
             },
             fontFamily: {
-                sans: ['Inter', 'sans-serif'],
+                sans: ['Inter', 'sans-serif', 'system-ui'],
             },
             boxShadow: {
                 'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
                 'premium': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                'glow': '0 0 20px -5px rgba(0, 220, 130, 0.3)',
             },
             animation: {
                 'fade-in': 'fadeIn 0.5s ease-in-out',
                 'slide-up': 'slideUp 0.4s ease-out',
                 'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                'float': 'float 6s ease-in-out infinite',
             },
             keyframes: {
                 fadeIn: {
@@ -57,6 +75,10 @@ export default {
                     '0%': { transform: 'translateY(20px)', opacity: '0' },
                     '100%': { transform: 'translateY(0)', opacity: '1' },
                 },
+                float: {
+                    '0%, 100%': { transform: 'translateY(0)' },
+                    '50%': { transform: 'translateY(-10px)' },
+                }
             },
         },
     },

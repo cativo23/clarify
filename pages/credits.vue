@@ -1,21 +1,21 @@
 <template>
-  <div class="min-h-screen bg-primary-50">
-    <AppHeader />
+  <div class="min-h-screen bg-white dark:bg-slate-950 transition-colors duration-500">
 
     <!-- Main Content -->
     <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div class="text-center mb-8 animate-fade-in">
-        <h1 class="text-4xl font-bold text-primary-900 mb-4">Compra Créditos</h1>
-        <p class="text-xl text-primary-600">
-          Selecciona el paquete que mejor se adapte a tus necesidades
+      <div class="text-center mb-12 animate-fade-in">
+        <h1 class="text-4xl lg:text-5xl font-black text-slate-900 dark:text-white mb-4">Compra Créditos</h1>
+        <p class="text-xl text-slate-500 dark:text-slate-400">
+          Selecciona el paquete que mejor se adapte a tus necesidades. Sin suscripciones.
         </p>
       </div>
 
       <!-- Credits Balance -->
-      <div class="bg-gradient-to-r from-accent-indigo to-accent-purple rounded-2xl p-8 text-center text-white mb-12 shadow-premium animate-slide-up">
-        <p class="text-lg mb-2 opacity-90">Créditos Disponibles</p>
-        <p class="text-6xl font-bold mb-2">{{ userCredits }}</p>
-        <p class="opacity-75">Un crédito = Un análisis de contrato</p>
+      <div class="relative bg-gradient-to-br from-secondary to-accent-indigo rounded-[2.5rem] p-10 text-center text-white mb-16 shadow-premium overflow-hidden animate-slide-up">
+        <div class="absolute inset-0 bg-[url('/grid.svg')] opacity-10 grayscale"></div>
+        <p class="text-lg mb-2 opacity-90 relative z-10 font-medium">Créditos Disponibles</p>
+        <p class="text-7xl font-black mb-2 relative z-10">{{ userCredits }}</p>
+        <p class="opacity-80 relative z-10 text-sm tracking-widest uppercase">Un crédito = Un análisis</p>
       </div>
 
       <!-- Pricing Cards -->
@@ -24,17 +24,17 @@
           v-for="pack in creditPackages"
           :key="pack.id"
           :class="[
-            'bg-white rounded-2xl p-8 border-2 transition-all cursor-pointer relative',
+            'bg-white dark:bg-slate-900 rounded-3xl p-8 border-2 transition-all cursor-pointer relative group',
             pack.popular 
-              ? 'border-accent-indigo shadow-premium scale-105' 
-              : 'border-primary-200 hover:border-accent-indigo hover:shadow-soft'
+              ? 'border-secondary shadow-glow scale-105 z-10' 
+              : 'border-slate-100 dark:border-slate-800 hover:border-secondary/50 hover:shadow-premium'
           ]"
           @click="selectPackage(pack)"
         >
           <!-- Popular Badge -->
           <div 
             v-if="pack.popular"
-            class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-accent-indigo text-white px-6 py-2 rounded-full text-sm font-semibold shadow-lg"
+            class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-secondary text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg"
           >
             ⭐ Más Popular
           </div>
@@ -49,10 +49,10 @@
 
           <!-- Price -->
           <div class="text-center mb-6">
-            <div class="text-4xl font-bold text-accent-indigo mb-1">
+            <div class="text-4xl font-black text-secondary mb-1">
               ${{ pack.price.toFixed(2) }}
             </div>
-            <div class="text-primary-500 text-sm">
+            <div class="text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-wider">
               ~${{ (pack.price / pack.credits).toFixed(2) }} por análisis
             </div>
           </div>
@@ -96,22 +96,29 @@
       </div>
 
       <!-- Payment Info -->
-      <div class="bg-white rounded-xl p-8 border border-primary-200">
-        <h3 class="text-xl font-bold text-primary-900 mb-4">Métodos de Pago</h3>
-        <div class="flex items-center gap-6 mb-6">
-          <div class="flex items-center gap-2">
-            <svg class="w-12 h-8" viewBox="0 0 48 32" fill="none">
-              <rect width="48" height="32" rx="4" fill="#1434CB"/>
-              <path d="M18 16C18 13.2386 20.2386 11 23 11H25C27.7614 11 30 13.2386 30 16C30 18.7614 27.7614 21 25 21H23C20.2386 21 18 18.7614 18 16Z" fill="#EB001B"/>
-              <path d="M23 11C20.2386 11 18 13.2386 18 16C18 18.7614 20.2386 21 23 21C25.7614 21 28 18.7614 28 16C28 13.2386 25.7614 11 23 11Z" fill="#F79E1B"/>
-            </svg>
-            <span class="text-primary-700 font-medium">Visa/Mastercard</span>
+      <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-soft">
+        <h3 class="text-xl font-black text-slate-900 dark:text-white mb-6">Métodos de Pago</h3>
+        <div class="flex items-center gap-6 mb-8">
+          <div class="flex items-center gap-3">
+            <div class="w-14 h-10 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center border border-slate-200 dark:border-slate-700">
+              <svg class="w-10 h-6" viewBox="0 0 48 32" fill="none">
+                <rect width="48" height="32" rx="4" fill="#1434CB"/>
+                <path d="M18 16C18 13.2386 20.2386 11 23 11H25C27.7614 11 30 13.2386 30 16C30 18.7614 27.7614 21 25 21H23C20.2386 21 18 18.7614 18 16Z" fill="#EB001B"/>
+                <path d="M23 11C20.2386 11 18 13.2386 18 16C18 18.7614 20.2386 21 23 21C25.7614 21 28 18.7614 28 16C28 13.2386 25.7614 11 23 11Z" fill="#F79E1B"/>
+              </svg>
+            </div>
+            <span class="text-slate-600 dark:text-slate-300 font-bold">Visa / Mastercard</span>
           </div>
         </div>
-        <p class="text-primary-600 text-sm">
-          Procesado de forma segura por <span class="font-semibold">Stripe</span>. 
-          Nunca almacenamos tu información de pago.
-        </p>
+        <div class="p-4 bg-slate-50 dark:bg-slate-950/50 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-start gap-4">
+          <svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+          <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
+            Procesado de forma segura por <span class="font-bold text-slate-900 dark:text-white">Stripe</span>. 
+            Nunca almacenamos tu información de pago.
+          </p>
+        </div>
       </div>
 
       <!-- Error Message -->

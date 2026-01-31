@@ -13,9 +13,12 @@
     "typecheck": "nuxt typecheck"
   },
   "dependencies": {
+    "@heroicons/vue": "^2.2.0",
+    "@nuxtjs/color-mode": "^4.0.0",
     "@nuxtjs/supabase": "^1.4.0",
     "@nuxtjs/tailwindcss": "^6.12.2",
     "@stripe/stripe-js": "^4.8.0",
+    "lucide-vue-next": "^0.563.0",
     "nuxt": "^3.15.1",
     "openai": "^4.77.3",
     "pdf-parse": "^1.1.1",
@@ -23,6 +26,7 @@
     "vue": "latest"
   },
   "devDependencies": {
+    "@types/node": "^25.1.0",
     "@types/pdf-parse": "^1.1.4",
     "typescript": "^5.7.3"
   }

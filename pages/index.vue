@@ -1,196 +1,271 @@
 <template>
-  <div class="min-h-screen">
+  <div class="min-h-screen bg-white dark:bg-slate-950 transition-colors duration-500">
     <!-- Hero Section -->
-    <section class="relative overflow-hidden bg-gradient-to-br from-primary-900 via-primary-800 to-accent-indigo">
-      <div class="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
+    <section class="relative overflow-hidden pt-20 pb-24 lg:pt-32 lg:pb-40">
+      <!-- Background Elements -->
+      <div class="absolute inset-0 z-0">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(0,220,130,0.1),transparent_50%)]"></div>
+        <div class="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.03] dark:opacity-[0.05] grayscale"></div>
+      </div>
       
-      <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
-        <div class="text-center animate-fade-in">
-          <h1 class="text-5xl lg:text-7xl font-bold text-white mb-6">
-            Entiende qué estás firmando
-            <span class="block text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500">
-              en segundos
+      <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary/10 border border-secondary/20 text-secondary text-sm font-medium mb-6 animate-fade-in">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span>
+            </span>
+            Nueva IA de Auditoría Legal v1.0
+          </div>
+
+          <h1 class="text-5xl lg:text-8xl font-black text-slate-900 dark:text-white mb-8 tracking-tight animate-slide-up">
+            Entiende lo que estás 
+            <span class="block text-transparent bg-clip-text bg-gradient-to-r from-secondary to-accent-indigo">
+              firmando hoy
             </span>
           </h1>
           
-          <p class="text-xl lg:text-2xl text-primary-200 mb-12 max-w-3xl mx-auto">
-            Traduce contratos legales complejos a un formato visual tipo semáforo. 
-            <span class="font-semibold text-white">Simple. Rápido. Seguro.</span>
+          <p class="text-xl lg:text-2xl text-slate-600 dark:text-slate-400 mb-12 max-w-3xl mx-auto leading-relaxed animate-slide-up" style="animation-delay: 0.1s">
+            Clarify traduce la jerga legal compleja en un análisis visual intuitivo. 
+            <span class="text-slate-900 dark:text-slate-200 font-medium">Audita tus contratos en segundos con IA.</span>
           </p>
 
           <!-- CTA Buttons -->
-          <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+          <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20 animate-slide-up" style="animation-delay: 0.2s">
             <NuxtLink 
               v-if="!user"
               to="/login" 
-              class="px-8 py-4 bg-white text-primary-900 rounded-lg font-semibold text-lg hover:bg-primary-50 transition-all shadow-premium hover:scale-105"
+              class="group relative px-8 py-4 bg-secondary text-white rounded-2xl font-bold text-lg hover:shadow-glow hover:scale-105 transition-all duration-300"
             >
               Comenzar Gratis
+              <span class="inline-block transform group-hover:translate-x-1 transition-transform ml-2">→</span>
             </NuxtLink>
             <NuxtLink 
               v-else
               to="/dashboard" 
-              class="px-8 py-4 bg-white text-primary-900 rounded-lg font-semibold text-lg hover:bg-primary-50 transition-all shadow-premium hover:scale-105"
+              class="group px-8 py-4 bg-secondary text-white rounded-2xl font-bold text-lg hover:shadow-glow hover:scale-105 transition-all duration-300"
             >
               Ir al Dashboard
+              <span class="inline-block transform group-hover:translate-x-1 transition-transform ml-2">→</span>
             </NuxtLink>
-            <button class="px-8 py-4 bg-transparent border-2 border-white text-white rounded-lg font-semibold text-lg hover:bg-white hover:text-primary-900 transition-all">
+            <button class="px-8 py-4 bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-800 rounded-2xl font-bold text-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-300">
               Ver Demo
             </button>
           </div>
 
-          <!-- Traffic Light Preview -->
-          <div class="flex justify-center gap-4">
-            <div class="flex flex-col items-center">
-              <div class="w-16 h-16 rounded-full bg-risk-low animate-pulse-slow shadow-premium"></div>
-              <span class="text-white mt-2 font-medium">Seguro</span>
+          <!-- Interactive Preview Card -->
+          <div class="relative max-w-4xl mx-auto animate-slide-up" style="animation-delay: 0.3s">
+            <div class="absolute -inset-1 bg-gradient-to-r from-secondary to-accent-indigo rounded-[2rem] blur opacity-20 dark:opacity-40"></div>
+            <div class="relative bg-white dark:bg-slate-900 rounded-[1.8rem] border border-slate-200 dark:border-slate-800 p-8 shadow-2xl overflow-hidden">
+              <div class="flex flex-wrap justify-center gap-8 sm:gap-16">
+                <div class="flex flex-col items-center group">
+                  <div class="w-16 h-16 rounded-2xl bg-risk-low/20 flex items-center justify-center text-risk-low mb-3 ring-1 ring-risk-low/30 group-hover:scale-110 transition-transform duration-500">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                  </div>
+                  <span class="text-slate-900 dark:text-slate-100 font-bold uppercase tracking-widest text-xs">Seguro</span>
+                </div>
+                <div class="flex flex-col items-center group">
+                  <div class="w-16 h-16 rounded-2xl bg-risk-medium/20 flex items-center justify-center text-risk-medium mb-3 ring-1 ring-risk-medium/30 group-hover:scale-110 transition-transform duration-500">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                  </div>
+                  <span class="text-slate-900 dark:text-slate-100 font-bold uppercase tracking-widest text-xs">Precaución</span>
+                </div>
+                <div class="flex flex-col items-center group">
+                  <div class="w-16 h-16 rounded-2xl bg-risk-high/20 flex items-center justify-center text-risk-high mb-3 ring-1 ring-risk-high/30 group-hover:scale-110 transition-transform duration-500">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                  </div>
+                  <span class="text-slate-900 dark:text-slate-100 font-bold uppercase tracking-widest text-xs">Crítico</span>
+                </div>
+              </div>
             </div>
-            <div class="flex flex-col items-center">
-              <div class="w-16 h-16 rounded-full bg-risk-medium animate-pulse-slow shadow-premium" style="animation-delay: 0.5s"></div>
-              <span class="text-white mt-2 font-medium">Precaución</span>
-            </div>
-            <div class="flex flex-col items-center">
-              <div class="w-16 h-16 rounded-full bg-risk-high animate-pulse-slow shadow-premium" style="animation-delay: 1s"></div>
-              <span class="text-white mt-2 font-medium">Crítico</span>
-            </div>
+            <!-- Decorative light -->
+            <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-secondary/20 rounded-full blur-[60px] animate-pulse-slow"></div>
+            <div class="absolute -top-10 -right-10 w-40 h-40 bg-accent-indigo/20 rounded-full blur-[60px] animate-pulse-slow"></div>
           </div>
         </div>
       </div>
     </section>
 
     <!-- How It Works -->
-    <section class="py-20 bg-white">
+    <section class="py-24 bg-slate-50 dark:bg-slate-900/50 transition-colors duration-500">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="text-4xl font-bold text-center text-primary-900 mb-16">
-          Cómo Funciona
-        </h2>
+        <div class="text-center mb-20">
+          <h2 class="text-3xl lg:text-5xl font-black text-slate-900 dark:text-white mb-4">
+            Auditoría en 3 pasos
+          </h2>
+          <p class="text-slate-500 dark:text-slate-400 text-lg">Tecnología de punta para decisiones inteligentes.</p>
+        </div>
         
-        <div class="grid md:grid-cols-3 gap-8">
+        <div class="grid md:grid-cols-3 gap-12">
           <!-- Step 1 -->
-          <div class="text-center p-8 rounded-2xl bg-primary-50 hover:shadow-premium transition-all animate-slide-up">
-            <div class="w-16 h-16 bg-accent-indigo rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
-              1
+          <div class="relative group">
+            <div class="text-[8rem] font-black text-slate-200 dark:text-slate-800 absolute -top-16 -left-4 z-0 group-hover:text-secondary/10 transition-colors">01</div>
+            <div class="relative z-10 p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-soft hover:shadow-premium transition-all">
+              <div class="w-14 h-14 bg-secondary/10 text-secondary rounded-2xl flex items-center justify-center mb-6">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+              </div>
+              <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">Sube tu Contrato</h3>
+              <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                Arrastra tu PDF o imagen. Usamos encriptación de grado militar para proteger tus datos.
+              </p>
             </div>
-            <h3 class="text-xl font-semibold text-primary-900 mb-4">Sube tu Contrato</h3>
-            <p class="text-primary-600">
-              Arrastra tu PDF o imagen del contrato a nuestra plataforma segura.
-            </p>
           </div>
 
           <!-- Step 2 -->
-          <div class="text-center p-8 rounded-2xl bg-primary-50 hover:shadow-premium transition-all animate-slide-up" style="animation-delay: 0.2s">
-            <div class="w-16 h-16 bg-accent-indigo rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
-              2
+          <div class="relative group md:mt-8">
+            <div class="text-[8rem] font-black text-slate-200 dark:text-slate-800 absolute -top-16 -left-4 z-0 group-hover:text-secondary/10 transition-colors">02</div>
+            <div class="relative z-10 p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-soft hover:shadow-premium transition-all">
+              <div class="w-14 h-14 bg-accent-indigo/10 text-accent-indigo rounded-2xl flex items-center justify-center mb-6">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+              </div>
+              <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">IA Analiza</h3>
+              <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                Nuestro motor GPT-4o audita cada línea buscando cláusulas abusivas y beneficios ocultos.
+              </p>
             </div>
-            <h3 class="text-xl font-semibold text-primary-900 mb-4">IA Analiza</h3>
-            <p class="text-primary-600">
-              Nuestra inteligencia artificial procesa y traduce cada cláusula.
-            </p>
           </div>
 
           <!-- Step 3 -->
-          <div class="text-center p-8 rounded-2xl bg-primary-50 hover:shadow-premium transition-all animate-slide-up" style="animation-delay: 0.4s">
-            <div class="w-16 h-16 bg-accent-indigo rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
-              3
+          <div class="relative group">
+            <div class="text-[8rem] font-black text-slate-200 dark:text-slate-800 absolute -top-16 -left-4 z-0 group-hover:text-secondary/10 transition-colors">03</div>
+            <div class="relative z-10 p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-soft hover:shadow-premium transition-all">
+              <div class="w-14 h-14 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-500 rounded-2xl flex items-center justify-center mb-6">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+              <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">Resultados Claros</h3>
+              <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                Visualiza el nivel de riesgo y entiende los puntos críticos en lenguaje humano. Sin rodeos.
+              </p>
             </div>
-            <h3 class="text-xl font-semibold text-primary-900 mb-4">Recibe Resultados</h3>
-            <p class="text-primary-600">
-              Visualiza riesgos en formato semáforo con explicaciones simples.
-            </p>
           </div>
         </div>
       </div>
     </section>
 
     <!-- Features -->
-    <section class="py-20 bg-primary-50">
+    <section class="py-24 bg-white dark:bg-slate-950 transition-colors duration-500">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="text-4xl font-bold text-center text-primary-900 mb-16">
-          ¿Por qué Clarify?
-        </h2>
-        
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div class="bg-white p-6 rounded-xl shadow-soft hover:shadow-premium transition-all">
-            <div class="text-3xl mb-4">🎯</div>
-            <h3 class="text-xl font-semibold text-primary-900 mb-2">Análisis Instantáneo</h3>
-            <p class="text-primary-600">Resultados en segundos, no en horas de lectura.</p>
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+          <div>
+            <h2 class="text-4xl lg:text-6xl font-black text-slate-900 dark:text-white mb-8 leading-tight">
+              ¿Por qué confiar en <span class="text-secondary">Clarify</span>?
+            </h2>
+            <div class="space-y-8">
+              <div class="flex gap-6">
+                <div class="flex-shrink-0 w-12 h-12 bg-slate-100 dark:bg-slate-900 rounded-xl flex items-center justify-center font-bold text-slate-400">01</div>
+                <div>
+                  <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">IA Especializada</h3>
+                  <p class="text-slate-500 dark:text-slate-400">Entrenada con miles de documentos legales reales para máxima precisión.</p>
+                </div>
+              </div>
+              <div class="flex gap-6">
+                <div class="flex-shrink-0 w-12 h-12 bg-slate-100 dark:bg-slate-900 rounded-xl flex items-center justify-center font-bold text-slate-400">02</div>
+                <div>
+                  <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Privacidad Extrema</h3>
+                  <p class="text-slate-500 dark:text-slate-400">Tus datos nunca se usan para entrenar modelos. Lo que es tuyo, se queda contigo.</p>
+                </div>
+              </div>
+              <div class="flex gap-6">
+                <div class="flex-shrink-0 w-12 h-12 bg-slate-100 dark:bg-slate-900 rounded-xl flex items-center justify-center font-bold text-slate-400">03</div>
+                <div>
+                  <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Sin Suscripciones</h3>
+                  <p class="text-slate-500 dark:text-slate-400">Paga solo por lo que necesites. Crétidos flexibles que nunca vencen.</p>
+                </div>
+              </div>
+            </div>
           </div>
-
-          <div class="bg-white p-6 rounded-xl shadow-soft hover:shadow-premium transition-all">
-            <div class="text-3xl mb-4">🧠</div>
-            <h3 class="text-xl font-semibold text-primary-900 mb-2">IA Especializada</h3>
-            <p class="text-primary-600">Entrenada específicamente en lenguaje legal.</p>
-          </div>
-
-          <div class="bg-white p-6 rounded-xl shadow-soft hover:shadow-premium transition-all">
-            <div class="text-3xl mb-4">💰</div>
-            <h3 class="text-xl font-semibold text-primary-900 mb-2">Paga por Uso</h3>
-            <p class="text-primary-600">Solo pagas por los contratos que analizas.</p>
-          </div>
-
-          <div class="bg-white p-6 rounded-xl shadow-soft hover:shadow-premium transition-all">
-            <div class="text-3xl mb-4">🔒</div>
-            <h3 class="text-xl font-semibold text-primary-900 mb-2">100% Seguro</h3>
-            <p class="text-primary-600">Tus documentos están encriptados y protegidos.</p>
-          </div>
-
-          <div class="bg-white p-6 rounded-xl shadow-soft hover:shadow-premium transition-all">
-            <div class="text-3xl mb-4">📱</div>
-            <h3 class="text-xl font-semibold text-primary-900 mb-2">Acceso Total</h3>
-            <p class="text-primary-600">Revisa tus análisis cuando quieras.</p>
-          </div>
-
-          <div class="bg-white p-6 rounded-xl shadow-soft hover:shadow-premium transition-all">
-            <div class="text-3xl mb-4">✨</div>
-            <h3 class="text-xl font-semibold text-primary-900 mb-2">Interface Simple</h3>
-            <p class="text-primary-600">Diseñado para que cualquiera pueda usarlo.</p>
+          <div class="relative">
+            <div class="aspect-square bg-gradient-to-br from-secondary/20 to-accent-indigo/20 rounded-[3rem] overflow-hidden flex items-center justify-center">
+              <!-- Placeholder for illustrative graphic or Image -->
+              <div class="w-2/3 h-2/3 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 p-6 animate-float">
+                <div class="w-1/2 h-4 bg-slate-100 dark:bg-slate-800 rounded-full mb-4"></div>
+                <div class="w-full h-2 bg-slate-50 dark:bg-slate-800/50 rounded-full mb-2"></div>
+                <div class="w-full h-2 bg-slate-50 dark:bg-slate-800/50 rounded-full mb-2"></div>
+                <div class="w-3/4 h-2 bg-slate-50 dark:bg-slate-800/50 rounded-full mb-8"></div>
+                <div class="p-4 rounded-2xl bg-risk-high/10 border border-risk-high/20 mb-4">
+                   <div class="w-1/3 h-3 bg-risk-high/20 rounded-full mb-2"></div>
+                   <div class="w-full h-2 bg-risk-high/10 rounded-full"></div>
+                </div>
+                <div class="p-4 rounded-2xl bg-risk-low/10 border border-risk-low/20">
+                   <div class="w-1/4 h-3 bg-risk-low/20 rounded-full mb-2"></div>
+                   <div class="w-full h-2 bg-risk-low/10 rounded-full"></div>
+                </div>
+              </div>
+            </div>
+            <!-- Decorative dots -->
+            <div class="absolute top-0 right-0 -mt-4 -mr-4 text-secondary opacity-40">
+              <svg width="100" height="100" fill="currentColor" viewBox="0 0 100 100"><circle cx="10" cy="10" r="2"/><circle cx="30" cy="10" r="2"/><circle cx="50" cy="10" r="2"/><circle cx="70" cy="10" r="2"/><circle cx="90" cy="10" r="2"/><circle cx="10" cy="30" r="2"/><circle cx="30" cy="30" r="2"/><circle cx="50" cy="30" r="2"/><circle cx="70" cy="30" r="2"/><circle cx="90" cy="30" r="2"/><circle cx="10" cy="50" r="2"/><circle cx="30" cy="50" r="2"/><circle cx="50" cy="50" r="2"/><circle cx="70" cy="50" r="2"/><circle cx="90" cy="50" r="2"/><circle cx="10" cy="70" r="2"/><circle cx="30" cy="70" r="2"/><circle cx="50" cy="70" r="2"/><circle cx="70" cy="70" r="2"/><circle cx="90" cy="70" r="2"/><circle cx="10" cy="90" r="2"/><circle cx="30" cy="90" r="2"/><circle cx="50" cy="90" r="2"/><circle cx="70" cy="90" r="2"/><circle cx="90" cy="90" r="2"/></svg>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="py-20 bg-gradient-to-r from-primary-900 to-accent-indigo">
-      <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-        <h2 class="text-4xl font-bold text-white mb-6">
-          ¿Listo para entender tus contratos?
+    <!-- Final CTA Section -->
+    <section class="py-24 relative overflow-hidden">
+      <div class="absolute inset-0 bg-slate-950">
+        <div class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_100%,rgba(0,220,130,0.2),transparent_50%)]"></div>
+      </div>
+      
+      <div class="relative z-10 max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+        <h2 class="text-4xl lg:text-6xl font-black text-white mb-8">
+          No vuelvas a firmar a ciegas.
         </h2>
-        <p class="text-xl text-primary-200 mb-8">
-          Únete a miles de usuarios que ya protegen sus decisiones legales.
+        <p class="text-xl text-slate-400 mb-12">
+          Únete a la nueva era de transparencia legal impulsada por IA.
         </p>
         <NuxtLink 
           v-if="!user"
           to="/login" 
-          class="inline-block px-10 py-5 bg-white text-primary-900 rounded-lg font-bold text-lg hover:bg-primary-50 transition-all shadow-premium hover:scale-105"
+          class="inline-block px-12 py-5 bg-secondary text-white rounded-[2rem] font-black text-xl hover:shadow-glow hover:scale-105 transition-all duration-300 transform"
         >
-          Comenzar Ahora - Es Gratis
+          Empezar Ahora - Gratis
         </NuxtLink>
         <NuxtLink 
           v-else
           to="/dashboard" 
-          class="inline-block px-10 py-5 bg-white text-primary-900 rounded-lg font-bold text-lg hover:bg-primary-50 transition-all shadow-premium hover:scale-105"
+          class="inline-block px-12 py-5 bg-secondary text-white rounded-[2rem] font-black text-xl hover:shadow-glow hover:scale-105 transition-all duration-300 transform"
         >
-          Ir a tu Dashboard
+          Ir a mi Dashboard
         </NuxtLink>
       </div>
     </section>
 
     <!-- Footer -->
-    <footer class="bg-primary-900 text-white py-12">
+    <footer class="bg-white dark:bg-slate-950 py-20 border-t border-slate-100 dark:border-slate-900 transition-colors duration-500">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center">
-          <h3 class="text-2xl font-bold mb-4">Clarify</h3>
-          <p class="text-primary-300 mb-4">
-            Análisis inteligente de contratos para todos
-          </p>
-          <div class="flex justify-center gap-6 text-primary-400">
-            <a href="#" class="hover:text-white transition-colors">Términos</a>
-            <a href="#" class="hover:text-white transition-colors">Privacidad</a>
-            <a href="#" class="hover:text-white transition-colors">Contacto</a>
-          </div>
-          <p class="text-primary-500 mt-6 text-sm">
-            © 2026 Clarify. Todos los derechos reservados.
-          </p>
+        <div class="grid md:grid-cols-4 gap-12">
+           <div class="col-span-2">
+              <h3 class="text-2xl font-black text-slate-900 dark:text-white mb-6">Clarify</h3>
+              <p class="text-slate-500 dark:text-slate-400 max-w-sm mb-8 leading-relaxed">
+                Democratizando el acceso a la asesoría legal mediante inteligencia artificial de vanguardia. Auditorías transparentes para todos.
+              </p>
+              <div class="flex gap-4">
+                <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-900 flex items-center justify-center text-slate-400 hover:text-secondary transition-colors cursor-pointer">𝕏</div>
+                <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-900 flex items-center justify-center text-slate-400 hover:text-secondary transition-colors cursor-pointer">in</div>
+                <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-900 flex items-center justify-center text-slate-400 hover:text-secondary transition-colors cursor-pointer">📦</div>
+              </div>
+           </div>
+           <div>
+              <h4 class="font-bold text-slate-900 dark:text-white mb-6 uppercase tracking-widest text-sm">Producto</h4>
+              <ul class="space-y-4 text-slate-500 dark:text-slate-400">
+                <li><a href="#" class="hover:text-secondary transition-colors">Características</a></li>
+                <li><a href="#" class="hover:text-secondary transition-colors">Seguridad</a></li>
+                <li><a href="#" class="hover:text-secondary transition-colors">Precios</a></li>
+              </ul>
+           </div>
+           <div>
+              <h4 class="font-bold text-slate-900 dark:text-white mb-6 uppercase tracking-widest text-sm">Legal</h4>
+              <ul class="space-y-4 text-slate-500 dark:text-slate-400">
+                <li><a href="#" class="hover:text-secondary transition-colors">Privacidad</a></li>
+                <li><a href="#" class="hover:text-secondary transition-colors">Términos</a></li>
+                <li><a href="#" class="hover:text-secondary transition-colors">Contacto</a></li>
+              </ul>
+           </div>
+        </div>
+        <div class="mt-20 pt-8 border-t border-slate-100 dark:border-slate-900 flex flex-col md:flex-row justify-between items-center gap-6">
+           <p class="text-slate-400 text-sm">© 2026 Clarify. Hecho con ❤️ para un mundo más transparente.</p>
+           <p class="text-slate-400 text-sm">Made with Nuxt 3 & OpenAI</p>
         </div>
       </div>
     </footer>
