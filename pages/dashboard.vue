@@ -63,33 +63,52 @@
         <Dropzone 
           v-model="selectedFile" 
           @error="handleDropzoneError"
-          class="mb-6"
+          class="mb-8"
         />
 
-        <div v-if="selectedFile" class="flex flex-col sm:flex-row gap-4 animate-slide-up">
-          <input
-            v-model="contractName"
-            type="text"
-            placeholder="Nombre del contrato (ej: Contrato de Arrendamiento)"
-            class="flex-1 px-6 py-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-secondary/50 focus:border-secondary text-slate-900 dark:text-white transition-all outline-none font-medium"
-          />
-          <button
-            @click="handleAnalyze"
-            :disabled="analyzing || !contractName || (userProfile?.credits || 0) < 1"
-            class="px-10 py-4 bg-secondary text-white rounded-2xl font-black text-lg hover:shadow-glow hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex items-center gap-3"
-          >
-            <span v-if="analyzing" class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-            {{ analyzing ? 'Iniciando...' : 'Analizar contrato' }}
-          </button>
+        <div v-if="selectedFile" class="space-y-8 animate-slide-up">
+          <!-- Analysis Type Selector -->
+          <div>
+            <label class="block text-sm font-black uppercase tracking-widest text-slate-400 mb-4">
+              Elige el nivel de protección
+            </label>
+            <AnalysisSelector 
+              v-model="analysisType" 
+              :user-credits="userProfile?.credits || 0"
+            />
+          </div>
+
+          <!-- Contract Name and Action -->
+          <div class="flex flex-col sm:flex-row gap-4">
+            <input
+              v-model="contractName"
+              type="text"
+              placeholder="Nombre del contrato (ej: Contrato de Arrendamiento)"
+              class="flex-1 px-6 py-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-secondary/50 focus:border-secondary text-slate-900 dark:text-white transition-all outline-none font-medium"
+            />
+            <button
+              @click="handleAnalyze"
+              :disabled="analyzing || !contractName || (userProfile?.credits || 0) < (analysisType === 'premium' ? 2 : 1)"
+              class="px-10 py-4 bg-secondary text-white rounded-2xl font-black text-lg hover:shadow-glow hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex items-center gap-3"
+            >
+              <span v-if="analyzing" class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+              {{ analyzing ? 'Iniciando...' : (analysisType === 'premium' ? 'Análisis Completo' : 'Análisis Rápido') }}
+            </button>
+          </div>
+
+          <p class="text-center text-xs font-bold text-slate-400">
+            Créditos después de este análisis: 
+            <span class="text-secondary">{{ (userProfile?.credits || 0) - (analysisType === 'premium' ? 2 : 1) }}</span>
+          </p>
         </div>
 
         <div v-if="analyzeError" class="mt-4 p-4 bg-risk-high/10 border border-risk-high rounded-lg">
           <p class="text-risk-high text-sm">{{ analyzeError }}</p>
         </div>
 
-        <div v-if="(userProfile?.credits || 0) < 1" class="mt-4 p-4 bg-risk-medium/10 border border-risk-medium rounded-lg">
+        <div v-if="(userProfile?.credits || 0) < 1 && !selectedFile" class="mt-4 p-4 bg-risk-medium/10 border border-risk-medium rounded-lg">
           <p class="text-risk-medium text-sm">
-            No tienes créditos suficientes. 
+            No tienes créditos suficientes para realizar análisis. 
             <NuxtLink to="/credits" class="font-semibold underline">Compra más créditos aquí</NuxtLink>
           </p>
         </div>
@@ -186,13 +205,22 @@ const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 
 const userProfile = ref<any>(null)
+const sharedCredits = useCreditsState()
 const analyses = ref<Analysis[]>([])
 const loading = ref(true)
 
 const selectedFile = ref<File | null>(null)
 const contractName = ref('')
+const analysisType = ref<'basic' | 'premium'>('premium')
 const analyzing = ref(false)
 const analyzeError = ref('')
+
+// Auto-switch to basic if they only have 1 credit
+watch(() => sharedCredits.value, (newCredits) => {
+  if (newCredits === 1 && analysisType.value === 'premium') {
+    analysisType.value = 'basic'
+  }
+}, { immediate: true })
 
 // Fetch user data
 const fetchUserData = async () => {
@@ -201,14 +229,10 @@ const fetchUserData = async () => {
   loading.value = true
 
   try {
-    // Fetch user profile via server API (handles sync automatically)
-    try {
-      const profile = await $fetch('/api/user/profile')
-      if (profile) {
-        userProfile.value = profile
-      }
-    } catch (e) {
-      console.error('Error fetching profile API:', e)
+    // Fetch user profile via shared composable (updates state)
+    const profile = await fetchUserProfile()
+    if (profile) {
+      userProfile.value = profile
     }
 
     // Fetch analyses (keep via Supabase client for list or move to API if preferred, keeping as is for now)
@@ -263,12 +287,7 @@ const setupRealtimeSubscription = () => {
 
         // If job completed or failed, refresh user profile to ensure credits are correct
         if (updatedAnalysis.status === 'completed' || updatedAnalysis.status === 'failed') {
-          try {
-            const profile = await $fetch('/api/user/profile')
-            if (profile) userProfile.value = profile
-          } catch (e) {
-            console.error('Error refreshing profile after realtime update:', e)
-          }
+          await fetchUserProfile()
         }
       }
     )
@@ -347,6 +366,7 @@ const handleAnalyze = async () => {
       body: {
         file_url: uploadResponse.file_url,
         contract_name: contractName.value,
+        analysis_type: analysisType.value,
       },
     })
 
@@ -370,9 +390,8 @@ const handleAnalyze = async () => {
     selectedFile.value = null
     contractName.value = ''
     
-    // Refresh profile to reflect credit deduction
-    const profile = await $fetch('/api/user/profile')
-    if (profile) userProfile.value = profile
+    // Refresh profile state
+    await fetchUserProfile()
 
   } catch (error: any) {
     analyzeError.value = error.message || 'Ocurrió un error durante el análisis'
