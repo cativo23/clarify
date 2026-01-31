@@ -15,6 +15,10 @@ export default defineEventHandler(async (event) => {
             throw createError({ statusCode: 400, message: 'Missing required fields' })
         }
 
+<<<<<<< Updated upstream
+=======
+        const creditCost = analysis_type === 'premium' ? 3 : 1
+>>>>>>> Stashed changes
         const client = await serverSupabaseClient(event)
 
         // 1. Check credits
