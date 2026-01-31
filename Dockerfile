@@ -29,6 +29,7 @@ COPY . .
 
 # Build the application
 ENV NODE_ENV=production
+ENV NITRO_PRESET=node-server
 RUN npm run build
 
 # ============================================
