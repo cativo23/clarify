@@ -21,6 +21,8 @@ CREATE TABLE IF NOT EXISTS analyses (
     file_url TEXT NOT NULL,
     summary_json JSONB,
     risk_level TEXT CHECK (risk_level IN ('low', 'medium', 'high')),
+    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'completed', 'failed')),
+    error_message TEXT,
     credits_used INTEGER DEFAULT 1,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -65,8 +67,8 @@ CREATE OR REPLACE FUNCTION process_analysis_transaction(
     p_user_id UUID,
     p_contract_name TEXT,
     p_file_url TEXT,
-    p_summary_json JSONB,
-    p_risk_level TEXT
+    p_summary_json JSONB DEFAULT NULL,
+    p_risk_level TEXT DEFAULT NULL
 )
 RETURNS UUID AS $$
 DECLARE
@@ -89,6 +91,7 @@ BEGIN
         file_url,
         summary_json,
         risk_level,
+        status,
         credits_used,
         created_at
     ) VALUES (
@@ -97,6 +100,7 @@ BEGIN
         p_file_url,
         p_summary_json,
         p_risk_level,
+        'pending',
         1,
         CURRENT_TIMESTAMP
     ) RETURNING id INTO v_analysis_id;
@@ -104,6 +108,9 @@ BEGIN
     RETURN v_analysis_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Enable Realtime for the analyses table
+ALTER PUBLICATION supabase_realtime ADD TABLE analyses;
 
 -- Confirmation message
 DO $$
