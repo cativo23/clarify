@@ -160,7 +160,10 @@ const vClickOutside = {
         binding.value()
       }
     }
-    document.addEventListener('click', el.clickOutsideEvent)
+    // Add a small delay to prevent immediate triggering
+    setTimeout(() => {
+      document.addEventListener('click', el.clickOutsideEvent)
+    }, 100)
   },
   unmounted(el: any) {
     document.removeEventListener('click', el.clickOutsideEvent)
