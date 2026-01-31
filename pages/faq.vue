@@ -4,12 +4,15 @@
       <h1 class="text-5xl lg:text-7xl font-black text-slate-900 dark:text-white mb-12 tracking-tight">
         Preguntas <span class="text-secondary">Frecuentes</span>
       </h1>
-      
+
       <div class="space-y-6">
         <div v-for="(item, index) in faqs" :key="index" class="group">
-          <div class="p-8 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 transition-all hover:shadow-premium group-hover:border-secondary/30">
+          <div
+            class="p-8 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 transition-all hover:shadow-premium group-hover:border-secondary/30">
             <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-4">
-              <span class="w-8 h-8 rounded-lg bg-secondary/10 text-secondary flex items-center justify-center text-sm">{{ index + 1 }}</span>
+              <span
+                class="w-8 h-8 rounded-lg bg-secondary/10 text-secondary flex items-center justify-center text-sm">{{
+                index + 1 }}</span>
               {{ item.question }}
             </h3>
             <p class="text-slate-600 dark:text-slate-400 leading-relaxed ml-12">
@@ -38,7 +41,7 @@ const faqs = [
   },
   {
     question: '¿Puedo analizar cualquier tipo de contrato?',
-    answer: 'Sí, nuestra IA es capaz de procesar contratos de arrendamiento, laborales, de servicios, términos y condiciones, y muchos más. Sin embargo, para documentos extremadamente técnicos o de alta cuantía, recomendamos siempre una revisión legal humana.'
+    answer: 'Sí, nuestra IA actúa como una potente guía capaz de procesar contratos de arrendamiento, laborales, de servicios, términos y condiciones, y muchos más. Sin embargo, los resultados son orientativos y para documentos extremadamente técnicos, recomendamos siempre una revisión legal humana.'
   }
 ]
 

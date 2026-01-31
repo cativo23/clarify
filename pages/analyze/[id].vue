@@ -154,11 +154,27 @@
                 <div class="pt-6 border-t border-slate-800 flex justify-between items-center">
                   <span class="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">Cobertura</span>
                   <span class="text-xl font-black text-secondary">{{ summary.metricas.porcentaje_clausulas_analizadas
-                    }}</span>
+                  }}</span>
                 </div>
               </div>
             </div>
           </div>
+        </div>
+
+        <!-- Legal Disclaimer Note -->
+        <div
+          class="mb-10 p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/50 rounded-2xl flex items-center gap-4 animate-fade-in">
+          <div
+            class="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <p class="text-xs font-bold text-amber-800 dark:text-amber-400 leading-relaxed">
+            <span class="uppercase">Nota:</span> Este análisis es una guía informativa generada por IA. No constituye
+            asesoría legal profesional. Siempre valide estos hallazgos con un abogado cualificado.
+          </p>
         </div>
 
         <!-- Hallazgos -->
