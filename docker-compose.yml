@@ -29,11 +29,11 @@ services:
     ports:
       - "6379:6379"
 
-  # Nuxt3 Application
+  # Nuxt3 Application (Development)
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     container_name: clarify-app
     restart: unless-stopped
     ports:
@@ -48,20 +48,18 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
       - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
+      - CHOKIDAR_USEPOLLING=true
     volumes:
       - .:/app
       - /app/node_modules
+      - /app/.nuxt
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_started
-    command: >
-      sh -c "
-      mkdir -p .nuxt && 
-      chown -R node:node .nuxt && 
-      npx nuxi prepare && 
-      npm run dev -- --port 3001"
+    stdin_open: true
+    tty: true
 
   # pgAdmin (Optional - Database Management UI)
   pgadmin:
