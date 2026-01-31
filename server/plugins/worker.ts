@@ -14,8 +14,8 @@ export default defineNitroPlugin((nitroApp) => {
     )
 
     const worker = new Worker('analysis-queue', async (job) => {
-        const { analysisId, userId, storagePath } = job.data
-        console.log(`[Worker] Started processing analysis ${analysisId} for user ${userId}`)
+        const { analysisId, userId, storagePath, analysisType } = job.data
+        console.log(`[Worker] Started processing ${analysisType || 'premium'} analysis ${analysisId} for user ${userId}`)
 
         try {
             // 1. Update status to processing
@@ -42,15 +42,50 @@ export default defineNitroPlugin((nitroApp) => {
             }
 
             // 4. Analyze with OpenAI
-            const analysisSummary = await analyzeContract(contractText)
+            let analysisSummary = await analyzeContract(contractText, analysisType || 'premium')
 
-            // 5. Map risk level
+            // 5. Map risk level and Normalize Summary for UI
+            // Premium uses 'nivel_riesgo_general', Basic uses 'nivel_riesgo'
+            const riskLevelStr = analysisSummary.nivel_riesgo_general || analysisSummary.nivel_riesgo
+
             const riskMapping: Record<string, string> = {
                 'Alto': 'high',
                 'Medio': 'medium',
-                'Bajo': 'low'
+                'Bajo': 'low',
+                'PELIGROSO': 'high',
+                'PRECAUCIÓN': 'medium',
+                'ACEPTABLE': 'low'
             }
-            const dbRiskLevel = riskMapping[analysisSummary.nivel_riesgo_general] || 'medium'
+            const dbRiskLevel = riskMapping[riskLevelStr] || 'medium'
+
+            // --- NORMALIZE SUMMARY FOR UI ---
+            if (analysisType === 'basic') {
+                analysisSummary = {
+                    resumen_ejecutivo: {
+                        veredicto: analysisSummary.recomendacion_final?.accion || analysisSummary.veredicto_rapido,
+                        justificacion: analysisSummary.resumen_ejecutivo,
+                        clausulas_criticas_totales: analysisSummary.total_clausulas_criticas,
+                        mayor_riesgo_identificado: analysisSummary.alertas_criticas?.[0]?.titulo || null
+                    },
+                    nivel_riesgo_general: analysisSummary.nivel_riesgo,
+                    metricas: {
+                        total_rojas: analysisSummary.total_clausulas_criticas || 0,
+                        total_amarillas: 0,
+                        total_verdes: 0,
+                        porcentaje_clausulas_analizadas: 'Escaneo de Alertas Rojas'
+                    },
+                    hallazgos: (analysisSummary.alertas_criticas || []).map((alerta: any) => ({
+                        color: 'rojo',
+                        titulo: alerta.titulo,
+                        clausula: alerta.clausula,
+                        cita_textual: alerta.cita_textual,
+                        explicacion: alerta.por_que_es_peligroso,
+                        riesgo_real: alerta.ejemplo_concreto,
+                        mitigacion: 'Revisar esta cláusula cuidadosamente antes de firmar.'
+                    })),
+                    clausulas_no_clasificadas: []
+                }
+            }
 
             // 6. Save results and complete
             const { error: updateError } = await supabaseAdmin
