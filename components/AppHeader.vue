@@ -48,7 +48,7 @@
           <!-- User Menu -->
           <div class="relative">
             <button
-              @click="showUserMenu = !showUserMenu"
+              @click.stop="showUserMenu = !showUserMenu"
               class="flex items-center gap-2 px-2 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             >
               <div class="w-9 h-9 bg-gradient-to-br from-secondary to-accent-indigo rounded-full flex items-center justify-center text-white font-bold shadow-lg shadow-secondary/20">
@@ -150,10 +150,7 @@ const vClickOutside = {
         binding.value()
       }
     }
-    // Add a small delay to prevent immediate triggering
-    setTimeout(() => {
-      document.addEventListener('click', el.clickOutsideEvent)
-    }, 100)
+    document.addEventListener('click', el.clickOutsideEvent)
   },
   unmounted(el: any) {
     document.removeEventListener('click', el.clickOutsideEvent)
