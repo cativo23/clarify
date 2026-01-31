@@ -10,18 +10,21 @@
 
       <div v-else-if="!analysis" class="text-center py-20">
         <svg class="w-20 h-20 text-primary-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <h2 class="text-2xl font-bold text-primary-900 mb-2">Análisis no encontrado</h2>
         <p class="text-primary-600 mb-6">El análisis que buscas no existe o ha sido eliminado</p>
-        <NuxtLink to="/dashboard" class="inline-block px-6 py-3 bg-accent-indigo text-white rounded-lg font-semibold hover:bg-accent-purple transition-all">
+        <NuxtLink to="/dashboard"
+          class="inline-block px-6 py-3 bg-accent-indigo text-white rounded-lg font-semibold hover:bg-accent-purple transition-all">
           Volver al Dashboard
         </NuxtLink>
       </div>
 
       <div v-else class="animate-fade-in">
         <!-- Header -->
-        <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-premium p-8 mb-10 border border-slate-100 dark:border-slate-800 relative overflow-hidden">
+        <div
+          class="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-premium p-8 mb-10 border border-slate-100 dark:border-slate-800 relative overflow-hidden">
           <div class="absolute top-0 right-0 w-64 h-64 bg-secondary/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
           <div class="flex items-start justify-between mb-4">
             <div class="flex-1">
@@ -33,65 +36,125 @@
               </p>
             </div>
 
-            <!-- Overall Risk Badge -->
-            <div 
-              :class="[
-                'px-6 py-3 rounded-full font-bold text-lg',
-                analysis.risk_level === 'high' ? 'bg-risk-high text-white' :
-                analysis.risk_level === 'medium' ? 'bg-risk-medium text-white' :
-                'bg-risk-low text-white'
-              ]"
-            >
-              {{ 
-                analysis.risk_level === 'high' ? '🔴 Riesgo Alto' :
-                analysis.risk_level === 'medium' ? '🟡 Precaución' :
-                '🟢 Seguro'
-              }}
+            <!-- Traffic Light (Semáforo) Style Header -->
+            <div
+              class="flex flex-col items-center gap-4 px-8 py-6 bg-slate-50 dark:bg-slate-950/50 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-inner">
+              <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Nivel de Riesgo</span>
+              <div class="flex gap-4">
+                <!-- Rojo -->
+                <div class="flex flex-col items-center gap-2 group">
+                  <div :class="[
+                    'w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 shadow-lg',
+                    analysis.risk_level === 'high' ? 'bg-risk-high text-white scale-110 shadow-risk-high/40' : 'bg-risk-high/10 text-risk-high/30 grayscale opacity-40'
+                  ]">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                  </div>
+                  <span v-if="analysis.risk_level === 'high'"
+                    class="text-[9px] font-black text-risk-high uppercase tracking-widest">Crítico</span>
+                </div>
+                <!-- Amarillo -->
+                <div class="flex flex-col items-center gap-2 group">
+                  <div :class="[
+                    'w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 shadow-lg',
+                    analysis.risk_level === 'medium' ? 'bg-risk-medium text-white scale-110 shadow-risk-medium/40' : 'bg-risk-medium/10 text-risk-medium/30 grayscale opacity-40'
+                  ]">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <span v-if="analysis.risk_level === 'medium'"
+                    class="text-[9px] font-black text-risk-medium uppercase tracking-widest">Cautela</span>
+                </div>
+                <!-- Verde -->
+                <div class="flex flex-col items-center gap-2 group">
+                  <div :class="[
+                    'w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 shadow-lg',
+                    analysis.risk_level === 'low' ? 'bg-risk-low text-white scale-110 shadow-risk-low/40' : 'bg-risk-low/10 text-risk-low/30 grayscale opacity-40'
+                  ]">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span v-if="analysis.risk_level === 'low'"
+                    class="text-[9px] font-black text-risk-low uppercase tracking-widest">Seguro</span>
+                </div>
+              </div>
             </div>
           </div>
 
           <!-- Summary & Metrics -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-4">
-            <div class="md:col-span-2 p-8 bg-slate-50 dark:bg-slate-800/50 rounded-3xl border border-slate-100 dark:border-slate-800 relative group">
+            <div
+              class="md:col-span-2 p-8 bg-slate-50 dark:bg-slate-800/50 rounded-3xl border border-slate-100 dark:border-slate-800 relative group">
               <div class="flex items-center gap-3 mb-6">
                 <span class="text-xs font-black uppercase tracking-widest text-slate-400">Veredicto Legal</span>
                 <span :class="[
                   'px-4 py-1 rounded-full text-xs font-bold ring-1 ring-inset',
-                  summary.resumen_ejecutivo.veredicto?.includes('Rechazar') ? 'bg-risk-high/10 text-risk-high ring-risk-high/30' :
-                  summary.resumen_ejecutivo.veredicto?.includes('Negociar') ? 'bg-risk-medium/10 text-risk-medium ring-risk-medium/30' :
-                  'bg-risk-low/10 text-risk-low ring-risk-low/30'
+                  summary.resumen_ejecutivo.veredicto?.includes('Rechazar') || summary.resumen_ejecutivo.veredicto?.includes('No') ? 'bg-risk-high/10 text-risk-high ring-risk-high/30' :
+                    summary.resumen_ejecutivo.veredicto?.includes('Negociar') || summary.resumen_ejecutivo.veredicto?.includes('Precaución') ? 'bg-risk-medium/10 text-risk-medium ring-risk-medium/30' :
+                      'bg-risk-low/10 text-risk-low ring-risk-low/30'
                 ]">
                   {{ summary.resumen_ejecutivo.veredicto }}
                 </span>
               </div>
-              <h2 class="text-xl font-black text-slate-900 dark:text-white mb-3">Análisis Forense</h2>
-              <p class="text-slate-600 dark:text-slate-300 leading-relaxed text-lg mb-6">
+              <h2 class="text-xl font-black text-slate-900 dark:text-white mb-3 tracking-tight">Análisis Forense</h2>
+              <p class="text-slate-600 dark:text-slate-300 leading-relaxed font-medium mb-6">
                 {{ summary.resumen_ejecutivo.justificacion }}
               </p>
-              <div v-if="summary.resumen_ejecutivo.mayor_riesgo_identificado" class="p-4 bg-white dark:bg-slate-900 rounded-2xl border-l-4 border-risk-high shadow-sm">
-                <span class="text-[10px] font-black text-risk-high uppercase tracking-widest block mb-1">Impacto Crítico Principal</span>
-                <p class="text-sm text-slate-800 dark:text-slate-200 font-bold italic">{{ summary.resumen_ejecutivo.mayor_riesgo_identificado }}</p>
+              <div v-if="summary.resumen_ejecutivo.mayor_riesgo_identificado"
+                class="p-4 bg-white dark:bg-slate-900 rounded-2xl border-l-4 border-risk-high shadow-lg shadow-risk-high/5">
+                <span class="text-[10px] font-black text-risk-high uppercase tracking-widest block mb-1">Impacto Crítico
+                  Principal</span>
+                <p class="text-sm text-slate-800 dark:text-slate-200 font-black italic">{{
+                  summary.resumen_ejecutivo.mayor_riesgo_identificado }}</p>
               </div>
             </div>
 
-            <div class="p-8 bg-slate-50 dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-inner">
-              <h3 class="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-6 text-center">Métricas de Auditoría</h3>
-              <div class="space-y-5">
-                <div class="flex justify-between items-center">
-                  <span class="text-sm font-bold text-slate-600 dark:text-slate-400">Puntos Críticos</span>
-                  <span class="px-3 py-1 bg-risk-high text-white rounded-full text-[10px] font-black shadow-glow-sm">{{ summary.metricas.total_rojas }}</span>
+            <div class="p-8 bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl relative overflow-hidden">
+              <div class="absolute top-0 right-0 w-32 h-32 bg-secondary/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
+              <h3 class="text-xs font-black text-slate-500 uppercase tracking-[0.2em] mb-6 text-center">Métricas</h3>
+              <div class="space-y-6 relative z-10">
+                <div class="flex justify-between items-center group">
+                  <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Críticos</span>
+                  <div class="flex items-center gap-3">
+                    <div class="w-16 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                      <div class="h-full bg-risk-high"
+                        :style="{ width: `${(summary.metricas.total_rojas / (summary.metricas.total_rojas + summary.metricas.total_amarillas + summary.metricas.total_verdes || 1)) * 100}%` }">
+                      </div>
+                    </div>
+                    <span class="text-sm font-black text-white">{{ summary.metricas.total_rojas }}</span>
+                  </div>
                 </div>
-                <div class="flex justify-between items-center">
-                  <span class="text-sm font-bold text-slate-600 dark:text-slate-400">Advertencias</span>
-                  <span class="px-3 py-1 bg-risk-medium text-white rounded-full text-[10px] font-black shadow-glow-sm">{{ summary.metricas.total_amarillas }}</span>
+                <div class="flex justify-between items-center group">
+                  <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Alertas</span>
+                  <div class="flex items-center gap-3">
+                    <div class="w-16 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                      <div class="h-full bg-risk-medium"
+                        :style="{ width: `${(summary.metricas.total_amarillas / (summary.metricas.total_rojas + summary.metricas.total_amarillas + summary.metricas.total_verdes || 1)) * 100}%` }">
+                      </div>
+                    </div>
+                    <span class="text-sm font-black text-white">{{ summary.metricas.total_amarillas }}</span>
+                  </div>
                 </div>
-                <div class="flex justify-between items-center">
-                  <span class="text-sm font-bold text-slate-600 dark:text-slate-400">Puntos Favorables</span>
-                  <span class="px-3 py-1 bg-risk-low text-white rounded-full text-[10px] font-black shadow-glow-sm">{{ summary.metricas.total_verdes }}</span>
+                <div class="flex justify-between items-center group">
+                  <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Seguros</span>
+                  <div class="flex items-center gap-3">
+                    <div class="w-16 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                      <div class="h-full bg-risk-low"
+                        :style="{ width: `${(summary.metricas.total_verdes / (summary.metricas.total_rojas + summary.metricas.total_amarillas + summary.metricas.total_verdes || 1)) * 100}%` }">
+                      </div>
+                    </div>
+                    <span class="text-sm font-black text-white">{{ summary.metricas.total_verdes }}</span>
+                  </div>
                 </div>
-                <div class="pt-5 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center">
-                  <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Cobertura</span>
-                  <span class="text-sm font-black text-slate-900 dark:text-white">{{ summary.metricas.porcentaje_clausulas_analizadas }}</span>
+                <div class="pt-6 border-t border-slate-800 flex justify-between items-center">
+                  <span class="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">Cobertura</span>
+                  <span class="text-xl font-black text-secondary">{{ summary.metricas.porcentaje_clausulas_analizadas
+                    }}</span>
                 </div>
               </div>
             </div>
@@ -99,33 +162,35 @@
         </div>
 
         <!-- Hallazgos -->
-        <div class="mb-8">
-          <h2 class="text-2xl font-bold dark:text-white text-primary-900 mb-6">Hallazgos Detallados</h2>
-          <div class="space-y-4">
-            <RiskCard
-              v-for="(hallazgo, index) in summary.hallazgos"
-              :key="index"
-              :category="hallazgo.titulo"
+        <div class="mb-12">
+          <div class="flex items-center gap-4 mb-8">
+            <h2 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Análisis por Cláusula</h2>
+            <div class="h-px flex-1 bg-slate-100 dark:bg-slate-800"></div>
+          </div>
+          <div class="grid gap-6">
+            <RiskCard v-for="(hallazgo, index) in summary.hallazgos" :key="index" :category="hallazgo.titulo"
               :description="hallazgo.explicacion"
               :risk="hallazgo.color === 'rojo' ? 'high' : hallazgo.color === 'amarillo' ? 'medium' : 'low'"
-              :clausula="hallazgo.clausula"
-              :cita-textual="hallazgo.cita_textual"
-              :riesgo-real="hallazgo.riesgo_real"
-              :mitigacion="hallazgo.mitigacion"
-            />
+              :clausula="hallazgo.clausula" :cita-textual="hallazgo.cita_textual" :riesgo-real="hallazgo.riesgo_real"
+              :mitigacion="hallazgo.mitigacion" />
           </div>
         </div>
 
         <!-- Cláusulas No Clasificadas -->
-        <div v-if="summary.clausulas_no_clasificadas?.length" class="mb-8 p-6 bg-white rounded-xl border-2 border-dashed border-primary-200">
-          <h3 class="text-lg font-bold text-primary-800 mb-4 flex items-center gap-2">
-            <svg class="w-5 h-5 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <div v-if="summary.clausulas_no_clasificadas?.length"
+          class="mb-12 p-8 bg-slate-50 dark:bg-slate-900/50 rounded-[2rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
+          <h3
+            class="text-sm font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-6 flex items-center gap-3">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            Cláusulas no categorizadas
+            Cláusulas Informativas
           </h3>
-          <ul class="list-disc list-inside space-y-2">
-            <li v-for="(item, i) in summary.clausulas_no_clasificadas" :key="i" class="text-sm text-primary-600">
+          <ul class="grid sm:grid-cols-2 gap-3">
+            <li v-for="(item, i) in summary.clausulas_no_clasificadas" :key="i"
+              class="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-start gap-2">
+              <span class="mt-1 w-1.5 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full shrink-0"></span>
               {{ item }}
             </li>
           </ul>
@@ -133,18 +198,15 @@
 
 
         <!-- Actions -->
-        <div class="flex gap-4 justify-center">
-          <button
-            @click="downloadPDF"
-            class="px-6 py-3 bg-white border-2 border-primary-300 text-primary-900 rounded-lg font-semibold hover:bg-primary-50 transition-all"
-          >
-            Descargar Reporte
+        <div
+          class="flex flex-col sm:flex-row gap-4 justify-center items-center py-10 border-t border-slate-100 dark:border-slate-800">
+          <button @click="downloadPDF"
+            class="w-full sm:w-auto px-10 py-4 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-900 transition-all shadow-soft">
+            Descargar Reporte (PDF)
           </button>
-          <NuxtLink
-            to="/dashboard"
-            class="px-6 py-3 bg-accent-indigo text-white rounded-lg font-semibold hover:bg-accent-purple transition-all"
-          >
-            Analizar Otro Contrato
+          <NuxtLink to="/dashboard"
+            class="w-full sm:w-auto px-10 py-4 bg-secondary text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-glow hover:scale-105 active:scale-95 transition-all text-center">
+            Nueva Auditoría
           </NuxtLink>
         </div>
       </div>
@@ -196,7 +258,7 @@ const fetchAnalysis = async () => {
       .single()
 
     if (error) throw error
-    
+
     analysis.value = data
   } catch (error) {
     console.error('Error fetching analysis:', error)
