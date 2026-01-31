@@ -1,5 +1,10 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-primary-900 via-primary-800 to-accent-indigo flex items-center justify-center px-4">
+  <div class="min-h-screen bg-white dark:bg-slate-950 flex items-center justify-center px-4 relative overflow-hidden transition-colors duration-500">
+    <!-- Background Decor -->
+    <div class="absolute top-0 left-0 w-full h-full pointer-events-none">
+      <div class="absolute -top-1/4 -left-1/4 w-1/2 h-1/2 bg-secondary/5 rounded-full blur-[120px]"></div>
+      <div class="absolute -bottom-1/4 -right-1/4 w-1/2 h-1/2 bg-accent-indigo/5 rounded-full blur-[120px]"></div>
+    </div>
     <div class="max-w-md w-full">
       <!-- Logo/Title -->
       <div class="text-center mb-8 animate-fade-in">
@@ -8,13 +13,13 @@
       </div>
 
       <!-- Auth Card -->
-      <div class="bg-white rounded-2xl shadow-premium p-8 animate-slide-up">
-        <div class="mb-6">
-          <h2 class="text-2xl font-bold text-primary-900 mb-2">
+      <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-premium p-10 animate-slide-up relative z-10 border border-slate-100 dark:border-slate-800">
+        <div class="mb-10 text-center">
+          <h2 class="text-3xl font-black text-slate-900 dark:text-white mb-2">
             {{ isSignUp ? 'Crear Cuenta' : 'Iniciar Sesión' }}
           </h2>
-          <p class="text-primary-600">
-            {{ isSignUp ? 'Comienza a analizar contratos hoy' : 'Bienvenido de vuelta' }}
+          <p class="text-slate-500 dark:text-slate-400 font-medium">
+            {{ isSignUp ? 'Comienza a analizar contratos hoy.' : 'Bienvenido de vuelta a Clarify.' }}
           </p>
         </div>
 
@@ -29,9 +34,9 @@
         </div>
 
         <!-- Form -->
-        <form @submit.prevent="handleSubmit" class="space-y-4">
+        <form @submit.prevent="handleSubmit" class="space-y-6">
           <div>
-            <label for="email" class="block text-sm font-medium text-primary-700 mb-1">
+            <label for="email" class="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 ml-1">
               Email
             </label>
             <input
@@ -40,12 +45,12 @@
               type="email"
               required
               placeholder="tu@email.com"
-              class="w-full px-4 py-3 border border-primary-200 rounded-lg focus:ring-2 focus:ring-accent-indigo focus:border-transparent transition-all"
+              class="w-full px-6 py-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-secondary/50 focus:border-secondary text-slate-900 dark:text-white transition-all outline-none"
             />
           </div>
 
           <div>
-            <label for="password" class="block text-sm font-medium text-primary-700 mb-1">
+            <label for="password" class="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 ml-1">
               Contraseña
             </label>
             <input
@@ -54,16 +59,16 @@
               type="password"
               required
               placeholder="••••••••"
-              class="w-full px-4 py-3 border border-primary-200 rounded-lg focus:ring-2 focus:ring-accent-indigo focus:border-transparent transition-all"
+              class="w-full px-6 py-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-secondary/50 focus:border-secondary text-slate-900 dark:text-white transition-all outline-none"
             />
           </div>
 
           <button
             type="submit"
             :disabled="loading"
-            class="w-full bg-accent-indigo text-white py-3 rounded-lg font-semibold hover:bg-accent-purple transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            class="w-full bg-secondary text-white py-4 rounded-2xl font-black text-lg hover:shadow-glow hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {{ loading ? 'Procesando...' : (isSignUp ? 'Crear Cuenta' : 'Iniciar Sesión') }}
+            {{ loading ? 'Procesando...' : (isSignUp ? 'Empezar ahora' : 'Ingresar') }}
           </button>
         </form>
 
@@ -78,12 +83,12 @@
         </div>
 
         <!-- Divider -->
-        <div class="relative my-6">
+        <div class="relative my-8">
           <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-primary-200"></div>
+            <div class="w-full border-t border-slate-100 dark:border-slate-800"></div>
           </div>
-          <div class="relative flex justify-center text-sm">
-            <span class="px-4 bg-white text-primary-500">o</span>
+          <div class="relative flex justify-center text-xs uppercase tracking-widest font-black text-slate-400">
+            <span class="px-6 bg-white dark:bg-slate-900">o</span>
           </div>
         </div>
 

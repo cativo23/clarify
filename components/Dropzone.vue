@@ -7,10 +7,10 @@
   >
     <div
       :class="[
-        'border-2 border-dashed rounded-2xl p-12 text-center transition-all cursor-pointer',
+        'border-2 border-dashed rounded-[2.5rem] p-16 text-center transition-all duration-500 cursor-pointer relative overflow-hidden group',
         isDragging 
-          ? 'border-accent-indigo bg-accent-indigo/5 scale-[1.02]' 
-          : 'border-primary-300 hover:border-accent-indigo hover:bg-primary-50'
+          ? 'border-secondary bg-secondary/5 scale-[1.02] shadow-glow' 
+          : 'border-slate-200 dark:border-slate-800 hover:border-secondary/50 hover:bg-slate-50 dark:hover:bg-slate-900/50'
       ]"
       @click="openFilePicker"
     >
@@ -22,17 +22,19 @@
         class="hidden"
       />
 
+      <!-- Decor gradient -->
+      <div v-if="isDragging" class="absolute inset-0 bg-gradient-to-br from-secondary/10 to-transparent pointer-events-none"></div>
+
       <!-- Upload Icon -->
-      <div class="mb-6">
+      <div class="mb-8 relative z-10">
         <div 
           :class="[
-            'w-20 h-20 mx-auto rounded-full flex items-center justify-center transition-all',
-            isDragging ? 'bg-accent-indigo' : 'bg-primary-100'
+            'w-24 h-24 mx-auto rounded-[2rem] flex items-center justify-center transition-all duration-500 shadow-lg',
+            isDragging ? 'bg-secondary text-white rotate-12' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 group-hover:bg-secondary/10 group-hover:text-secondary group-hover:-rotate-6'
           ]"
         >
           <svg 
-            class="w-10 h-10 transition-colors" 
-            :class="isDragging ? 'text-white' : 'text-primary-600'"
+            class="w-12 h-12" 
             fill="none" 
             stroke="currentColor" 
             viewBox="0 0 24 24"
@@ -43,41 +45,41 @@
       </div>
 
       <!-- Text -->
-      <div class="mb-4">
-        <p class="text-xl font-semibold text-primary-900 mb-2">
-          {{ isDragging ? '¡Suelta tu contrato aquí!' : 'Arrastra tu contrato' }}
+      <div class="mb-6 relative z-10">
+        <p class="text-2xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">
+          {{ isDragging ? '¡Suelta tu contrato aquí!' : 'Sube tu contrato' }}
         </p>
-        <p class="text-primary-600">
-          o <span class="text-accent-indigo font-medium">haz clic para seleccionar</span>
+        <p class="text-slate-500 dark:text-slate-400 font-medium">
+          Arrastra el archivo o <span class="text-secondary underline decoration-secondary/30 decoration-2 underline-offset-4 font-bold">explora tus archivos</span>
         </p>
       </div>
 
       <!-- File Info -->
-      <div class="text-sm text-primary-500">
-        Solo archivos PDF • Máximo 10MB
+      <div class="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-slate-600 relative z-10">
+        PDF (MÁX. 10MB)
       </div>
     </div>
 
     <!-- Selected File Preview -->
-    <div v-if="selectedFile" class="mt-4 p-4 bg-primary-50 rounded-lg border border-primary-200 flex items-center justify-between animate-slide-up">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-risk-high rounded flex items-center justify-center">
-          <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+    <div v-if="selectedFile" class="mt-6 p-6 bg-slate-50 dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 flex items-center justify-between animate-slide-up shadow-premium">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-risk-high/10 rounded-xl flex items-center justify-center text-risk-high shadow-inner">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd" />
           </svg>
         </div>
         <div>
-          <p class="font-medium text-primary-900">{{ selectedFile.name }}</p>
-          <p class="text-sm text-primary-600">{{ formatFileSize(selectedFile.size) }}</p>
+          <p class="font-bold text-slate-900 dark:text-white leading-tight">{{ selectedFile.name }}</p>
+          <p class="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mt-1">{{ formatFileSize(selectedFile.size) }}</p>
         </div>
       </div>
       <button
         @click.stop="clearFile"
-        class="text-primary-400 hover:text-risk-high transition-colors p-2"
+        class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-risk-high hover:text-white transition-all flex items-center justify-center"
         title="Eliminar archivo"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
     </div>
