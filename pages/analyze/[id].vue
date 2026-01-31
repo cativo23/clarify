@@ -28,9 +28,21 @@
               <h1 class="text-4xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">
                 {{ analysis.contract_name }}
               </h1>
-              <p class="text-slate-500 dark:text-slate-400 font-medium">
-                Analizado el {{ formatDate(analysis.created_at) }}
-              </p>
+              <div class="flex items-center gap-3">
+                <p class="text-slate-500 dark:text-slate-400 font-medium">
+                  Analizado el {{ formatDate(analysis.created_at) }}
+                </p>
+                <span 
+                  :class="[
+                    'px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ring-1 ring-inset',
+                    analysis.analysis_type === 'premium' 
+                      ? 'bg-secondary/10 text-secondary ring-secondary/30' 
+                      : 'bg-slate-100 text-slate-500 ring-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:ring-slate-700'
+                  ]"
+                >
+                  {{ analysis.analysis_type === 'premium' ? '💎 Premium' : '⚡ Básico' }}
+                </span>
+              </div>
             </div>
 
             <!-- Overall Risk Badge -->
