@@ -100,7 +100,7 @@
 
         <!-- Hallazgos -->
         <div class="mb-8">
-          <h2 class="text-2xl font-bold text-primary-900 mb-6">Hallazgos Detallados</h2>
+          <h2 class="text-2xl font-bold dark:text-white text-primary-900 mb-6">Hallazgos Detallados</h2>
           <div class="space-y-4">
             <RiskCard
               v-for="(hallazgo, index) in summary.hallazgos"
