@@ -99,43 +99,49 @@
         <div class="grid md:grid-cols-3 gap-12">
           <!-- Step 1 -->
           <div class="relative group">
-            <div class="text-[8rem] font-black text-slate-200 dark:text-slate-800 absolute -top-16 -left-4 z-0 group-hover:text-secondary/10 transition-colors">01</div>
-            <div class="relative z-10 p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-soft hover:shadow-premium transition-all">
-              <div class="w-14 h-14 bg-secondary/10 text-secondary rounded-2xl flex items-center justify-center mb-6">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+            <div class="relative p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-soft hover:shadow-premium transition-all overflow-hidden">
+              <div class="absolute -top-6 -right-2 text-8xl font-black text-slate-100/50 dark:text-slate-800/20 group-hover:text-secondary/10 transition-all duration-500 pointer-events-none">01</div>
+              <div class="relative z-10">
+                <div class="w-14 h-14 bg-secondary/10 text-secondary rounded-2xl flex items-center justify-center mb-6">
+                  <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">Sube tu Contrato</h3>
+                <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Arrastra tu PDF o imagen. Usamos encriptación de grado militar para proteger tus datos.
+                </p>
               </div>
-              <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">Sube tu Contrato</h3>
-              <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
-                Arrastra tu PDF o imagen. Usamos encriptación de grado militar para proteger tus datos.
-              </p>
             </div>
           </div>
 
           <!-- Step 2 -->
           <div class="relative group md:mt-8">
-            <div class="text-[8rem] font-black text-slate-200 dark:text-slate-800 absolute -top-16 -left-4 z-0 group-hover:text-secondary/10 transition-colors">02</div>
-            <div class="relative z-10 p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-soft hover:shadow-premium transition-all">
-              <div class="w-14 h-14 bg-accent-indigo/10 text-accent-indigo rounded-2xl flex items-center justify-center mb-6">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+            <div class="relative p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-soft hover:shadow-premium transition-all overflow-hidden">
+              <div class="absolute -top-6 -right-2 text-8xl font-black text-slate-100/50 dark:text-slate-800/20 group-hover:text-accent-indigo/10 transition-all duration-500 pointer-events-none">02</div>
+              <div class="relative z-10">
+                <div class="w-14 h-14 bg-accent-indigo/10 text-accent-indigo rounded-2xl flex items-center justify-center mb-6">
+                  <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">IA Analiza</h3>
+                <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Nuestro motor de IA avanzada audita cada línea buscando cláusulas abusivas y beneficios ocultos.
+                </p>
               </div>
-              <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">IA Analiza</h3>
-              <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
-                Nuestro motor GPT-4o audita cada línea buscando cláusulas abusivas y beneficios ocultos.
-              </p>
             </div>
           </div>
 
           <!-- Step 3 -->
           <div class="relative group">
-            <div class="text-[8rem] font-black text-slate-200 dark:text-slate-800 absolute -top-16 -left-4 z-0 group-hover:text-secondary/10 transition-colors">03</div>
-            <div class="relative z-10 p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-soft hover:shadow-premium transition-all">
-              <div class="w-14 h-14 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-500 rounded-2xl flex items-center justify-center mb-6">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <div class="relative p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-soft hover:shadow-premium transition-all overflow-hidden">
+              <div class="absolute -top-6 -right-2 text-8xl font-black text-slate-100/50 dark:text-slate-800/20 group-hover:text-emerald-500/10 transition-all duration-500 pointer-events-none">03</div>
+              <div class="relative z-10">
+                <div class="w-14 h-14 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-500 rounded-2xl flex items-center justify-center mb-6">
+                  <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">Resultados Claros</h3>
+                <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Visualiza el nivel de riesgo y entiende los puntos críticos en lenguaje humano. Sin rodeos.
+                </p>
               </div>
-              <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">Resultados Claros</h3>
-              <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
-                Visualiza el nivel de riesgo y entiende los puntos críticos en lenguaje humano. Sin rodeos.
-              </p>
             </div>
           </div>
         </div>
@@ -231,44 +237,7 @@
       </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-white dark:bg-slate-950 py-20 border-t border-slate-100 dark:border-slate-900 transition-colors duration-500">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid md:grid-cols-4 gap-12">
-           <div class="col-span-2">
-              <h3 class="text-2xl font-black text-slate-900 dark:text-white mb-6">Clarify</h3>
-              <p class="text-slate-500 dark:text-slate-400 max-w-sm mb-8 leading-relaxed">
-                Democratizando el acceso a la asesoría legal mediante inteligencia artificial de vanguardia. Auditorías transparentes para todos.
-              </p>
-              <div class="flex gap-4">
-                <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-900 flex items-center justify-center text-slate-400 hover:text-secondary transition-colors cursor-pointer">𝕏</div>
-                <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-900 flex items-center justify-center text-slate-400 hover:text-secondary transition-colors cursor-pointer">in</div>
-                <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-900 flex items-center justify-center text-slate-400 hover:text-secondary transition-colors cursor-pointer">📦</div>
-              </div>
-           </div>
-           <div>
-              <h4 class="font-bold text-slate-900 dark:text-white mb-6 uppercase tracking-widest text-sm">Producto</h4>
-              <ul class="space-y-4 text-slate-500 dark:text-slate-400">
-                <li><a href="#" class="hover:text-secondary transition-colors">Características</a></li>
-                <li><a href="#" class="hover:text-secondary transition-colors">Seguridad</a></li>
-                <li><a href="#" class="hover:text-secondary transition-colors">Precios</a></li>
-              </ul>
-           </div>
-           <div>
-              <h4 class="font-bold text-slate-900 dark:text-white mb-6 uppercase tracking-widest text-sm">Legal</h4>
-              <ul class="space-y-4 text-slate-500 dark:text-slate-400">
-                <li><a href="#" class="hover:text-secondary transition-colors">Privacidad</a></li>
-                <li><a href="#" class="hover:text-secondary transition-colors">Términos</a></li>
-                <li><a href="#" class="hover:text-secondary transition-colors">Contacto</a></li>
-              </ul>
-           </div>
-        </div>
-        <div class="mt-20 pt-8 border-t border-slate-100 dark:border-slate-900 flex flex-col md:flex-row justify-between items-center gap-6">
-           <p class="text-slate-400 text-sm">© 2026 Clarify. Hecho con ❤️ para un mundo más transparente.</p>
-           <p class="text-slate-400 text-sm">Made with Nuxt 3 & OpenAI</p>
-        </div>
-      </div>
-    </footer>
+
   </div>
 </template>
 

@@ -8,9 +8,13 @@
         <h1 class="text-4xl font-black text-slate-900 dark:text-white mb-3 tracking-tight">
           Bienvenido, <span class="text-secondary">{{ user?.email?.split('@')[0] }}</span>
         </h1>
-        <p class="text-slate-500 dark:text-slate-400 text-lg">
+        <p class="text-slate-500 dark:text-slate-400 text-lg mb-4">
           Analiza tus contratos y mantén el control de tus acuerdos legales con IA.
         </p>
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold uppercase tracking-wider">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+          Recordatorio: No es asesoría legal. Revisa los resultados con un profesional.
+        </div>
       </div>
 
       <!-- Quick Stats -->
