@@ -67,4 +67,17 @@ export default defineNuxtConfig({
   nitro: {
     preset: 'vercel',
   },
+
+  // Vite configuration for Hot Module Replacement (HMR) in Docker
+  vite: {
+    server: {
+      hmr: {
+        protocol: 'ws',
+        port: 3001,
+      },
+      watch: {
+        usePolling: true,
+      },
+    },
+  },
 })

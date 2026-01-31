@@ -7,7 +7,7 @@ services:
     container_name: clarify-db
     restart: unless-stopped
     ports:
-      - "5432:5432"
+      - "5433:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -41,11 +41,15 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-      - /app/.nuxt
     depends_on:
       postgres:
         condition: service_healthy
-    command: npm run dev -- --port 3001
+    command: >
+      sh -c "
+      mkdir -p .nuxt && 
+      chown -R node:node .nuxt && 
+      npx nuxi prepare && 
+      npm run dev -- --port 3001"
 
   # pgAdmin (Optional - Database Management UI)
   pgadmin:
