@@ -2,25 +2,28 @@ import type { User, Analysis, Transaction } from '~/types'
 
 
 
+// Shared state for credits
+export const useCreditsState = () => useState<number>('user-credits', () => 0)
+
 // Fetch user profile with credits
-export const useUserProfile = async () => {
-    const client = useSupabaseClient()
+// Fetch user profile with credits
+export const fetchUserProfile = async () => {
     const user = useSupabaseUser()
+    const creditsState = useCreditsState()
 
     if (!user.value?.id) return null
 
-    const { data, error } = await client
-        .from('users')
-        .select('*')
-        .eq('id', user.value.id)
-        .single()
-
-    if (error) {
+    try {
+        const profile = await $fetch<User>('/api/user/profile')
+        if (profile) {
+            creditsState.value = profile.credits
+            return profile
+        }
+    } catch (error) {
         console.error('Error fetching user profile:', error)
-        return null
     }
 
-    return data as User
+    return null
 }
 
 // Fetch user's analyses

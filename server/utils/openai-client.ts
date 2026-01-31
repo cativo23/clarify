@@ -15,11 +15,12 @@ export const createOpenAIClient = () => {
 
 const MAX_TOKENS_INPUT = 120000 // gpt-4o-mini has 128k, leave room for prompt
 
-export const analyzeContract = async (contractText: string) => {
+export const analyzeContract = async (contractText: string, analysisType: 'basic' | 'premium' = 'premium') => {
     const openai = createOpenAIClient()
 
     // Read custom prompt from file - Asyncly
-    const promptPath = path.resolve(process.cwd(), 'server/prompts/analysis-prompt.txt')
+    const promptFile = analysisType === 'basic' ? 'basic-analysis-prompt.txt' : 'analysis-prompt.txt'
+    const promptPath = path.resolve(process.cwd(), `server/prompts/${promptFile}`)
     const systemPrompt = await fs.readFile(promptPath, 'utf-8')
 
     // Token counting and truncation
@@ -51,7 +52,7 @@ ${processedText}
                 },
             ],
             temperature: 0.1, // Lower temperature for more consistency in legal analysis
-            max_tokens: 4000,
+            max_tokens: 8000,
             response_format: { type: 'json_object' },
         })
 

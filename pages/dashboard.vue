@@ -63,10 +63,9 @@
         <Dropzone 
           v-model="selectedFile" 
           @error="handleDropzoneError"
-          class="mb-6"
+          class="mb-8"
         />
 
-<<<<<<< Updated upstream
         <div v-if="selectedFile" class="flex flex-col sm:flex-row gap-4 animate-slide-up">
           <input
             v-model="contractName"
@@ -82,7 +81,6 @@
             <span v-if="analyzing" class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
             {{ analyzing ? 'Iniciando...' : 'Analizar contrato' }}
           </button>
-=======
         <div v-if="selectedFile" class="space-y-8 animate-slide-up">
           <!-- Analysis Type Selector -->
           <div>
@@ -117,16 +115,15 @@
             Créditos después de este análisis: 
             <span class="text-secondary">{{ (userProfile?.credits || 0) - (analysisType === 'premium' ? 3 : 1) }}</span>
           </p>
->>>>>>> Stashed changes
         </div>
 
         <div v-if="analyzeError" class="mt-4 p-4 bg-risk-high/10 border border-risk-high rounded-lg">
           <p class="text-risk-high text-sm">{{ analyzeError }}</p>
         </div>
 
-        <div v-if="(userProfile?.credits || 0) < 1" class="mt-4 p-4 bg-risk-medium/10 border border-risk-medium rounded-lg">
+        <div v-if="(userProfile?.credits || 0) < 1 && !selectedFile" class="mt-4 p-4 bg-risk-medium/10 border border-risk-medium rounded-lg">
           <p class="text-risk-medium text-sm">
-            No tienes créditos suficientes. 
+            No tienes créditos suficientes para realizar análisis. 
             <NuxtLink to="/credits" class="font-semibold underline">Compra más créditos aquí</NuxtLink>
           </p>
         </div>
@@ -223,13 +220,22 @@ const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 
 const userProfile = ref<any>(null)
+const sharedCredits = useCreditsState()
 const analyses = ref<Analysis[]>([])
 const loading = ref(true)
 
 const selectedFile = ref<File | null>(null)
 const contractName = ref('')
+const analysisType = ref<'basic' | 'premium'>('premium')
 const analyzing = ref(false)
 const analyzeError = ref('')
+
+// Auto-switch to basic if they only have 1 credit
+watch(() => sharedCredits.value, (newCredits) => {
+  if (newCredits === 1 && analysisType.value === 'premium') {
+    analysisType.value = 'basic'
+  }
+}, { immediate: true })
 
 // Fetch user data
 const fetchUserData = async () => {
@@ -238,14 +244,10 @@ const fetchUserData = async () => {
   loading.value = true
 
   try {
-    // Fetch user profile via server API (handles sync automatically)
-    try {
-      const profile = await $fetch('/api/user/profile')
-      if (profile) {
-        userProfile.value = profile
-      }
-    } catch (e) {
-      console.error('Error fetching profile API:', e)
+    // Fetch user profile via shared composable (updates state)
+    const profile = await fetchUserProfile()
+    if (profile) {
+      userProfile.value = profile
     }
 
     // Fetch analyses (keep via Supabase client for list or move to API if preferred, keeping as is for now)
@@ -300,12 +302,7 @@ const setupRealtimeSubscription = () => {
 
         // If job completed or failed, refresh user profile to ensure credits are correct
         if (updatedAnalysis.status === 'completed' || updatedAnalysis.status === 'failed') {
-          try {
-            const profile = await $fetch('/api/user/profile')
-            if (profile) userProfile.value = profile
-          } catch (e) {
-            console.error('Error refreshing profile after realtime update:', e)
-          }
+          await fetchUserProfile()
         }
       }
     )
@@ -384,6 +381,7 @@ const handleAnalyze = async () => {
       body: {
         file_url: uploadResponse.file_url,
         contract_name: contractName.value,
+        analysis_type: analysisType.value,
       },
     })
 
@@ -407,9 +405,8 @@ const handleAnalyze = async () => {
     selectedFile.value = null
     contractName.value = ''
     
-    // Refresh profile to reflect credit deduction
-    const profile = await $fetch('/api/user/profile')
-    if (profile) userProfile.value = profile
+    // Refresh profile state
+    await fetchUserProfile()
 
   } catch (error: any) {
     analyzeError.value = error.message || 'Ocurrió un error durante el análisis'
