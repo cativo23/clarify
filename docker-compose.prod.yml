@@ -1,0 +1,97 @@
+# Production Docker Compose with Traefik
+# Network: space-server_web (external)
+
+services:
+  # Nuxt3 Application (Production)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: clarify-app-prod
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - NUXT_HOST=0.0.0.0
+      - NUXT_PORT=3000
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - REDIS_HOST=${REDIS_HOST:-redis}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - BASE_URL=${BASE_URL:-https://clarify.yourdomain.com}
+    networks:
+      - web
+      - internal
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    labels:
+      # Enable Traefik
+      - "traefik.enable=true"
+      - "traefik.docker.network=space-server_web"
+      
+      # HTTP Router - Redirect to HTTPS
+      - "traefik.http.routers.clarify-http.rule=Host(`clarify.yourdomain.com`)"
+      - "traefik.http.routers.clarify-http.entrypoints=http"
+      - "traefik.http.routers.clarify-http.middlewares=https-redirect"
+      
+      # HTTPS Router
+      - "traefik.http.routers.clarify.rule=Host(`clarify.yourdomain.com`)"
+      - "traefik.http.routers.clarify.entrypoints=https"
+      - "traefik.http.routers.clarify.tls=true"
+      - "traefik.http.routers.clarify.tls.certresolver=letsencrypt"
+      
+      # Service
+      - "traefik.http.services.clarify.loadbalancer.server.port=3000"
+      
+      # Middleware - HTTPS Redirect
+      - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.https-redirect.redirectscheme.permanent=true"
+      
+      # Security Headers
+      - "traefik.http.middlewares.clarify-headers.headers.stsSeconds=31536000"
+      - "traefik.http.middlewares.clarify-headers.headers.stsIncludeSubdomains=true"
+      - "traefik.http.middlewares.clarify-headers.headers.stsPreload=true"
+      - "traefik.http.middlewares.clarify-headers.headers.forceSTSHeader=true"
+      - "traefik.http.routers.clarify.middlewares=clarify-headers"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Redis (Production)
+  redis:
+    image: redis:7-alpine
+    container_name: clarify-redis-prod
+    restart: always
+    command: redis-server --appendonly yes --maxmemory 128mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  web:
+    external: true
+    name: space-server_web
+  internal:
+    driver: bridge
+
+volumes:
+  redis_data:

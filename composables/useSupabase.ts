@@ -1,4 +1,4 @@
-import type { User, Analysis, Transaction } from '~/types'
+import type { User, Analysis } from '~/types'
 
 
 
@@ -91,7 +91,7 @@ export const uploadContractFile = async (file: File) => {
     const fileExt = file.name.split('.').pop()
     const fileName = `${user.value.id}/${Date.now()}.${fileExt}`
 
-    const { data, error } = await client.storage
+    const { data: _uploadData, error } = await client.storage
         .from('contracts')
         .upload(fileName, file)
 
