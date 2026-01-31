@@ -66,6 +66,7 @@
           class="mb-6"
         />
 
+<<<<<<< Updated upstream
         <div v-if="selectedFile" class="flex flex-col sm:flex-row gap-4 animate-slide-up">
           <input
             v-model="contractName"
@@ -81,6 +82,42 @@
             <span v-if="analyzing" class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
             {{ analyzing ? 'Iniciando...' : 'Analizar contrato' }}
           </button>
+=======
+        <div v-if="selectedFile" class="space-y-8 animate-slide-up">
+          <!-- Analysis Type Selector -->
+          <div>
+            <label class="block text-sm font-black uppercase tracking-widest text-slate-400 mb-4">
+              Elige el nivel de protección
+            </label>
+            <AnalysisSelector 
+              v-model="analysisType" 
+              :user-credits="userProfile?.credits || 0"
+            />
+          </div>
+
+          <!-- Contract Name and Action -->
+          <div class="flex flex-col sm:flex-row gap-4">
+            <input
+              v-model="contractName"
+              type="text"
+              placeholder="Nombre del contrato (ej: Contrato de Arrendamiento)"
+              class="flex-1 px-6 py-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-secondary/50 focus:border-secondary text-slate-900 dark:text-white transition-all outline-none font-medium"
+            />
+            <button
+              @click="handleAnalyze"
+              :disabled="analyzing || !contractName || (userProfile?.credits || 0) < (analysisType === 'premium' ? 3 : 1)"
+              class="px-10 py-4 bg-secondary text-white rounded-2xl font-black text-lg hover:shadow-glow hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex items-center gap-3"
+            >
+              <span v-if="analyzing" class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+              {{ analyzing ? 'Iniciando...' : (analysisType === 'premium' ? 'Análisis Completo' : 'Análisis Rápido') }}
+            </button>
+          </div>
+
+          <p class="text-center text-xs font-bold text-slate-400">
+            Créditos después de este análisis: 
+            <span class="text-secondary">{{ (userProfile?.credits || 0) - (analysisType === 'premium' ? 3 : 1) }}</span>
+          </p>
+>>>>>>> Stashed changes
         </div>
 
         <div v-if="analyzeError" class="mt-4 p-4 bg-risk-high/10 border border-risk-high rounded-lg">
