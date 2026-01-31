@@ -60,6 +60,51 @@ INSERT INTO users (email, credits)
 VALUES ('demo@clarify.app', 10)
 ON CONFLICT (email) DO NOTHING;
 
+-- Function to process analysis and deduct credit atomically
+CREATE OR REPLACE FUNCTION process_analysis_transaction(
+    p_user_id UUID,
+    p_contract_name TEXT,
+    p_file_url TEXT,
+    p_summary_json JSONB,
+    p_risk_level TEXT
+)
+RETURNS UUID AS $$
+DECLARE
+    v_analysis_id UUID;
+BEGIN
+    -- 1. Check if user has credits
+    IF NOT EXISTS (SELECT 1 FROM users WHERE id = p_user_id AND credits >= 1) THEN
+        RAISE EXCEPTION 'Insufficient credits';
+    END IF;
+
+    -- 2. Deduct credit
+    UPDATE users 
+    SET credits = credits - 1 
+    WHERE id = p_user_id;
+
+    -- 3. Insert analysis
+    INSERT INTO analyses (
+        user_id,
+        contract_name,
+        file_url,
+        summary_json,
+        risk_level,
+        credits_used,
+        created_at
+    ) VALUES (
+        p_user_id,
+        p_contract_name,
+        p_file_url,
+        p_summary_json,
+        p_risk_level,
+        1,
+        CURRENT_TIMESTAMP
+    ) RETURNING id INTO v_analysis_id;
+
+    RETURN v_analysis_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- Confirmation message
 DO $$
 BEGIN

@@ -83,37 +83,35 @@ export default defineEventHandler(async (event): Promise<AnalysisResponse> => {
         }
         const dbRiskLevel = riskMapping[analysisSummary.nivel_riesgo_general] || 'medium'
 
-        // Deduct credit
-        const { error: creditError } = await client
-            .from('users')
-            .update({ credits: userData.credits - 1 })
-            .eq('id', user.id)
+        // Operación atómica: Deducción de crédito + guardar análisis (Uso de RPC para atomicidad)
+        const { data: analysisId, error: txError } = await client
+            .rpc('process_analysis_transaction', {
+                p_user_id: user.id,
+                p_contract_name: contract_name,
+                p_file_url: file_url,
+                p_summary_json: analysisSummary,
+                p_risk_level: dbRiskLevel
+            })
 
-        if (creditError) {
+        if (txError) {
+            console.error('Transaction error:', txError)
             throw createError({
                 statusCode: 500,
-                message: 'Failed to deduct credit',
+                message: txError.message || 'Failed to process analysis transaction',
             })
         }
 
-        // Save analysis to database
-        const { data: analysisData, error: analysisError } = await client
+        // Fetch the created analysis record
+        const { data: analysisData, error: fetchError } = await client
             .from('analyses')
-            .insert({
-                user_id: user.id,
-                contract_name,
-                file_url,
-                summary_json: analysisSummary,
-                risk_level: dbRiskLevel,
-                credits_used: 1,
-            })
-            .select()
+            .select('*')
+            .eq('id', analysisId)
             .single()
 
-        if (analysisError || !analysisData) {
+        if (fetchError || !analysisData) {
             throw createError({
                 statusCode: 500,
-                message: 'Failed to save analysis',
+                message: 'Analysis saved but could not be retrieved',
             })
         }
 
