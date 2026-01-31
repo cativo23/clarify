@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     const client = await serverSupabaseClient(event)
 
     // Try to get user profile
-    const { data: profile, error } = await client
+    const { data: profile } = await client
         .from('users')
         .select('*')
         .eq('id', user.id)

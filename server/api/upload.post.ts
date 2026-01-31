@@ -24,6 +24,12 @@ export default defineEventHandler(async (event): Promise<UploadResponse> => {
         }
 
         const fileEntry = formData[0]
+        if (!fileEntry) {
+            throw createError({
+                statusCode: 400,
+                message: 'No file found in upload',
+            })
+        }
         const fileName = fileEntry.filename || 'contract.pdf'
         const fileBuffer = fileEntry.data
 
@@ -44,7 +50,7 @@ export default defineEventHandler(async (event): Promise<UploadResponse> => {
         const uniqueFileName = `${user.id}/${Date.now()}.${fileExt}`
 
         // Upload to Supabase Storage
-        const { data, error } = await client.storage
+        const { data: _uploadData, error } = await client.storage
             .from('contracts')
             .upload(uniqueFileName, fileBuffer, {
                 contentType: 'application/pdf',
