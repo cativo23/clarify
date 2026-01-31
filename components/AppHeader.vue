@@ -41,6 +41,11 @@
               Inicio
               <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full"></span>
             </NuxtLink>
+            <NuxtLink to="/about"
+              class="text-primary-600 dark:text-slate-400 hover:text-primary-900 dark:hover:text-white font-medium transition-colors relative group">
+              Sobre Nosotros
+              <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full"></span>
+            </NuxtLink>
             <NuxtLink v-if="$route.path !== '/login'" to="/login"
               class="px-5 py-2 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl font-bold hover:bg-secondary/20 transition-all">
               Iniciar Sesión
