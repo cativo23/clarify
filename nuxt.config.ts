@@ -26,17 +26,17 @@ export default defineNuxtConfig({
   // Runtime config for environment variables
   runtimeConfig: {
     // Private keys (server-side only)
-    openaiApiKey: process.env.OPENAI_API_KEY,
-    stripeSecretKey: process.env.STRIPE_SECRET_KEY,
-    stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
-    supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY,
+    openaiApiKey: process.env.OPENAI_API_KEY || '',
+    stripeSecretKey: process.env.STRIPE_SECRET_KEY || '',
+    stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
+    supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY || '',
     redisHost: process.env.REDIS_HOST || 'localhost',
     redisPort: parseInt(process.env.REDIS_PORT || '6379'),
 
     // Public keys (exposed to client)
     public: {
       baseUrl: process.env.BASE_URL || 'http://localhost:3000',
-      stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
+      stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY || '',
     },
   },
 

@@ -2,6 +2,7 @@
   <div class="min-h-screen bg-white dark:bg-slate-950 transition-colors duration-500">
     <AppHeader />
     <NuxtPage />
+    <AppFooter />
   </div>
 </template>
 

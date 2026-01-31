@@ -1,191 +1,304 @@
 <template>
   <div class="min-h-screen bg-white dark:bg-slate-950 transition-colors duration-500">
 
-    <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <!-- Welcome Section -->
-      <div class="mb-10 animate-fade-in">
-        <h1 class="text-4xl font-black text-slate-900 dark:text-white mb-3 tracking-tight">
-          Bienvenido, <span class="text-secondary">{{ user?.email?.split('@')[0] }}</span>
-        </h1>
-        <p class="text-slate-500 dark:text-slate-400 text-lg">
-          Analiza tus contratos y mantén el control de tus acuerdos legales con IA.
-        </p>
-      </div>
+      <!-- New Dashboard Layout -->
+      <div class="grid lg:grid-cols-4 gap-8 mb-12">
+        <!-- Sidebar: User & Quick Stats -->
+        <div class="lg:col-span-1 space-y-6">
+          <div
+            class="bg-white dark:bg-slate-900 rounded-[2rem] p-6 border border-slate-100 dark:border-slate-800 shadow-soft relative overflow-hidden group">
+            <div
+              class="absolute -top-4 -right-4 w-24 h-24 bg-secondary/5 rounded-full blur-2xl group-hover:bg-secondary/10 transition-colors">
+            </div>
+            <div class="relative z-10 text-center">
+              <div
+                class="w-20 h-20 bg-gradient-to-br from-secondary to-accent-indigo rounded-3xl mx-auto mb-4 flex items-center justify-center text-white text-3xl font-black shadow-lg shadow-secondary/20">
+                {{ user?.email?.charAt(0).toUpperCase() }}
+              </div>
+              <h2 class="text-xl font-black text-slate-900 dark:text-white truncate mb-1">{{ user?.email?.split('@')[0]
+                }}
+              </h2>
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Plan Estándar</p>
 
-      <!-- Quick Stats -->
-      <div class="grid md:grid-cols-3 gap-6 mb-8">
-        <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-soft p-6 border border-slate-100 dark:border-slate-800 transition-all hover:shadow-premium group">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider text-xs">Total Análisis</h3>
-            <div class="w-12 h-12 bg-secondary/10 rounded-2xl flex items-center justify-center text-secondary group-hover:scale-110 transition-transform">
-              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
-              </svg>
+              <div
+                class="flex items-center justify-center gap-2 px-4 py-2 bg-secondary/10 rounded-xl mb-4 border border-secondary/20">
+                <svg class="w-4 h-4 text-secondary" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" />
+                </svg>
+                <span class="text-lg font-black text-secondary">{{ userProfile?.credits || 0 }}</span>
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Créditos</span>
+              </div>
+
+              <NuxtLink to="/credits"
+                class="block w-full py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-black text-xs uppercase tracking-widest hover:scale-[1.02] transition-all active:scale-[0.98]">
+                Comprar Más
+              </NuxtLink>
             </div>
           </div>
-          <p class="text-4xl font-black text-slate-900 dark:text-white">{{ analyses.length }}</p>
-        </div>
 
-        <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-soft p-6 border border-slate-100 dark:border-slate-800 transition-all hover:shadow-premium group">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider text-xs">Créditos Disponibles</h3>
-            <div class="w-12 h-12 bg-secondary/10 rounded-2xl flex items-center justify-center text-secondary group-hover:scale-110 transition-transform">
-              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-              </svg>
+          <!-- Quick Metrics -->
+          <div
+            class="bg-slate-900 rounded-[2rem] p-6 text-white border border-slate-800 shadow-xl relative overflow-hidden group">
+            <div
+              class="absolute top-0 right-0 w-32 h-32 bg-secondary/20 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-secondary/30 transition-colors">
+            </div>
+            <div class="relative z-10">
+              <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Resumen de Seguridad</h3>
+                <span
+                  class="px-2 py-0.5 bg-secondary/20 text-secondary text-[8px] font-black uppercase rounded-full border border-secondary/30">
+                  En Vivo
+                </span>
+              </div>
+
+              <div class="space-y-6">
+                <!-- Safety Score -->
+                <div class="flex items-center gap-4">
+                  <div class="relative flex items-center justify-center">
+                    <svg class="w-16 h-16 transform -rotate-90">
+                      <circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="6" fill="transparent"
+                        class="text-slate-800" />
+                      <circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="6" fill="transparent"
+                        :stroke-dasharray="2 * Math.PI * 28"
+                        :stroke-dashoffset="(1 - safetyScore / 100) * (2 * Math.PI * 28)"
+                        class="text-secondary transition-all duration-1000 ease-out" />
+                    </svg>
+                    <span class="absolute text-sm font-black">{{ safetyScore }}%</span>
+                  </div>
+                  <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Índice de Protección</p>
+                    <p class="text-xs font-black text-white">{{ safetyScore > 80 ? 'Seguridad Alta' : safetyScore > 50 ?
+                      'Seguridad Media' : 'Atención Requerida' }}</p>
+                  </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-2 gap-4 border-t border-slate-800 pt-6">
+                  <div>
+                    <p class="text-xl font-black text-white">{{ totalCriticalFindings }}</p>
+                    <p class="text-[9px] font-bold text-slate-500 uppercase">Puntos Críticos</p>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-xl font-black text-secondary">{{ monthlyActivity }}</p>
+                    <p class="text-[9px] font-bold text-slate-500 uppercase">Analizados / Mes</p>
+                  </div>
+                </div>
+
+                <!-- Last Audit -->
+                <div class="flex items-center justify-between bg-white/5 p-3 rounded-2xl border border-white/5">
+                  <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 bg-secondary rounded-full animate-pulse"></div>
+                    <span class="text-[9px] font-bold text-slate-400 uppercase">Última Auditoría</span>
+                  </div>
+                  <span class="text-[10px] font-black text-white">{{ lastAnalysisDate }}</span>
+                </div>
+              </div>
             </div>
           </div>
-          <p class="text-4xl font-black text-slate-900 dark:text-white">{{ userProfile?.credits || 0 }}</p>
         </div>
 
-        <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-soft p-6 border border-slate-100 dark:border-slate-800 transition-all hover:shadow-premium group">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider text-xs">Último Análisis</h3>
-            <div class="w-12 h-12 bg-risk-medium/10 rounded-2xl flex items-center justify-center text-risk-medium group-hover:scale-110 transition-transform">
-              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+        <!-- Center: Distribution & New Analysis -->
+        <div class="lg:col-span-3 space-y-8">
+          <!-- Distribution Chart Area -->
+          <div
+            class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-premium grid md:grid-cols-2 gap-8 items-center">
+            <div>
+              <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-2">Distribución de Riesgos</h2>
+              <p class="text-slate-500 dark:text-slate-400 text-sm mb-6">Panorama general de tus contratos analizados.
+              </p>
+
+              <div class="space-y-3">
+                <div v-for="risk in riskDistribution" :key="risk.level" class="flex items-center gap-3">
+                  <div :class="['w-3 h-3 rounded-full', risk.color]"></div>
+                  <span class="flex-1 text-sm font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">{{
+                    risk.label }}</span>
+                  <span class="text-sm font-black text-slate-900 dark:text-white">{{ risk.count }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- SVG Donut Chart -->
+            <div class="relative flex items-center justify-center">
+              <svg viewBox="0 0 100 100" class="w-48 h-48 transform -rotate-90">
+                <circle v-for="(segment, idx) in chartSegments" :key="idx" cx="50" cy="50" r="40" fill="transparent"
+                  stroke-width="12" :stroke="segment.stroke" :stroke-dasharray="`${segment.length} 251.2`"
+                  :stroke-dashoffset="-segment.offset" class="transition-all duration-1000 ease-out" />
               </svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center">
+                <span class="text-3xl font-black text-slate-900 dark:text-white">{{ analyses.length }}</span>
+                <span
+                  class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center leading-3">Contratos<br />Auditados</span>
+              </div>
             </div>
           </div>
-          <p class="text-2xl font-black text-slate-900 dark:text-white">
-            {{ lastAnalysisDate }}
-          </p>
-        </div>
-      </div>
 
-      <!-- New Analysis Section -->
-      <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-premium p-8 mb-12 border border-slate-100 dark:border-slate-800 relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-64 h-64 bg-secondary/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
-        <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-8">Auditar nuevo contrato</h2>
-        
-        <Dropzone 
-          v-model="selectedFile" 
-          @error="handleDropzoneError"
-          class="mb-8"
-        />
+          <!-- New Analysis Section -->
+          <div
+            class="bg-gradient-to-br from-slate-50 to-white dark:from-slate-900 dark:to-slate-950 rounded-[2.5rem] shadow-premium p-8 border border-slate-100 dark:border-slate-800 relative overflow-hidden group">
+            <div
+              class="absolute bottom-0 right-0 w-64 h-64 bg-secondary/5 rounded-full blur-3xl -mb-32 -mr-32 group-hover:bg-secondary/10 transition-colors duration-700">
+            </div>
+            <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-8 flex items-center gap-3">
+              <span class="w-10 h-10 bg-secondary/10 rounded-xl flex items-center justify-center text-secondary">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                </svg>
+              </span>
+              Auditar nuevo contrato
+            </h2>
 
-        <div v-if="selectedFile" class="space-y-8 animate-slide-up">
-          <!-- Analysis Type Selector -->
-          <div>
-            <label class="block text-sm font-black uppercase tracking-widest text-slate-400 mb-4">
-              Elige el nivel de protección
-            </label>
-            <AnalysisSelector 
-              v-model="analysisType" 
-              :user-credits="userProfile?.credits || 0"
-            />
+            <Dropzone v-model="selectedFile" @error="handleDropzoneError" class="mb-8" />
+
+            <div v-if="selectedFile" class="space-y-8 animate-slide-up">
+              <!-- Analysis Type Selector -->
+              <div>
+                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4">
+                  Elige el nivel de protección
+                </label>
+                <AnalysisSelector v-model="analysisType" :user-credits="userProfile?.credits || 0" />
+              </div>
+
+              <!-- Contract Name and Action -->
+              <div class="flex flex-col sm:flex-row gap-4 mb-4">
+                <input v-model="contractName" type="text" placeholder="Nombre (ej: Contrato Arriendo)"
+                  class="flex-1 px-6 py-4 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-secondary/50 focus:border-secondary text-slate-900 dark:text-white transition-all outline-none font-bold" />
+                <button @click="handleAnalyze"
+                  :disabled="analyzing || !contractName || (sharedCredits || 0) < (analysisType === 'premium' ? 3 : 1)"
+                  class="px-10 py-4 bg-secondary text-white rounded-2xl font-black text-lg hover:shadow-glow hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex items-center gap-3">
+                  <span v-if="analyzing"
+                    class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                  {{ analyzeButtonText }}
+                </button>
+              </div>
+
+              <!-- Credit Warnings -->
+              <div v-if="needsCredits"
+                class="p-4 bg-secondary/5 rounded-2xl border border-secondary/10 animate-slide-up flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" />
+                    </svg>
+                  </div>
+                  <p class="text-xs font-bold text-slate-600 dark:text-slate-400">
+                    No tienes créditos suficientes para realizar esta auditoría.
+                  </p>
+                </div>
+                <NuxtLink to="/credits"
+                  class="text-[10px] font-black uppercase tracking-widest text-secondary hover:underline whitespace-nowrap">
+                  Comprar Créditos
+                </NuxtLink>
+              </div>
+
+              <div v-else-if="needsMoreForPremium"
+                class="p-4 bg-secondary/5 rounded-2xl border border-secondary/10 animate-slide-up flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" />
+                    </svg>
+                  </div>
+                  <p class="text-xs font-bold text-slate-600 dark:text-slate-400">
+                    Necesitas 3 créditos para un <span class="text-secondary">Análisis Premium</span>.
+                  </p>
+                </div>
+                <div class="flex items-center gap-4">
+                  <button @click="analysisType = 'basic'"
+                    class="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+                    Usar Rápido (1)
+                  </button>
+                  <NuxtLink to="/credits"
+                    class="text-[10px] font-black uppercase tracking-widest text-secondary hover:underline whitespace-nowrap">
+                    Obtener más
+                  </NuxtLink>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="analyzeError" class="mt-4 p-4 bg-risk-high/10 border border-risk-high rounded-2xl animate-shake">
+              <p class="text-risk-high text-xs font-bold">{{ analyzeError }}</p>
+            </div>
           </div>
-
-          <!-- Contract Name and Action -->
-          <div class="flex flex-col sm:flex-row gap-4">
-            <input
-              v-model="contractName"
-              type="text"
-              placeholder="Nombre del contrato (ej: Contrato de Arrendamiento)"
-              class="flex-1 px-6 py-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-secondary/50 focus:border-secondary text-slate-900 dark:text-white transition-all outline-none font-medium"
-            />
-            <button
-              @click="handleAnalyze"
-              :disabled="analyzing || !contractName || (userProfile?.credits || 0) < (analysisType === 'premium' ? 3 : 1)"
-              class="px-10 py-4 bg-secondary text-white rounded-2xl font-black text-lg hover:shadow-glow hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex items-center gap-3"
-            >
-              <span v-if="analyzing" class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-              {{ analyzing ? 'Iniciando...' : (analysisType === 'premium' ? 'Análisis Completo' : 'Análisis Rápido') }}
-            </button>
-          </div>
-
-          <p class="text-center text-xs font-bold text-slate-400">
-            Créditos después de este análisis: 
-            <span class="text-secondary">{{ (userProfile?.credits || 0) - (analysisType === 'premium' ? 3 : 1) }}</span>
-          </p>
-        </div>
-
-        <div v-if="analyzeError" class="mt-4 p-4 bg-risk-high/10 border border-risk-high rounded-lg">
-          <p class="text-risk-high text-sm">{{ analyzeError }}</p>
-        </div>
-
-        <div v-if="(userProfile?.credits || 0) < 1 && !selectedFile" class="mt-4 p-4 bg-risk-medium/10 border border-risk-medium rounded-lg">
-          <p class="text-risk-medium text-sm">
-            No tienes créditos suficientes para realizar análisis. 
-            <NuxtLink to="/credits" class="font-semibold underline">Compra más créditos aquí</NuxtLink>
-          </p>
         </div>
       </div>
 
       <!-- Recent Analyses -->
-      <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-premium p-8 border border-slate-100 dark:border-slate-800">
-        <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-8">Análisis Recientes</h2>
+      <div class="mb-12">
+        <div class="flex items-center justify-between mb-8">
+          <h2 class="text-2xl font-black text-slate-900 dark:text-white">Análisis Recientes</h2>
+          <NuxtLink v-if="analyses.length > 5" to="/history"
+            class="text-xs font-black text-secondary uppercase tracking-widest hover:underline">Ver Todo</NuxtLink>
+        </div>
 
         <div v-if="loading" class="text-center py-12">
-          <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-accent-indigo"></div>
-          <p class="mt-4 text-primary-600">Cargando análisis...</p>
+          <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-secondary"></div>
+          <p class="mt-4 text-slate-400 font-bold uppercase tracking-widest text-[10px]">Sincronizando...</p>
         </div>
 
-        <div v-else-if="analyses.length === 0" class="text-center py-20 bg-slate-50 dark:bg-slate-950/50 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800">
-          <svg class="w-16 h-16 text-slate-300 dark:text-slate-700 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        <div v-else-if="analyses.length === 0"
+          class="text-center py-20 bg-slate-50 dark:bg-slate-900/50 rounded-[2.5rem] border border-dashed border-slate-200 dark:border-slate-800">
+          <svg class="w-16 h-16 text-slate-200 dark:text-slate-800 mx-auto mb-4" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
-          <p class="text-slate-900 dark:text-white font-bold mb-1">No tienes análisis todavía</p>
-          <p class="text-slate-500 dark:text-slate-500 text-sm">Sube tu primer contrato para comenzar</p>
+          <p class="text-slate-900 dark:text-white font-black mb-1">Aún no has analizado contratos</p>
+          <p class="text-slate-500 dark:text-slate-500 text-sm font-medium">Sube tu primer documento para comenzar.</p>
         </div>
 
-        <div v-else class="space-y-4">
-          <NuxtLink
-            v-for="analysis in analyses"
-            :key="analysis.id"
-            :to="`/analyze/${analysis.id}`"
-            class="block p-6 bg-slate-50 dark:bg-slate-950/50 border border-slate-100 dark:border-slate-800 rounded-3xl hover:border-secondary/50 hover:shadow-premium transition-all group/item"
-          >
-            <div class="flex items-start justify-between">
-              <div class="flex-1">
-                <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2 group-hover/item:text-secondary transition-colors">
-                  {{ analysis.contract_name }}
-                </h3>
-                <p class="text-slate-500 dark:text-slate-500 text-xs font-black uppercase tracking-widest mb-4">
-                  {{ formatDate(analysis.created_at) }}
-                </p>
-                <div class="flex items-center gap-2">
-                  <template v-if="analysis.status === 'completed'">
-                    <span 
-                      :class="[
-                        'px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-wider',
-                        analysis.risk_level === 'high' ? 'bg-risk-high/10 text-risk-high' :
-                        analysis.risk_level === 'medium' ? 'bg-risk-medium/10 text-risk-medium' :
-                        'bg-risk-low/10 text-risk-low'
-                      ]"
-                    >
-                      {{ 
-                        analysis.risk_level === 'high' ? 'Riesgo Alto' :
-                        analysis.risk_level === 'medium' ? 'Precaución' :
-                        'Seguro'
-                      }}
-                    </span>
-                  </template>
-                  <template v-else-if="analysis.status === 'processing'">
-                    <span class="px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-secondary/10 text-secondary flex items-center gap-2">
-                      <span class="w-2 h-2 bg-secondary rounded-full animate-pulse"></span>
-                      Analizando...
-                    </span>
-                  </template>
-                  <template v-else-if="analysis.status === 'failed'">
-                    <span class="px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-risk-high/10 text-risk-high">
-                      Error en análisis
-                    </span>
-                  </template>
-                  <template v-else>
-                    <span class="px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-200 dark:bg-slate-800 text-slate-500">
-                      En cola...
-                    </span>
-                  </template>
-                </div>
-              </div>
-              <div class="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex items-center justify-center text-slate-400 group-hover/item:text-secondary group-hover/item:border-secondary/30 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+        <div v-else class="grid md:grid-cols-2 gap-4">
+          <NuxtLink v-for="analysis in analyses.slice(0, 5)" :key="analysis.id" :to="`/analyze/${analysis.id}`"
+            class="group p-5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2rem] hover:border-secondary/50 hover:shadow-premium transition-all flex items-center justify-between">
+            <div class="flex items-center gap-4">
+              <div :class="[
+                'w-14 h-14 rounded-2xl flex items-center justify-center transition-all group-hover:scale-110',
+                analysis.risk_level === 'high' ? 'bg-risk-high/10 text-risk-high' :
+                  analysis.risk_level === 'medium' ? 'bg-risk-medium/10 text-risk-medium' :
+                    analysis.risk_level === 'low' ? 'bg-risk-low/10 text-risk-low' : 'bg-slate-100 text-slate-400'
+              ]">
+                <svg v-if="analysis.status === 'completed'" class="w-7 h-7" fill="none" stroke="currentColor"
+                  viewBox="0 0 24 24">
+                  <path v-if="analysis.risk_level === 'high'" stroke-linecap="round" stroke-linejoin="round"
+                    stroke-width="2.5"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  <path v-else-if="analysis.risk_level === 'medium'" stroke-linecap="round" stroke-linejoin="round"
+                    stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                </svg>
+                <span v-else-if="analysis.status === 'processing'"
+                  class="w-6 h-6 border-2 border-secondary/30 border-t-secondary rounded-full animate-spin"></span>
+                <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
+              <div>
+                <h3
+                  class="font-black text-slate-900 dark:text-white group-hover:text-secondary transition-colors line-clamp-1">
+                  {{ analysis.contract_name }}</h3>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{
+                    formatDate(analysis.created_at) }}</span>
+                  <span class="w-1 h-1 bg-slate-200 dark:bg-slate-800 rounded-full"></span>
+                  <span :class="[
+                    'text-[9px] font-black uppercase tracking-tighter',
+                    analysis.status === 'completed' ? (analysis.risk_level === 'high' ? 'text-risk-high' : analysis.risk_level === 'medium' ? 'text-risk-medium' : 'text-risk-low') : 'text-slate-400'
+                  ]">
+                    {{ analysis.status === 'completed' ? (analysis.risk_level === 'high' ? 'Alto Riesgo' :
+                      analysis.risk_level === 'medium' ? 'Cautela' : 'Seguro') : (analysis.status === 'processing' ?
+                        'Analizando' : 'Pendiente') }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div
+              class="w-8 h-8 rounded-full flex items-center justify-center text-slate-200 group-hover:text-secondary group-hover:bg-secondary/10 transition-all">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
+              </svg>
             </div>
           </NuxtLink>
         </div>
@@ -214,6 +327,50 @@ const contractName = ref('')
 const analysisType = ref<'basic' | 'premium'>('premium')
 const analyzing = ref(false)
 const analyzeError = ref('')
+
+const analyzeButtonText = computed(() => {
+  if (analyzing.value) return 'Procesando...'
+  return analysisType.value === 'premium' ? 'Análisis Completo' : 'Análisis Rápido'
+})
+
+const needsCredits = computed(() => (sharedCredits.value || 0) === 0)
+const needsMoreForPremium = computed(() =>
+  analysisType.value === 'premium' &&
+  (sharedCredits.value || 0) > 0 &&
+  (sharedCredits.value || 0) < 3
+)
+
+// Chart Logic
+const riskDistribution = computed(() => {
+  const counts = { high: 0, medium: 0, low: 0 }
+  analyses.value.forEach(a => {
+    if (a.status === 'completed' && a.risk_level) {
+      counts[a.risk_level as keyof typeof counts]++
+    }
+  })
+  return [
+    { level: 'high', label: 'Riesgo Alto', count: counts.high, color: 'bg-risk-high', stroke: '#ef4444' },
+    { level: 'medium', label: 'Precaución', count: counts.medium, color: 'bg-risk-medium', stroke: '#f59e0b' },
+    { level: 'low', label: 'Seguro', count: counts.low, color: 'bg-risk-low', stroke: '#10b981' },
+  ]
+})
+
+const chartSegments = computed(() => {
+  const total = riskDistribution.value.reduce((acc, curr) => acc + curr.count, 0)
+  if (total === 0) return [{ stroke: '#cbd5e1', length: 251.2, offset: 0 }]
+
+  let currentOffset = 0
+  return riskDistribution.value.map(risk => {
+    const length = (risk.count / total) * 251.2
+    const segment = {
+      stroke: risk.stroke,
+      length,
+      offset: currentOffset
+    }
+    currentOffset += length
+    return segment
+  })
+})
 
 // Auto-switch to basic if they only have 1 credit
 watch(() => sharedCredits.value, (newCredits) => {
@@ -313,18 +470,44 @@ watch(() => user.value, (newUser) => {
 // Removed onMounted since watcher handles immediate check
 
 const lastAnalysisDate = computed(() => {
-  if (analyses.value.length === 0) return 'Ninguno'
-  
-  const lastDate = new Date(analyses.value[0].created_at)
+  const firstAnalysis = analyses.value[0]
+  if (!firstAnalysis) return 'Ninguno'
+
+  const lastDate = new Date(firstAnalysis.created_at)
   const now = new Date()
   const diffMs = now.getTime() - lastDate.getTime()
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-  
+
   if (diffDays === 0) return 'Hoy'
   if (diffDays === 1) return 'Ayer'
   if (diffDays < 7) return `Hace ${diffDays} días`
-  
-  return formatDate(analyses.value[0].created_at)
+
+  return formatDate(firstAnalysis.created_at)
+})
+
+const totalCriticalFindings = computed(() => {
+  return analyses.value.reduce((acc, a) => {
+    return acc + (a.summary_json?.metricas?.total_rojas || 0)
+  }, 0)
+})
+
+const safetyScore = computed(() => {
+  if (analyses.value.length === 0) return 0
+  const completed = analyses.value.filter(a => a.status === 'completed')
+  if (completed.length === 0) return 100
+
+  const weights = { low: 100, medium: 50, high: 0 }
+  const sum = completed.reduce((acc, a) => {
+    const level = (a.risk_level as 'low' | 'medium' | 'high') || 'low'
+    return acc + weights[level]
+  }, 0)
+  return Math.round(sum / completed.length)
+})
+
+const monthlyActivity = computed(() => {
+  const thirtyDaysAgo = new Date()
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+  return analyses.value.filter(a => new Date(a.created_at) >= thirtyDaysAgo).length
 })
 
 const formatDate = (dateString: string) => {
@@ -383,13 +566,13 @@ const handleAnalyze = async () => {
       risk_level: null,
       summary_json: null
     }
-    
+
     analyses.value.unshift(newAnalysis)
-    
+
     // Clear form
     selectedFile.value = null
     contractName.value = ''
-    
+
     // Refresh profile state
     await fetchUserProfile()
 

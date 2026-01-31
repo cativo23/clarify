@@ -4,7 +4,7 @@ import { extractTextFromPDF } from '../utils/pdf-parser'
 import { analyzeContract } from '../utils/openai-client'
 import { createClient } from '@supabase/supabase-js'
 
-export default defineNitroPlugin((nitroApp) => {
+export default defineNitroPlugin((_nitroApp) => {
     const config = useRuntimeConfig()
 
     // Create Supabase Admin client to bypass RLS in background jobs

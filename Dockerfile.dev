@@ -1,0 +1,26 @@
+# Development Dockerfile for Clarify
+# Optimized for hot reload with Nuxt 3
+
+FROM node:23-alpine
+
+# Install dependencies for file watching
+RUN apk add --no-cache libc6-compat
+
+WORKDIR /app
+
+# Install dependencies first (cached layer)
+COPY --chown=node:node package*.json ./
+
+RUN npm ci
+
+# Copy source code (will be overwritten by volume mount in development)
+COPY --chown=node:node . .
+
+# Prepare Nuxt
+RUN npx nuxi prepare
+
+# Expose development port
+EXPOSE 3001
+
+# Run development server with hot reload
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "3001"]
