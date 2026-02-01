@@ -15,17 +15,18 @@ export default defineEventHandler(async (event) => {
         })
     }
 
-    const body = await readBody(event)
+        const body = await readBody(event)
     // Use Service Role to bypass RLS policies
     const client = await serverSupabaseServiceRole(event)
 
-    // Validation (Basic)
-    if (!body || !body.promptVersion || !body.models || !body.tokenLimits) {
-        throw createError({
-            statusCode: 400,
-            message: 'Invalid configuration object',
-        })
-    }
+
+        // Validation (Basic) - expect new `tiers` shape
+        if (!body || !body.promptVersion || !body.tiers || !body.tiers.basic || !body.tiers.premium || !body.tiers.forensic) {
+            throw createError({
+                statusCode: 400,
+                message: 'Invalid configuration object; expected promptVersion and tiers.{basic,premium,forensic}',
+            })
+        }
 
     const { error } = await client
         .from('configurations')
