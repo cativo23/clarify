@@ -58,35 +58,6 @@ export default defineNitroPlugin((_nitroApp) => {
             }
             const dbRiskLevel = riskMapping[riskLevelStr] || 'medium'
 
-            // --- NORMALIZE SUMMARY FOR UI ---
-            if (analysisType === 'basic') {
-                analysisSummary = {
-                    resumen_ejecutivo: {
-                        veredicto: analysisSummary.recomendacion_final?.accion || analysisSummary.veredicto_rapido,
-                        justificacion: analysisSummary.resumen_ejecutivo,
-                        clausulas_criticas_totales: analysisSummary.total_clausulas_criticas,
-                        mayor_riesgo_identificado: analysisSummary.alertas_criticas?.[0]?.titulo || null
-                    },
-                    nivel_riesgo_general: analysisSummary.nivel_riesgo,
-                    metricas: {
-                        total_rojas: analysisSummary.total_clausulas_criticas || 0,
-                        total_amarillas: 0,
-                        total_verdes: 0,
-                        porcentaje_clausulas_analizadas: 'Escaneo de Alertas Rojas'
-                    },
-                    hallazgos: (analysisSummary.alertas_criticas || []).map((alerta: any) => ({
-                        color: 'rojo',
-                        titulo: alerta.titulo,
-                        clausula: alerta.clausula,
-                        cita_textual: alerta.cita_textual,
-                        explicacion: alerta.por_que_es_peligroso,
-                        riesgo_real: alerta.ejemplo_concreto,
-                        mitigacion: 'Revisar esta cláusula cuidadosamente antes de firmar.'
-                    })),
-                    clausulas_no_clasificadas: []
-                }
-            }
-
             // 6. Save results and complete
             const { error: updateError } = await supabaseAdmin
                 .from('analyses')
@@ -106,12 +77,23 @@ export default defineNitroPlugin((_nitroApp) => {
         } catch (error: any) {
             console.error(`[Worker] Error processing analysis ${analysisId}:`, error)
 
+            // Prepare error data
+            const errorMessage = error.message || 'Unknown error occurred during analysis'
+
+            // If we have detailed debug info (e.g. from JSON parse error), save it
+            let debugData = null
+            if (error.debugInfo) {
+                console.log(`[Worker] Saving debug info for failed analysis ${analysisId}`)
+                debugData = error.debugInfo
+            }
+
             // Mark as failed in DB
             await supabaseAdmin
                 .from('analyses')
                 .update({
                     status: 'failed',
-                    error_message: error.message || 'Unknown error occurred during analysis'
+                    error_message: errorMessage,
+                    summary_json: debugData ? { _debug: debugData } : null // Save debug info in summary_json even if failed, or a dedicated column if available. Using summary_json as we can assume frontend can check status.
                 })
                 .eq('id', analysisId)
         }
