@@ -14,7 +14,16 @@ export const fetchUserProfile = async () => {
     if (!user.value?.id) return null
 
     try {
-        const profile = await $fetch<User>('/api/user/profile')
+        const headers = useRequestHeaders(['cookie'])
+        const fetchOptions: any = {}
+
+        // Only forward headers if we have a cookie (important for SSR)
+        // On client, browser handles cookies automatically if we don't override headers
+        if (headers.cookie) {
+            fetchOptions.headers = headers
+        }
+
+        const profile = await $fetch<User>('/api/user/profile', fetchOptions)
         if (profile) {
             creditsState.value = profile.credits
             return profile

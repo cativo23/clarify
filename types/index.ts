@@ -38,7 +38,12 @@ export interface AnalysisSummary {
         porcentaje_clausulas_analizadas: string
     }
     hallazgos: Hallazgo[]
-    clausulas_no_clasificadas?: string[]
+
+    clausulas_no_clasificadas?: {
+        clausula: string;
+        motivo: string;
+    }[]
+    _debug?: any
 }
 
 export interface Hallazgo {
