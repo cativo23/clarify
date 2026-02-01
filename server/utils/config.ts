@@ -1,14 +1,17 @@
 import { createClient } from '@supabase/supabase-js'
 
+export interface TierInfo {
+    model: string
+    credits: number
+    tokenLimits: { input: number; output: number }
+}
+
 export interface PromptConfig {
     promptVersion: 'v1' | 'v2'
-    models: {
-        basic: string
-        premium: string
-    }
-    tokenLimits: {
-        basic: { input: number; output: number }
-        premium: { input: number; output: number }
+    tiers: {
+        basic: TierInfo
+        premium: TierInfo
+        forensic: TierInfo
     }
     features: {
         preprocessing: boolean
@@ -19,13 +22,22 @@ export interface PromptConfig {
 // Default config failover matching v1 hardcoded values and new defaults
 const DEFAULT_CONFIG: PromptConfig = {
     promptVersion: 'v2',
-    models: {
-        basic: 'gpt-4o-mini',
-        premium: 'gpt-5',
-    },
-    tokenLimits: {
-        basic: { input: 8000, output: 2500 },
-        premium: { input: 35000, output: 10000 },
+    tiers: {
+        basic: {
+            model: 'gpt-4o-mini',
+            credits: 1,
+            tokenLimits: { input: 8000, output: 2500 },
+        },
+        premium: {
+            model: 'gpt-5-mini',
+            credits: 3,
+            tokenLimits: { input: 35000, output: 10000 },
+        },
+        forensic: {
+            model: 'gpt-5',
+            credits: 10,
+            tokenLimits: { input: 120000, output: 30000 },
+        },
     },
     features: {
         preprocessing: true,
