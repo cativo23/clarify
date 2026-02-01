@@ -203,13 +203,52 @@
             </svg>
             Cláusulas Informativas
           </h3>
-          <ul class="grid sm:grid-cols-2 gap-3">
-            <li v-for="(item, i) in summary.clausulas_no_clasificadas" :key="i"
-              class="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-start gap-2">
-              <span class="mt-1 w-1.5 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full shrink-0"></span>
-              {{ item }}
-            </li>
-          </ul>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div v-for="(item, i) in summary.clausulas_no_clasificadas" :key="i"
+              class="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm transition-all hover:shadow-md group">
+              <div class="flex items-start gap-3">
+                <div class="mt-1 w-2 h-2 bg-slate-200 dark:bg-slate-700 rounded-full shrink-0 group-hover:bg-secondary transition-colors"></div>
+                <div>
+                  <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{{ item.clausula || 'Información General' }}</h4>
+                  <p class="text-xs font-bold text-slate-600 dark:text-slate-300 leading-relaxed">{{ item.motivo }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Debug Info (Admin Only) -->
+        <div v-if="isAdmin && summary._debug" class="mb-12 p-6 bg-slate-900 rounded-xl border border-slate-800 font-mono text-xs text-slate-400">
+             <h3 class="text-white font-bold mb-4 uppercase tracking-widest flex items-center gap-2">
+                🤖 Technical Debug Info
+             </h3>
+             <div class="grid grid-cols-3 gap-4">
+                 <div>
+                     <span class="block text-slate-600 mb-1">Model Used</span>
+                     <span class="text-secondary">{{ summary._debug.model_used }}</span>
+                 </div>
+                  <div>
+                     <span class="block text-slate-600 mb-1">Prompt Version</span>
+                     <span>{{ summary._debug.prompt_version }}</span>
+                 </div>
+                 <div v-if="summary._debug.preprocessing">
+                      <span class="block text-slate-600 mb-1">Tokens (Processed / Original)</span>
+                      <span>{{ summary._debug.preprocessing.processedTokens }} / {{ summary._debug.preprocessing.originalTokens }}</span>
+                 </div>
+                 <div v-if="summary._debug.usage">
+                      <span class="block text-slate-600 mb-1">Usage (Prompt / Completion / Total)</span>
+                      <pre class="whitespace-pre-wrap">{{ summary._debug.usage.prompt_tokens }} / {{ summary._debug.usage.completion_tokens }} / {{ summary._debug.usage.total_tokens }}</pre>
+                 </div>
+                 <div>
+                     <span class="block text-slate-600 mb-1">Timestamp</span>
+                     <span>{{ summary._debug.timestamp }}</span>
+                 </div>
+                 <div v-if="summary._debug.error" class="col-span-2 mt-2 p-2 bg-red-900/20 border border-red-900/50 rounded text-red-400">
+                      <span class="block font-bold mb-1">Error Details:</span>
+                      <pre class="whitespace-pre-wrap">{{ summary._debug.error }}</pre>
+                      <pre class="whitespace-pre-wrap mt-2 text-[10px]">{{ summary._debug.raw_error }}</pre>
+                 </div>
+             </div>
         </div>
 
 
@@ -299,8 +338,21 @@ const downloadPDF = () => {
   alert('Funcionalidad de descarga en desarrollo')
 }
 
-onMounted(() => {
-  fetchAnalysis()
+// Debug & Admin Logic
+const config = useRuntimeConfig()
+const user = useSupabaseUser()
+const isAdmin = computed(() => {
+    return user.value?.email === config.public.adminEmail
+})
+
+onMounted(async () => {
+  await fetchAnalysis()
+  
+  // Navigation Guard: If not ready, kick out
+  if (analysis.value && (analysis.value.status === 'processing' || analysis.value.status === 'pending')) {
+      alert('El análisis está en proceso. Serás redirigido al dashboard.')
+      navigateTo('/dashboard')
+  }
 })
 
 useHead({
