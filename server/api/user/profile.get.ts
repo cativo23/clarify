@@ -2,7 +2,15 @@ import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server'
 import type { User } from '~/types'
 
 export default defineEventHandler(async (event) => {
-    const user = await serverSupabaseUser(event)
+    let user
+    try {
+        user = await serverSupabaseUser(event)
+    } catch (error) {
+        throw createError({
+            statusCode: 401,
+            message: 'Unauthorized: Session missing or invalid',
+        })
+    }
 
     if (!user) {
         throw createError({

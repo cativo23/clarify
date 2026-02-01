@@ -19,6 +19,15 @@
               <h2 class="text-xl font-black text-slate-900 dark:text-white truncate mb-1">{{ user?.email?.split('@')[0]
                 }}
               </h2>
+              
+               <!-- Admin Badge/Link -->
+               <div v-if="isAdmin" class="mb-4">
+                  <NuxtLink to="/admin/config" class="inline-flex items-center gap-1.5 px-3 py-1 bg-red-500/10 border border-red-500/20 text-red-500 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                      Admin Panel
+                  </NuxtLink>
+               </div>
+
               <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Plan Estándar</p>
 
               <div
@@ -165,12 +174,37 @@
                 <input v-model="contractName" type="text" placeholder="Nombre (ej: Contrato Arriendo)"
                   class="flex-1 px-6 py-4 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-secondary/50 focus:border-secondary text-slate-900 dark:text-white transition-all outline-none font-bold" />
                 <button @click="handleAnalyze"
-                  :disabled="analyzing || !contractName || (sharedCredits || 0) < (analysisType === 'premium' ? 3 : 1)"
+                  :disabled="analyzing || checkingTokens || !uploadedFileUrl || !contractName || (sharedCredits || 0) < (analysisType === 'premium' ? 3 : 1)"
                   class="px-10 py-4 bg-secondary text-white rounded-2xl font-black text-lg hover:shadow-glow hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex items-center gap-3">
-                  <span v-if="analyzing"
+                  <span v-if="analyzing || checkingTokens"
                     class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
                   {{ analyzeButtonText }}
                 </button>
+              </div>
+
+               <!-- Token Check Info -->
+              <div v-if="tokenCheckResult" class="mb-6 mx-2">
+                 <div :class="['p-3 rounded-xl border flex items-center justify-between text-xs font-bold', 
+                    tokenCheckResult.suggestion === analysisType || tokenCheckResult.fitsInBasic ? 'bg-green-50 text-green-700 border-green-200' : 'bg-amber-50 text-amber-700 border-amber-200']">
+                    <div>
+                        <span class="block text-[10px] uppercase tracking-widest text-slate-400 mb-0.5">Tamaño Documento</span>
+                        <span>{{ tokenCheckResult.originalTokens.toLocaleString() }} tokens estimados</span>
+                    </div>
+                    <div class="text-right">
+                        <span v-if="!tokenCheckResult.fitsInBasic && analysisType === 'basic'" class="flex items-center gap-2">
+                             ⚠️ Se recomienda Premium
+                        </span>
+                        <span v-if="analysisType === 'premium' && !tokenCheckResult.fitsInPremium" class="flex items-center gap-2 text-red-600">
+                             🚫 Excede límite Premium
+                        </span>
+                        <span v-if="tokenCheckResult.fitsInBasic && analysisType === 'basic'" class="text-green-600">
+                             ✅ Apto para Basic
+                        </span>
+                         <span v-if="tokenCheckResult.fitsInPremium && analysisType === 'premium'" class="text-green-600">
+                             ✅ Apto para Premium
+                        </span>
+                    </div>
+                 </div>
               </div>
 
               <!-- Credit Warnings -->
@@ -251,56 +285,81 @@
         </div>
 
         <div v-else class="grid md:grid-cols-2 gap-4">
-          <NuxtLink v-for="analysis in analyses.slice(0, 5)" :key="analysis.id" :to="`/analyze/${analysis.id}`"
-            class="group p-5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2rem] hover:border-secondary/50 hover:shadow-premium transition-all flex items-center justify-between">
-            <div class="flex items-center gap-4">
-              <div :class="[
-                'w-14 h-14 rounded-2xl flex items-center justify-center transition-all group-hover:scale-110',
-                analysis.risk_level === 'high' ? 'bg-risk-high/10 text-risk-high' :
-                  analysis.risk_level === 'medium' ? 'bg-risk-medium/10 text-risk-medium' :
-                    analysis.risk_level === 'low' ? 'bg-risk-low/10 text-risk-low' : 'bg-slate-100 text-slate-400'
-              ]">
-                <svg v-if="analysis.status === 'completed'" class="w-7 h-7" fill="none" stroke="currentColor"
-                  viewBox="0 0 24 24">
-                  <path v-if="analysis.risk_level === 'high'" stroke-linecap="round" stroke-linejoin="round"
-                    stroke-width="2.5"
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  <path v-else-if="analysis.risk_level === 'medium'" stroke-linecap="round" stroke-linejoin="round"
-                    stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                </svg>
-                <span v-else-if="analysis.status === 'processing'"
-                  class="w-6 h-6 border-2 border-secondary/30 border-t-secondary rounded-full animate-spin"></span>
-                <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <template v-for="analysis in analyses.slice(0, 6)" :key="analysis.id">
+            <!-- Clickable Card (Completed/Failed) -->
+            <NuxtLink v-if="analysis.status === 'completed' || analysis.status === 'failed'" 
+              :to="`/analyze/${analysis.id}`"
+              class="group p-5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2rem] transition-all flex items-center justify-between hover:border-secondary/50 hover:shadow-premium cursor-pointer">
+              
+              <div class="flex items-center gap-4">
+                <div :class="[
+                  'w-14 h-14 rounded-2xl flex items-center justify-center transition-all group-hover:scale-110',
+                  analysis.risk_level === 'high' ? 'bg-risk-high/10 text-risk-high' :
+                    analysis.risk_level === 'medium' ? 'bg-risk-medium/10 text-risk-medium' :
+                      analysis.risk_level === 'low' ? 'bg-risk-low/10 text-risk-low' : 'bg-slate-100 text-slate-400'
+                ]">
+                  <svg v-if="analysis.status === 'completed'" class="w-7 h-7" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path v-if="analysis.risk_level === 'high'" stroke-linecap="round" stroke-linejoin="round"
+                      stroke-width="2.5"
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    <path v-else-if="analysis.risk_level === 'medium'" stroke-linecap="round" stroke-linejoin="round"
+                      stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="font-black text-slate-900 dark:text-white group-hover:text-secondary transition-colors line-clamp-1">
+                    {{ analysis.contract_name }}
+                  </h3>
+                  <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ formatDate(analysis.created_at) }}</span>
+                    <span class="w-1 h-1 bg-slate-200 dark:bg-slate-800 rounded-full"></span>
+                    <span :class="[
+                      'text-[9px] font-black uppercase tracking-tighter',
+                      analysis.status === 'completed' ? (analysis.risk_level === 'high' ? 'text-risk-high' : analysis.risk_level === 'medium' ? 'text-risk-medium' : 'text-risk-low') : 'text-slate-400'
+                    ]">
+                      {{ analysis.status === 'completed' ? (analysis.risk_level === 'high' ? 'Alto Riesgo' : analysis.risk_level === 'medium' ? 'Cautela' : 'Seguro') : 'Fallido' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="w-8 h-8 rounded-full flex items-center justify-center text-slate-200 group-hover:text-secondary group-hover:bg-secondary/10 transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
                 </svg>
               </div>
-              <div>
-                <h3
-                  class="font-black text-slate-900 dark:text-white group-hover:text-secondary transition-colors line-clamp-1">
-                  {{ analysis.contract_name }}</h3>
-                <div class="flex items-center gap-2">
-                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{
-                    formatDate(analysis.created_at) }}</span>
-                  <span class="w-1 h-1 bg-slate-200 dark:bg-slate-800 rounded-full"></span>
-                  <span :class="[
-                    'text-[9px] font-black uppercase tracking-tighter',
-                    analysis.status === 'completed' ? (analysis.risk_level === 'high' ? 'text-risk-high' : analysis.risk_level === 'medium' ? 'text-risk-medium' : 'text-risk-low') : 'text-slate-400'
-                  ]">
-                    {{ analysis.status === 'completed' ? (analysis.risk_level === 'high' ? 'Alto Riesgo' :
-                      analysis.risk_level === 'medium' ? 'Cautela' : 'Seguro') : (analysis.status === 'processing' ?
-                        'Analizando' : 'Pendiente') }}
-                  </span>
+            </NuxtLink>
+
+            <!-- Non-clickable Card (Processing/Pending) -->
+            <div v-else 
+              class="group p-5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2rem] transition-all flex items-center justify-between opacity-70 cursor-wait">
+              
+              <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-2xl flex items-center justify-center bg-slate-100 text-slate-400">
+                   <span v-if="analysis.status === 'processing'" class="w-6 h-6 border-2 border-secondary/30 border-t-secondary rounded-full animate-spin"></span>
+                   <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="font-black text-slate-900 dark:text-white line-clamp-1">
+                    {{ analysis.contract_name }}
+                  </h3>
+                  <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ formatDate(analysis.created_at) }}</span>
+                    <span class="w-1 h-1 bg-slate-200 dark:bg-slate-800 rounded-full"></span>
+                    <span class="text-[9px] font-black uppercase tracking-tighter text-slate-400">
+                      {{ analysis.status === 'processing' ? 'Analizando...' : 'Pendiente' }}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
-            <div
-              class="w-8 h-8 rounded-full flex items-center justify-center text-slate-200 group-hover:text-secondary group-hover:bg-secondary/10 transition-all">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
-              </svg>
-            </div>
-          </NuxtLink>
+          </template>
         </div>
       </div>
     </main>
@@ -316,6 +375,8 @@ definePageMeta({
 
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
+const config = useRuntimeConfig()
+const isAdmin = computed(() => user.value?.email === config.public.adminEmail)
 
 const userProfile = ref<any>(null)
 const sharedCredits = useCreditsState()
@@ -328,8 +389,13 @@ const analysisType = ref<'basic' | 'premium'>('premium')
 const analyzing = ref(false)
 const analyzeError = ref('')
 
+const uploadedFileUrl = ref('')
+const tokenCheckResult = ref<any>(null)
+const checkingTokens = ref(false)
+
 const analyzeButtonText = computed(() => {
   if (analyzing.value) return 'Procesando...'
+  if (checkingTokens.value) return 'Calculando tokens...'
   return analysisType.value === 'premium' ? 'Análisis Completo' : 'Análisis Rápido'
 })
 
@@ -444,7 +510,15 @@ const setupRealtimeSubscription = () => {
 
         // If job completed or failed, refresh user profile to ensure credits are correct
         if (updatedAnalysis.status === 'completed' || updatedAnalysis.status === 'failed') {
-          await fetchUserProfile()
+          try {
+             const profile = await fetchUserProfile()
+             if (profile) {
+                userProfile.value = profile
+                sharedCredits.value = profile.credits
+             }
+          } catch (err) {
+             console.error('Error refreshing profile in realtime callback:', err)
+          }
         }
       }
     )
@@ -523,31 +597,69 @@ const handleDropzoneError = (message: string) => {
   analyzeError.value = message
 }
 
+// Watch selectedFile to trigger immediate upload and token check
+watch(selectedFile, async (newFile) => {
+    if (!newFile) {
+        uploadedFileUrl.value = ''
+        tokenCheckResult.value = null
+        return
+    }
+
+    checkingTokens.value = true
+    analyzeError.value = ''
+    
+    try {
+        // 1. Upload Immediately
+        const formData = new FormData()
+        formData.append('file', newFile)
+
+        const uploadResponse = await $fetch('/api/upload', {
+            method: 'POST',
+            body: formData,
+        })
+
+        if (!uploadResponse.success || !uploadResponse.file_url) {
+            throw new Error(uploadResponse.error || 'Error al subir archivo')
+        }
+
+        uploadedFileUrl.value = uploadResponse.file_url
+
+        // 2. Check Tokens
+        const tokenResponse = await $fetch<any>('/api/check-tokens', {
+            method: 'POST',
+            body: { file_url: uploadedFileUrl.value }
+        })
+
+        if (!tokenResponse.success) {
+             throw new Error(tokenResponse.error || 'Error calculating tokens')
+        }
+
+        tokenCheckResult.value = tokenResponse
+
+    } catch (error: any) {
+        analyzeError.value = error.message || 'Error processing file'
+        selectedFile.value = null // clear to force re-selection
+        uploadedFileUrl.value = ''
+        tokenCheckResult.value = null
+    } finally {
+        checkingTokens.value = false
+    }
+})
+
 const handleAnalyze = async () => {
-  if (!selectedFile.value || !contractName.value) return
+  if (!uploadedFileUrl.value || !contractName.value) return
 
   analyzing.value = true
   analyzeError.value = ''
 
   try {
-    // Upload file
-    const formData = new FormData()
-    formData.append('file', selectedFile.value)
-
-    const uploadResponse = await $fetch('/api/upload', {
-      method: 'POST',
-      body: formData,
-    })
-
-    if (!uploadResponse.success || !uploadResponse.file_url) {
-      throw new Error(uploadResponse.error || 'Error al subir archivo')
-    }
-
+    // Use existing uploaded file URL
+    
     // Analyze contract
     const analyzeResponse = await $fetch<{ success: boolean, analysisId: string, error?: string }>('/api/analyze', {
       method: 'POST',
       body: {
-        file_url: uploadResponse.file_url,
+        file_url: uploadedFileUrl.value,
         contract_name: contractName.value,
         analysis_type: analysisType.value,
       },
@@ -571,7 +683,9 @@ const handleAnalyze = async () => {
 
     // Clear form
     selectedFile.value = null
+    uploadedFileUrl.value = ''
     contractName.value = ''
+    tokenCheckResult.value = null
 
     // Refresh profile state
     await fetchUserProfile()

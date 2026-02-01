@@ -37,6 +37,7 @@ export default defineNuxtConfig({
     public: {
       baseUrl: process.env.BASE_URL || 'http://localhost:3000',
       stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY || '',
+      adminEmail: process.env.ADMIN_EMAIL || '',
     },
   },
 
