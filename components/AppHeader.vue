@@ -1,33 +1,39 @@
 <template>
   <header
-    class="bg-white/80 dark:bg-slate-900/80 border-b border-primary-100 dark:border-slate-800 sticky top-0 z-50 backdrop-blur-xl">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    class="sticky top-0 z-50 border-b bg-white/80 dark:bg-slate-900/80 border-primary-100 dark:border-slate-800 backdrop-blur-xl">
+    <div class="px-4 py-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-8">
           <NuxtLink :to="user ? '/dashboard' : '/'"
-            class="text-2xl font-bold text-primary-900 dark:text-white flex items-center gap-2 group">
+            class="flex items-center gap-2 text-2xl font-bold text-primary-900 dark:text-white group">
             <div
-              class="w-8 h-8 bg-secondary rounded-lg flex items-center justify-center group-hover:rotate-12 transition-transform duration-300">
-              <span class="text-white text-lg">C</span>
+              class="flex items-center justify-center w-8 h-8 transition-transform duration-300 rounded-lg bg-secondary group-hover:rotate-12">
+              <span class="text-lg text-white">C</span>
             </div>
             Clarify
           </NuxtLink>
 
-          <nav v-if="user" class="hidden md:flex items-center gap-6">
+          <nav v-if="user" class="items-center hidden gap-6 md:flex">
             <NuxtLink to="/dashboard"
-              class="text-primary-600 dark:text-slate-400 hover:text-primary-900 dark:hover:text-white font-medium transition-colors relative group"
+              class="relative font-medium transition-colors text-primary-600 dark:text-slate-400 hover:text-primary-900 dark:hover:text-white group"
               active-class="!text-secondary">
               Dashboard
               <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full"></span>
             </NuxtLink>
+            <NuxtLink v-if="isAdmin" to="/admin/analytics"
+              class="relative font-medium transition-colors text-primary-600 dark:text-slate-400 hover:text-primary-900 dark:hover:text-white group"
+              active-class="!text-secondary !font-black">
+              Analíticas
+              <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full"></span>
+            </NuxtLink>
             <NuxtLink to="/credits"
-              class="text-primary-600 dark:text-slate-400 hover:text-primary-900 dark:hover:text-white font-medium transition-colors relative group"
+              class="relative font-medium transition-colors text-primary-600 dark:text-slate-400 hover:text-primary-900 dark:hover:text-white group"
               active-class="!text-secondary">
               Créditos
               <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full"></span>
             </NuxtLink>
             <NuxtLink to="/history"
-              class="text-primary-600 dark:text-slate-400 hover:text-primary-900 dark:hover:text-white font-medium transition-colors relative group"
+              class="relative font-medium transition-colors text-primary-600 dark:text-slate-400 hover:text-primary-900 dark:hover:text-white group"
               active-class="!text-secondary">
               Historial
               <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full"></span>
@@ -40,19 +46,19 @@
           </nav>
 
           <!-- Guest Nav -->
-          <nav v-else class="hidden md:flex items-center gap-6">
+          <nav v-else class="items-center hidden gap-6 md:flex">
             <NuxtLink to="/"
-              class="text-primary-600 dark:text-slate-400 hover:text-primary-900 dark:hover:text-white font-medium transition-colors relative group">
+              class="relative font-medium transition-colors text-primary-600 dark:text-slate-400 hover:text-primary-900 dark:hover:text-white group">
               Inicio
               <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full"></span>
             </NuxtLink>
             <NuxtLink to="/about"
-              class="text-primary-600 dark:text-slate-400 hover:text-primary-900 dark:hover:text-white font-medium transition-colors relative group">
+              class="relative font-medium transition-colors text-primary-600 dark:text-slate-400 hover:text-primary-900 dark:hover:text-white group">
               Sobre Nosotros
               <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full"></span>
             </NuxtLink>
             <NuxtLink v-if="$route.path !== '/login'" to="/login"
-              class="px-5 py-2 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl font-bold hover:bg-secondary/20 transition-all">
+              class="px-5 py-2 font-bold transition-all border bg-secondary/10 text-secondary border-secondary/20 rounded-xl hover:bg-secondary/20">
               Iniciar Sesión
             </NuxtLink>
           </nav>
@@ -63,8 +69,8 @@
 
           <!-- Credits -->
           <NuxtLink v-if="user" to="/credits"
-            class="hidden sm:flex items-center gap-2 px-4 py-2 bg-secondary/10 dark:bg-secondary/20 rounded-xl hover:bg-secondary/20 dark:hover:bg-secondary/30 transition-all border border-secondary/20 dark:border-secondary/30 group">
-            <svg class="w-5 h-5 text-secondary group-hover:scale-110 transition-transform" fill="currentColor"
+            class="items-center hidden gap-2 px-4 py-2 transition-all border sm:flex bg-secondary/10 dark:bg-secondary/20 rounded-xl hover:bg-secondary/20 dark:hover:bg-secondary/30 border-secondary/20 dark:border-secondary/30 group">
+            <svg class="w-5 h-5 transition-transform text-secondary group-hover:scale-110" fill="currentColor"
               viewBox="0 0 20 20">
               <path
                 d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
@@ -78,12 +84,12 @@
           <!-- User Menu -->
           <div v-if="user" class="relative">
             <button @click.stop="showUserMenu = !showUserMenu"
-              class="flex items-center gap-2 px-2 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+              class="flex items-center gap-2 px-2 py-2 transition-colors rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
               <div
-                class="w-9 h-9 bg-gradient-to-br from-secondary to-accent-indigo rounded-full flex items-center justify-center text-white font-bold shadow-lg shadow-secondary/20">
+                class="flex items-center justify-center font-bold text-white rounded-full shadow-lg w-9 h-9 bg-gradient-to-br from-secondary to-accent-indigo shadow-secondary/20">
                 {{ userInitials }}
               </div>
-              <svg class="w-4 h-4 text-primary-600 dark:text-slate-400 transition-transform"
+              <svg class="w-4 h-4 transition-transform text-primary-600 dark:text-slate-400"
                 :class="{ 'rotate-180': showUserMenu }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
@@ -91,18 +97,18 @@
 
             <!-- Dropdown -->
             <div v-if="showUserMenu" v-click-outside="() => showUserMenu = false"
-              class="absolute right-0 mt-3 w-56 bg-white dark:bg-slate-900 rounded-2xl shadow-premium border border-primary-100 dark:border-slate-800 py-2 animate-slide-up overflow-hidden backdrop-blur-xl">
+              class="absolute right-0 w-56 py-2 mt-3 overflow-hidden bg-white border dark:bg-slate-900 rounded-2xl shadow-premium border-primary-100 dark:border-slate-800 animate-slide-up backdrop-blur-xl">
               <div class="px-4 py-3 border-b border-primary-50 dark:border-slate-800">
-                <p class="text-xs font-medium text-primary-400 dark:text-slate-500 uppercase tracking-wider mb-1">
+                <p class="mb-1 text-xs font-medium tracking-wider uppercase text-primary-400 dark:text-slate-500">
                   Usuario</p>
-                <p class="text-sm font-semibold text-primary-900 dark:text-white truncate">{{ userEmail }}</p>
+                <p class="text-sm font-semibold truncate text-primary-900 dark:text-white">{{ userEmail }}</p>
               </div>
 
               <div class="p-1">
                 <NuxtLink to="/dashboard"
-                  class="flex items-center gap-3 w-full px-3 py-2 text-sm text-primary-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
+                  class="flex items-center w-full gap-3 px-3 py-2 text-sm transition-colors text-primary-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl"
                   @click="showUserMenu = false">
-                  <div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                  <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -112,9 +118,9 @@
                 </NuxtLink>
 
                 <NuxtLink to="/credits"
-                  class="flex items-center gap-3 w-full px-3 py-2 text-sm text-primary-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
+                  class="flex items-center w-full gap-3 px-3 py-2 text-sm transition-colors text-primary-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl"
                   @click="showUserMenu = false">
-                  <div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                  <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -124,9 +130,9 @@
                 </NuxtLink>
 
                 <NuxtLink to="/history"
-                  class="flex items-center gap-3 w-full px-3 py-2 text-sm text-primary-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
+                  class="flex items-center w-full gap-3 px-3 py-2 text-sm transition-colors text-primary-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl"
                   @click="showUserMenu = false">
-                  <div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                  <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -135,21 +141,29 @@
                 </NuxtLink>
 
                 <NuxtLink v-if="isAdmin" to="/admin/config"
-                  class="flex items-center gap-3 w-full px-3 py-2 text-sm text-red-500 hover:bg-red-500/10 rounded-xl transition-colors font-bold"
+                  class="flex items-center w-full gap-3 px-3 py-2 text-sm font-bold text-red-500 transition-colors hover:bg-red-500/10 rounded-xl"
                   @click="showUserMenu = false">
-                  <div class="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center">
+                  <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-red-500/10">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                     </svg>
                   </div>
                   Panel de Control
                 </NuxtLink>
+                <NuxtLink v-if="isAdmin" to="/admin/analytics"
+                  class="flex items-center w-full gap-3 px-3 py-2 text-sm font-bold transition-colors text-primary-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl"
+                  @click="showUserMenu = false">
+                  <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 3v18h18"/></svg>
+                  </div>
+                  Analíticas
+                </NuxtLink>
               </div>
 
               <div class="p-1 border-t border-primary-50 dark:border-slate-800">
                 <button @click="handleSignOut"
-                  class="flex items-center gap-3 w-full px-3 py-2 text-sm text-risk-high hover:bg-risk-high/10 rounded-xl transition-colors font-semibold">
-                  <div class="w-8 h-8 rounded-lg bg-risk-high/10 flex items-center justify-center">
+                  class="flex items-center w-full gap-3 px-3 py-2 text-sm font-semibold transition-colors text-risk-high hover:bg-risk-high/10 rounded-xl">
+                  <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-risk-high/10">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
