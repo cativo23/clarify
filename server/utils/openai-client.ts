@@ -20,14 +20,15 @@ export const analyzeContract = async (contractText: string, analysisType: 'basic
 
     // 1. Load Dynamic Configuration
     const promptConfig = await getPromptConfig()
-    const { models, tokenLimits, features } = promptConfig
+    const { tiers, features } = promptConfig
 
     // Force V2 if configured (or default to V2 if random string). We only support V2 now.
     const versionToUse = 'v2'
 
     // 2. Resolve Parameters
-    const model = models[analysisType] || 'gpt-4o-mini'
-    const limits = tokenLimits[analysisType] || { input: 8000, output: 800 }
+    const tier = tiers[analysisType] || tiers.premium
+    const model = tier.model || 'gpt-4o-mini'
+    const limits = tier.tokenLimits || { input: 8000, output: 800 }
 
     // 3. Load System Prompt -- Strict V2 Path
     const promptFile = analysisType === 'basic' ? 'basic-analysis-prompt.txt' : 'analysis-prompt.txt'
@@ -148,7 +149,7 @@ ${processedText}
                 const cleanContent = rawContent.replace(/^```json\s*/, '').replace(/^```\s*/, '').replace(/```$/, '').trim()
                 result = JSON.parse(cleanContent)
             }
-        } catch (parseError) {
+        } catch (parseError: any) {
             // CRITICAL: We caught a JSON error. We must THROW a specific error that contains the RAW content
             // so the upper layer (Worker) can save it to the DB for debugging, while we eventually show a friendly error to user.
             const debugInfo = {
