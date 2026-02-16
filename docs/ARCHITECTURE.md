@@ -1,69 +1,61 @@
-# 🏗️ Arquitectura Técnica - Clarify
+# Technical Architecture — Clarify
 
-Este documento detalla el diseño técnico y el flujo de datos de la plataforma Clarify para desarrolladores.
+This document describes the technical design, data flows, and architectural guidelines for Clarify.
 
-## 🧱 Componentes del Sistema
+## 🧱 Component Overview
 
-El sistema sigue una arquitectura de Micro-SaaS moderna basada en Nuxt 3 (Fullstack Framework):
+The platform is built on a modern Micro-SaaS stack using **Nuxt 3**.
 
-### 1. Frontend (Vue 3 / Nuxt 3)
-- **Framework:** Nuxt 3 con Sidebase/Supabase para autenticación.
-- **UI:** Tailwind CSS con componentes modulares (`RiskCard`, `Dropzone`, `AppHeader`).
-- **Gestión de Estado:** Vue Composition API (`ref`, `computed`).
-- **Protección de Rutas:** Middleware de autenticación integrado con Supabase Auth.
+### 1. Frontend (Nuxt 3 / Vue 3)
+- **Framework:** Nuxt 3 with server-side rendering (SSR) capabilities.
+- **UI System:** Tailwind CSS with a modular component architecture.
+- **State Management:** Vue Composition API (`ref`, `computed`).
+- **Authentication:** Managed by Supabase Auth with client-side session awareness.
 
 ### 2. Backend (Nitro Engine)
-- **API Server:** Endpoints en `server/api/`.
-- **Análisis de Documentos:** Servidor encargado de la extracción de texto (PDF) para evitar fugas de memoria en el cliente.
-- **Integración IA:** Comunicación segura con OpenAI desde el lado del servidor.
-- **Webhooks:** Gestión de eventos asíncronos de Stripe para la recarga de créditos.
+- **API Server:** Lightweight Nitro endpoints located in `server/api/`.
+- **Worker Process:** Handles long-running AI analysis via **BullMQ** and **Redis**.
+- **Services Layer:** (Recommended) Business logic should be decoupled from route handlers into helper utilities or classes.
+- **AI Integration:** Secure server-side communication with OpenAI using `gpt-4o-mini`, `gpt-5-mini`, and `gpt-5`.
 
-### 3. Persistencia y Almacenamiento (Supabase)
-- **Base de Datos:** PostgreSQL para usuarios, análisis y transacciones.
-- **Storage:** Buckets de Supabase para el almacenamiento persistente de contratos PDF.
-- **Auth:** Proveedor de identidad gestionado.
-
----
-
-## 🔄 Flujo de Datos: Análisis de Contrato
-
-El proceso de análisis es el núcleo de la aplicación y sigue estos pasos:
-
-1. **Carga (Upload):** El cliente sube un PDF a `server/api/upload`. Nitro lo transfiere al Bucket `contracts` de Supabase Storage bajo el folder del `user_id`.
-2. **Extracción:** El backend descarga el PDF temporalmente, extrae el texto plano usando `pdf-parse`.
-3. **Auditoría (IA):**
-    - Se carga el prompt dinámico desde `server/prompts/analysis-prompt.txt`.
-    - Se envía el texto + prompt a `gpt-4o`.
-    - Se recibe un objeto JSON estructurado con la auditoría.
-4. **Almacenamiento:** El resultado se guarda en la tabla `analyses` (columna `summary_json`).
-5. **Deducción:** Se resta 1 crédito de la tabla `users` de forma atómica.
-6. **Visualización:** El cliente recibe la ID del análisis y redirige a la página de resultados.
+### 3. Data & Storage (Supabase)
+- **Database:** PostgreSQL for structured data (Users, Analyses, Transactions).
+- **Storage:** Supabase Storage (S3-compatible) for encrypted contract PDFs.
+- **Realtime:** Supabase Realtime for pushing analysis updates to the dashboard without polling.
 
 ---
 
-## 💳 Sistema de Créditos y Pagos
+## 🔄 Core Data Flows
 
-Clarify utiliza un modelo de "Top-up" basado en créditos:
+### A. Contract Analysis Flow
+1. **Upload**: Client sends PDF to `/api/upload`. The server streams it to Supabase Storage in a user-isolated folder.
+2. **Preprocessing**: The backend extracts text using `pdf-parse`, tokenizes it, and identifies the target model based on the selected **Analysis Tier**.
+3. **Queueing**: A job is enqueued in Redis.
+4. **Execution**: The worker process picks up the job, sends the payload to OpenAI, and parses the structured JSON response.
+5. **Persistence**: Results are saved to the `analyses` table.
+6. **Notification**: The client UI is updated via a Realtime subscription.
 
-- **Inicio Gratuitos:** Al crear una cuenta (vía Trigger en BD), el usuario recibe 3 créditos.
-- **Checkout:** Se utiliza [Stripe Checkout](https://stripe.com/docs/payments/checkout) para una experiencia segura y cumplimiento de PCI.
-- **Cumplimiento (Fullfillment):** El crédito no se añade en el frontend. El servidor de Stripe envía un Webhook a `server/api/stripe/webhook` que valida la firma y actualiza el saldo del usuario en la base de datos de forma segura.
-
----
-
-## 🛡️ Seguridad y RLS
-
-La seguridad se apoya fuertemente en **Row Level Security (RLS)** de Supabase:
-
-- Un usuario **NUNCA** puede leer los análisis de otro.
-- Las claves de API críticas (`OPENAI_API_KEY`, `STRIPE_SECRET_KEY`) solo residen en el servidor y nunca se exponen al cliente.
-- Las comunicaciones cliente-servidor se validan mediante el JWT de sesión de Supabase.
+### B. Payment & Credits
+1. **Checkout**: User initiates a Stripe Checkout session.
+2. **Success**: After successful payment, Stripe sends a secure Webhook to `/api/stripe/webhook`.
+3. **Fulfillment**: The server validates the signature and atomically increments the user's credits in the database.
 
 ---
 
-## 🛠️ Herramientas de Desarrollo Recomendadas
+## 🛠️ Architectural Guidelines & Recommendations
 
-- **Visual Studio Code** + extensión Volar (Vue 3).
-- **Postman/Insomnia:** Para pruebas de API.
-- **Stripe CLI:** Esencial para probar webhooks en local.
-- **Supabase CLI:** Para migraciones locales (opcional).
+### Keep It Lean (Nitro vs NestJS)
+The current monolithic architecture (one Nuxt project) is optimal for the current scale (~15-20 endpoints). Moving to a separate backend (like NestJS) is deemed **overkill** until the API surface exceeds 50+ endpoints or multiple clients (Mobile, Public API) are introduced.
+
+### Development Standards
+1. **Zod Validation**: (Recommended) Implement Zod for input schema validation in all `server/api` routes.
+2. **Atomic Operations**: All credit changes must be performed via atomic PostgreSQL functions (RPCs) to prevent race conditions.
+3. **Row Level Security (RLS)**: No data should be accessible without a matching RLS policy in Supabase.
+4. **Error Masking**: Raw database or AI errors must be masked. Log the full error server-side, but return generic messages to the client.
+
+---
+
+## ⚙️ Deployment & Infrastructure
+- **Containerization**: The app is dockerized with a non-root user for security.
+- **Routing**: Traefik handles SSL termination and routing.
+- **Scaling**: The worker process can be scaled independently of the web tier to handle analysis load spikes.

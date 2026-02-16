@@ -103,9 +103,12 @@ npm run dev
 
 Para una configuración más profunda, consulta nuestras guías para desarrolladores:
 
-1. 💳 [Configuración de Stripe](file:///home/cativo23/projects/personal/clarify/docs/STRIPE_SETUP.md)
-2. 🗄️ [Configuración de Supabase](file:///home/cativo23/projects/personal/clarify/docs/SUPABASE_SETUP.md)
-3. 📖 [Manual de Usuario / Walkthrough](file:///home/cativo23/projects/personal/clarify/docs/WALKTHROUGH_FINAL.md)
+1. 🧪 [Analysis Tiers & AI Strategy](docs/ANALYSIS_TIERS.md)
+2. 🏗️ [Technical Architecture](docs/ARCHITECTURE.md)
+3. 🔐 [Security & Risk Report](docs/SECURITY_CONSOLIDATED_REPORT.md)
+4. 💳 [Stripe Setup](docs/STRIPE_SETUP.md)
+5. 🗄️ [Supabase Setup](docs/SUPABASE_SETUP.md)
+6. 📖 [Developer Walkthrough](docs/DEV_WALKTHROUGH.md)
 
 ---
 
