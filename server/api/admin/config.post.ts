@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig()
     const adminEmail = config.public.adminEmail
 
-    if (!adminEmail || user.email !== adminEmail) {
+    if (!user || user.email !== adminEmail) {
         throw createError({
             statusCode: 401,
             message: 'Unauthorized',
@@ -19,11 +19,12 @@ export default defineEventHandler(async (event) => {
     // Use Service Role to bypass RLS policies
     const client = await serverSupabaseServiceRole(event)
 
-    // Validation (Basic)
-    if (!body || !body.promptVersion || !body.models || !body.tokenLimits) {
+
+    // Validation (Basic) - expect new `tiers` shape
+    if (!body || !body.promptVersion || !body.tiers || !body.tiers.basic || !body.tiers.premium || !body.tiers.forensic) {
         throw createError({
             statusCode: 400,
-            message: 'Invalid configuration object',
+            message: 'Invalid configuration object; expected promptVersion and tiers.{basic,premium,forensic}',
         })
     }
 

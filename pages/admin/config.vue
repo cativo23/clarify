@@ -4,15 +4,12 @@ definePageMeta({
     layout: 'default' // Or admin layout if exists
 })
 
-const config = ref({
-    promptVersion: 'v1',
-    models: {
-        basic: '',
-        premium: ''
-    },
-    tokenLimits: {
-        basic: { input: 0, output: 0 },
-        premium: { input: 0, output: 0 }
+const config = ref<any>({
+    promptVersion: 'v2',
+    tiers: {
+        basic: { model: '', credits: 1, tokenLimits: { input: 8000, output: 2500 } },
+        premium: { model: '', credits: 3, tokenLimits: { input: 35000, output: 10000 } },
+        forensic: { model: '', credits: 10, tokenLimits: { input: 120000, output: 30000 } },
     },
     features: {
         preprocessing: true,
@@ -27,8 +24,21 @@ const message = ref('')
 // Fetch Config
 onMounted(async () => {
     try {
-        const data = await $fetch('/api/admin/config')
-        config.value = data
+        const data = await $fetch('/api/admin/config') as any
+        // Map legacy shape if present
+        if (data && data.models) {
+            config.value = {
+                promptVersion: data.promptVersion || 'v2',
+                tiers: {
+                    basic: { model: data.models.basic || '', credits: 1, tokenLimits: data.tokenLimits?.basic || { input: 8000, output: 2500 } },
+                    premium: { model: data.models.premium || '', credits: 3, tokenLimits: data.tokenLimits?.premium || { input: 35000, output: 10000 } },
+                    forensic: { model: 'gpt-5', credits: 10, tokenLimits: { input: 120000, output: 30000 } },
+                },
+                features: data.features || { preprocessing: true, tokenDebug: false }
+            }
+        } else {
+            config.value = data
+        }
     } catch (e: any) {
         message.value = 'Error loading config: ' + e.message
     } finally {
@@ -47,9 +57,21 @@ const saveConfig = async () => {
         })
         message.value = 'Configuration saved successfully!'
         
-        // Refresh to ensure we have canonical state
-        const data = await $fetch('/api/admin/config')
-        config.value = data
+        // Refresh to ensure we have canonical state (map legacy if needed)
+        const data = await $fetch('/api/admin/config') as any
+        if (data && data.models) {
+            config.value = {
+                promptVersion: data.promptVersion || 'v2',
+                tiers: {
+                    basic: { model: data.models.basic || '', credits: 1, tokenLimits: data.tokenLimits?.basic || { input: 8000, output: 2500 } },
+                    premium: { model: data.models.premium || '', credits: 3, tokenLimits: data.tokenLimits?.premium || { input: 35000, output: 10000 } },
+                    forensic: { model: 'gpt-5', credits: 10, tokenLimits: { input: 120000, output: 30000 } },
+                },
+                features: data.features || { preprocessing: true, tokenDebug: false }
+            }
+        } else {
+            config.value = data
+        }
     } catch (e: any) {
         message.value = 'Error saving config: ' + e.message
     } finally {
@@ -74,8 +96,10 @@ const availableModels = [
 
 const searchBasic = ref('')
 const searchPremium = ref('')
+const searchForensic = ref('')
 const showDropdownBasic = ref(false)
 const showDropdownPremium = ref(false)
+const showDropdownForensic = ref(false)
 
 const filteredModelsBasic = computed(() => {
     return availableModels.filter(m => 
@@ -91,14 +115,24 @@ const filteredModelsPremium = computed(() => {
     )
 })
 
-const selectModel = (plan: 'basic' | 'premium', modelId: string) => {
-    config.value.models[plan] = modelId
+const filteredModelsForensic = computed(() => {
+    return availableModels.filter(m => 
+        m.name.toLowerCase().includes(searchForensic.value.toLowerCase()) ||
+        m.id.toLowerCase().includes(searchForensic.value.toLowerCase())
+    )
+})
+
+const selectModel = (plan: 'basic' | 'premium' | 'forensic', modelId: string) => {
+    config.value.tiers[plan].model = modelId
     if (plan === 'basic') {
         showDropdownBasic.value = false
         searchBasic.value = ''
-    } else {
+    } else if (plan === 'premium') {
         showDropdownPremium.value = false
         searchPremium.value = ''
+    } else {
+        showDropdownForensic.value = false
+        searchForensic.value = ''
     }
 }
 
@@ -130,8 +164,11 @@ const vClickOutside = {
                     <h1 class="text-4xl font-black mb-2">Configuración del Sistema</h1>
                     <p class="text-slate-500 dark:text-slate-400 font-medium">Gestiona parámetros globales de la IA y límites.</p>
                 </div>
-                <div class="w-16 h-16 bg-gradient-to-br from-red-500 to-amber-500 rounded-3xl shadow-lg shadow-red-500/20 flex items-center justify-center text-white">
+                <div class="flex items-center gap-3">
+                    <NuxtLink to="/admin/analytics" class="px-3 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-600 rounded-lg text-[12px] font-bold uppercase tracking-widest hover:bg-amber-500 hover:text-white transition-all">Analíticas</NuxtLink>
+                    <div class="w-16 h-16 bg-gradient-to-br from-red-500 to-amber-500 rounded-3xl shadow-lg shadow-red-500/20 flex items-center justify-center text-white">
                      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </div>
                 </div>
             </div>
 
@@ -197,8 +234,8 @@ const vClickOutside = {
                                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Basic Plan Model</label>
                                 <div @click="showDropdownBasic = !showDropdownBasic" 
                                      class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 font-mono text-sm cursor-pointer flex justify-between items-center group hover:border-secondary transition-all">
-                                    <span :class="config.models.basic ? 'text-slate-900 dark:text-white' : 'text-slate-400'">
-                                        {{ config.models.basic || 'Seleccionar modelo...' }}
+                                        <span :class="config.tiers?.basic?.model ? 'text-slate-900 dark:text-white' : 'text-slate-400'">
+                                        {{ config.tiers?.basic?.model || 'Seleccionar modelo...' }}
                                     </span>
                                     <svg class="w-4 h-4 text-slate-400 group-hover:text-secondary transition-transform" :class="{'rotate-180': showDropdownBasic}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                                 </div>
@@ -213,7 +250,7 @@ const vClickOutside = {
                                         <button v-for="m in filteredModelsBasic" :key="m.id" 
                                             @click="selectModel('basic', m.id)"
                                             class="w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-between group"
-                                            :class="config.models.basic === m.id ? 'bg-secondary text-white' : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'">
+                                            :class="config.tiers?.basic?.model === m.id ? 'bg-secondary text-white' : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'">
                                             <span>{{ m.name }}</span>
                                             <span class="text-[8px] px-1.5 py-0.5 rounded uppercase" :class="m.type === 'reasoning' ? 'bg-amber-500/20 text-amber-500' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'">{{ m.id }}</span>
                                         </button>
@@ -226,8 +263,8 @@ const vClickOutside = {
                                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Premium Plan Model</label>
                                 <div @click="showDropdownPremium = !showDropdownPremium" 
                                      class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 font-mono text-sm cursor-pointer flex justify-between items-center group hover:border-secondary transition-all">
-                                    <span :class="config.models.premium ? 'text-slate-900 dark:text-white' : 'text-slate-400'">
-                                        {{ config.models.premium || 'Seleccionar modelo...' }}
+                                    <span :class="config.tiers?.premium?.model ? 'text-slate-900 dark:text-white' : 'text-slate-400'">
+                                        {{ config.tiers?.premium?.model || 'Seleccionar modelo...' }}
                                     </span>
                                     <svg class="w-4 h-4 text-slate-400 group-hover:text-secondary transition-transform" :class="{'rotate-180': showDropdownPremium}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                                 </div>
@@ -242,7 +279,34 @@ const vClickOutside = {
                                         <button v-for="m in filteredModelsPremium" :key="m.id" 
                                             @click="selectModel('premium', m.id)"
                                             class="w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-between group"
-                                            :class="config.models.premium === m.id ? 'bg-secondary text-white' : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'">
+                                            :class="config.tiers?.premium?.model === m.id ? 'bg-secondary text-white' : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'">
+                                            <span>{{ m.name }}</span>
+                                            <span class="text-[8px] px-1.5 py-0.5 rounded uppercase" :class="m.type === 'reasoning' ? 'bg-amber-500/20 text-amber-500' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'">{{ m.id }}</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Forensic Model Dropdown -->
+                            <div class="relative" v-click-outside="() => showDropdownForensic = false">
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Forensic Plan Model</label>
+                                <div @click="showDropdownForensic = !showDropdownForensic" 
+                                     class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 font-mono text-sm cursor-pointer flex justify-between items-center group hover:border-secondary transition-all">
+                                    <span :class="config.tiers?.forensic?.model ? 'text-slate-900 dark:text-white' : 'text-slate-400'">
+                                        {{ config.tiers?.forensic?.model || 'Seleccionar modelo...' }}
+                                    </span>
+                                    <svg class="w-4 h-4 text-slate-400 group-hover:text-secondary transition-transform" :class="{'rotate-180': showDropdownForensic}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                </div>
+                                
+                                <div v-if="showDropdownForensic" class="absolute z-20 mt-2 w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl overflow-hidden p-2 animate-slide-up">
+                                    <div class="mb-2 p-2 relative">
+                                        <input v-model="searchForensic" type="text" placeholder="Buscar modelo..." 
+                                               class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg px-8 py-2 text-xs outline-none">
+                                    </div>
+                                    <div class="max-h-48 overflow-y-auto space-y-1 custom-scrollbar">
+                                        <button v-for="m in filteredModelsForensic" :key="m.id" 
+                                            @click="selectModel('forensic', m.id)"
+                                            class="w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-between group"
+                                            :class="config.tiers?.forensic?.model === m.id ? 'bg-secondary text-white' : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'">
                                             <span>{{ m.name }}</span>
                                             <span class="text-[8px] px-1.5 py-0.5 rounded uppercase" :class="m.type === 'reasoning' ? 'bg-amber-500/20 text-amber-500' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'">{{ m.id }}</span>
                                         </button>
@@ -287,37 +351,66 @@ const vClickOutside = {
                 <!-- Token Limits -->
                  <section class="bg-white dark:bg-slate-900 p-8 rounded-[2rem] shadow-premium border border-slate-100 dark:border-slate-800">
                     <h2 class="text-xl font-black mb-6">Límites de Tokens</h2>
-                    <div class="grid md:grid-cols-2 gap-8">
+                         <div class="grid md:grid-cols-3 gap-8">
                          <div class="p-6 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800">
                             <h3 class="font-black text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                                 <span class="w-2 h-2 rounded-full bg-slate-400"></span>
                                 Basic Plan
                             </h3>
+                             <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Credits</label>
+                                        <input type="number" v-model="config.tiers.basic.credits" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-sm font-bold">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Input Max</label>
+                                        <input type="number" v-model="config.tiers.basic.tokenLimits.input" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-sm font-bold">
+                                    </div>
+                                     <div>
+                                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Output Max</label>
+                                        <input type="number" v-model="config.tiers.basic.tokenLimits.output" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-sm font-bold">
+                                    </div>
+                                </div>
+                        </div>
+                        
+                        <div class="p-6 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800">
+                            <h3 class="font-black text-rose-500 mb-4 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-rose-400"></span>
+                                Forensic Plan
+                            </h3>
                             <div class="space-y-4">
                                 <div>
+                                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Credits</label>
+                                    <input type="number" v-model="config.tiers.forensic.credits" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-sm font-bold">
+                                </div>
+                                <div>
                                     <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Input Max</label>
-                                    <input type="number" v-model="config.tokenLimits.basic.input" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-sm font-bold">
+                                    <input type="number" v-model="config.tiers.forensic.tokenLimits.input" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-sm font-bold">
                                 </div>
                                  <div>
                                     <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Output Max</label>
-                                    <input type="number" v-model="config.tokenLimits.basic.output" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-sm font-bold">
+                                    <input type="number" v-model="config.tiers.forensic.tokenLimits.output" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-sm font-bold">
                                 </div>
                             </div>
                         </div>
 
-                         <div class="p-6 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800">
+                                 <div class="p-6 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800">
                             <h3 class="font-black text-secondary mb-4 flex items-center gap-2">
                                 <span class="w-2 h-2 rounded-full bg-secondary"></span>
                                 Premium Plan
                             </h3>
                             <div class="space-y-4">
                                 <div>
+                                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Credits</label>
+                                    <input type="number" v-model="config.tiers.premium.credits" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-sm font-bold">
+                                </div>
+                                <div>
                                     <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Input Max</label>
-                                    <input type="number" v-model="config.tokenLimits.premium.input" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-sm font-bold">
+                                    <input type="number" v-model="config.tiers.premium.tokenLimits.input" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-sm font-bold">
                                 </div>
                                  <div>
                                     <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Output Max</label>
-                                    <input type="number" v-model="config.tokenLimits.premium.output" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-sm font-bold">
+                                    <input type="number" v-model="config.tiers.premium.tokenLimits.output" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-sm font-bold">
                                 </div>
                             </div>
                         </div>

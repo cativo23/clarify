@@ -48,14 +48,14 @@ export default defineEventHandler(async (event) => {
 
         // 3. Get Limits
         const config = await getPromptConfig(client)
-        const { tokenLimits, features } = config
+        const { tiers } = config
 
         // 4. Calculate Tokens
         // Basic Check
-        const basicLimit = tokenLimits.basic.input
+        const basicLimit = tiers.basic.tokenLimits.input
 
         // Premium Check
-        const premiumLimit = tokenLimits.premium.input
+        const premiumLimit = tiers.premium.tokenLimits.input
 
         // Just run full count, reusing preprocessDocument to count
         const fullResult = preprocessDocument(text, 1000000)
