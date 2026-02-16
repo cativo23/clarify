@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
     const runtimeConfig = useRuntimeConfig()
     const adminEmail = runtimeConfig.public.adminEmail
 
-    if (!adminEmail || user.email !== adminEmail) {
+    if (!user || user.email !== adminEmail) {
         throw createError({
             statusCode: 401,
             message: 'Unauthorized',

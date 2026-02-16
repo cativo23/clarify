@@ -24,7 +24,7 @@ const message = ref('')
 // Fetch Config
 onMounted(async () => {
     try {
-        const data = await $fetch('/api/admin/config')
+        const data = await $fetch('/api/admin/config') as any
         // Map legacy shape if present
         if (data && data.models) {
             config.value = {
@@ -58,7 +58,7 @@ const saveConfig = async () => {
         message.value = 'Configuration saved successfully!'
         
         // Refresh to ensure we have canonical state (map legacy if needed)
-        const data = await $fetch('/api/admin/config')
+        const data = await $fetch('/api/admin/config') as any
         if (data && data.models) {
             config.value = {
                 promptVersion: data.promptVersion || 'v2',

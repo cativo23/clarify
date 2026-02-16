@@ -14,7 +14,7 @@ const loadData = async () => {
     const [uRes, pRes] = await Promise.all([
       $fetch('/api/admin/users'),
       $fetch('/api/admin/pricing')
-    ])
+    ]) as [any, any]
     users.value = uRes.users || []
     pricing.value = pRes.pricing || []
     renderChart()
@@ -34,7 +34,9 @@ const renderChart = async () => {
     if (chartInstance) {
       chartInstance.destroy()
     }
-    chartInstance = new Chart(chartRef.value.getContext('2d'), {
+    const ctx = chartRef.value.getContext('2d')
+    if (!ctx) return
+    chartInstance = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: users.value.map(u => u.email),
@@ -60,10 +62,10 @@ const estimateUserCost = async (userId: string) => {
   // If cached, return
   if (estimates.value[userId] !== undefined) return
   try {
-    const res = await $fetch(`/api/admin/user/${userId}`)
+    const res = await $fetch(`/api/admin/user/${userId}`) as any
     const analyses = res.analyses || []
     // fetch prompt config to know fallback models
-    const promptConfig = await $fetch('/api/admin/config')
+    const promptConfig = await $fetch('/api/admin/config') as any
     let total = 0
     for (const a of analyses) {
       const summary = a.summary_json || {}
@@ -132,7 +134,7 @@ const estimateUserCost = async (userId: string) => {
                   <div v-if="estimates[u.id] !== undefined" class="font-mono text-xs">
                     <span v-if="estimates[u.id] === -1">Error</span>
                     <span v-else>
-                      ${{ estimates[u.id].toFixed(6) }}
+                      ${{ (estimates[u.id] as number).toFixed(6) }}
                     </span>
                   </div>
                 </div>

@@ -10,7 +10,9 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
-    "typecheck": "nuxt typecheck"
+    "typecheck": "nuxt typecheck",
+    "security:audit": "npm audit --audit-level=high",
+    "security:fix": "npm audit fix"
   },
   "dependencies": {
     "@heroicons/vue": "^2.2.0",
