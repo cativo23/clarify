@@ -1,51 +1,60 @@
-# 📖 Guía de Desarrollo y Funcionalidades (MVP)
+# Developer Walkthrough & MVP Guide
 
-Bienvenido a la guía técnica de **Clarify**. Este documento describe los hitos alcanzados y cómo opera cada sección del MVP para facilitar la integración de nuevos desarrolladores.
+Welcome to the **Clarify** technical guide. This document describes the architecture, core modules, and implementation status of the MVP to help onboard new developers.
 
-## 🏁 Estado Actual: MVP Completo
+## 🏁 Current Status: MVP Feature-Complete
 
-El proyecto ha superado las fases fundamentales de infraestructura, lógica de negocio y UI Premium. Actualmente se encuentra en un estado listo para despliegue en producción (Staging/Master).
-
----
-
-## 🛠️ Módulos Implementados
-
-### 1. Infraestructura de Microservicios
-- **Docker Ready:** El sistema utiliza contenedores optimizados para Node 20 y PostgreSQL. [docker-compose.yml](file:///home/cativo23/projects/personal/clarify/docker-compose.yml) gestiona el stack completo.
-- **Persistence Layer:** Esquema relacional optimizado con índices para búsquedas rápidas de análisis por usuario. [database/init.sql](file:///home/cativo23/projects/personal/clarify/database/init.sql).
-
-### 2. Motor de Auditoría IA
-- **Análisis Semántico:** Integración con OpenAI GPT-4o. La lógica reside en [server/utils/openai-client.ts](file:///home/cativo23/projects/personal/clarify/server/utils/openai-client.ts) y utiliza un **Prompt Dinámico** externalizado en `server/prompts/`.
-- **Parser de Documentos:** Extracción robusta de texto desde PDF para análisis masivos. [server/utils/pdf-parser.ts](file:///home/cativo23/projects/personal/clarify/server/utils/pdf-parser.ts).
-
-### 3. Pagos y Monetización
-- **Stripe Integration:** Flujo completo de Checkout y Webhooks. El sistema garantiza que los créditos solo se otorguen tras la confirmación exitosa de Stripe. [server/api/stripe/webhook.post.ts](file:///home/cativo23/projects/personal/clarify/server/api/stripe/webhook.post.ts).
-
-### 4. Interfaz de Usuario (UI/UX)
-- **Dashboard:** Centro de control del usuario con métricas en tiempo real y carga de archivos vía Drag & Drop. [pages/dashboard.vue](file:///home/cativo23/projects/personal/clarify/pages/dashboard.vue).
-- **Reportes Visuales:** Visualización de riesgos mediante componentes semáforo (`RiskCard.vue`) y resumen ejecutivo. [pages/analyze/[id].vue](file:///home/cativo23/projects/personal/clarify/pages/analyze/%5Bid%5D.vue).
+The project has completed the foundational phases of infrastructure, business logic, and Premium UI. It is currently in a production-ready state (Staging/Master).
 
 ---
 
-## 🧭 Navegando el Código
+## 🛠️ Key Modules
 
-Para entender la lógica profunda, recomendamos leer los siguientes documentos en orden:
+### 1. 🧪 Hybrid AI Engine (3-Tier Strategy)
+Our core value proposition is the multi-tier analysis system:
+- **Tiers**: Basic (`gpt-4o-mini`), Premium (`gpt-5-mini`), and Forensic (`gpt-5`).
+- **Dynamic Config**: Managed via `server/utils/config.ts` and remote database overrides.
+- **Optimization**: Uses prompt versioning (v2) with high cache efficiency and semantic text preprocessing.
+- **Reference**: See [Analysis Tiers & Strategy](ANALYSIS_TIERS.md).
 
-1. 🏗️ [Arquitectura de Sistema](file:///home/cativo23/projects/personal/clarify/docs/ARCHITECTURE.md)
-2. 🗄️ [Configuración de Infraestructura (Supabase)](file:///home/cativo23/projects/personal/clarify/docs/SUPABASE_SETUP.md)
-3. 💳 [Manual de Integración Financiera (Stripe)](file:///home/cativo23/projects/personal/clarify/docs/STRIPE_SETUP.md)
+### 2. 🏗️ Tech Stack & Infrastructure
+- **Nuxt 3 (Fullstack)**: Single-origin deployment using Nitro.
+- **Dockerized Environment**: Optimized for Node 20 and PostgreSQL. [docker-compose.yml](../docker-compose.yml) manages the full stack.
+- **Persistence Layer**: Relational schema with trigram indices for fast analysis searches. [database/init.sql](../database/init.sql).
+
+### 3. 💳 Financial Infrastructure
+- **Stripe Integration**: Complete Checkout and Webhook flow. Ensures credits are granted only after Stripe confirmation.
+- **Atomic Billing**: Credit deductions are performed via PostgreSQL RPCs to prevent race conditions.
+- **Reference**: See [Stripe Setup](STRIPE_SETUP.md).
+
+### 4. 📊 User & Admin Dashboards
+- **User Dashboard**: Real-time status updates via Supabase Realtime and drag-and-drop file uploads.
+- **Admin Analytics**: Private dashboard for monitoring token costs, model performance, and user growth.
+- **Risk Visualization**: The "Traffic Light" indicator system (`RiskCard.vue`) provides an executive summary of legal risks.
 
 ---
 
-## 🚀 Guía de Despliegue (Checklist)
+## 🧭 Codebase Navigation
 
-Para llevar Clarify a producción, siga estos pasos críticos:
+To dive deep into the implementation, follow these documents in order:
 
-- [ ] **Configuración de Dominio:** Apuntar DNS a Vercel/Netlify.
-- [ ] **Secrets Management:** Configurar las 7 variables de entorno clave en el panel de control de producción.
-- [ ] **Whitelisting:** Agregar el dominio de producción a los "Allowed Origins" en Supabase y Stripe.
-- [ ] **Webhooks:** Asegurarse de que el Webhook Secret de Stripe coincida con el de producción.
+1.  🏗️ [Technical Architecture](ARCHITECTURE.md)
+2.  🗄️ [Infrastructure Setup (Supabase)](SUPABASE_SETUP.md)
+3.  🧪 [Analysis Strategy & Tiers](ANALYSIS_TIERS.md)
+4.  🔐 [Security Consolidated Report](SECURITY_CONSOLIDATED_REPORT.md)
 
 ---
 
-Este proyecto ha sido diseñado siguiendo principios de **Limpia Arquitectura** y **Typescript First** para asegurar su mantenibilidad y escalabilidad a futuro.
+## 🚀 Deployment Checklist
+
+Before moving to production, ensure these critical steps are completed:
+
+- [ ] **Domain Setup**: Point DNS to your hosting provider (Vercel/Self-hosted).
+- [ ] **Secret Management**: Configure the 7+ mandatory environment variables (OpenAI, Stripe, Supabase).
+- [ ] **Whitelisting**: Add production origins to "Allowed Domains" in Supabase Auth and Stripe settings.
+- [ ] **Webhooks**: Confirm the production Stripe Webhook Secret is correctly set.
+- [ ] **Admin Security**: Ensure the `ADMIN_EMAIL` environment variable matches the intended administrator account.
+
+---
+
+*This project follows **Clean Architecture** and **TypeScript-First** principles to ensure long-term maintainability and scalability.*

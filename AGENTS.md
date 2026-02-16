@@ -17,9 +17,17 @@
 | **Language** | **TypeScript** | Strict typing is enforced. Avoid `any`. |
 | **Database** | **Supabase** | PostgreSQL. **Relies heavily on RLS (Row Level Security)**. |
 | **Auth** | **Supabase Auth** | Integrated with Nuxt sidebase/supabase. |
-| **AI** | **OpenAI API** | GPT-4o. Prompts stored in `server/prompts`. |
+| **AI** | **OpenAI API** | GPT-4o-mini, GPT-5-mini, and GPT-5. See 3-tier strategy. |
 | **Payments** | **Stripe** | Webhook-based credit fulfillment. |
 | **Styling** | **Tailwind CSS** | "Premium" aesthetic. Dark mode optimization. |
+
+## 🏗️ 3-Tier Strategy
+The system offers three analysis levels:
+- **Basic**: `gpt-4o-mini` (1 credit) - Fast red-flag scan.
+- **Premium**: `gpt-5-mini` (3 credits) - Reasoning-based forensic audit.
+- **Forensic**: `gpt-5` (10 credits) - Exhaustive high-precision audit.
+
+Configuration is handled in `server/utils/config.ts`.
 
 ## 📂 Architecture & Directory Structure
 
