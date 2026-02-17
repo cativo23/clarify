@@ -5,13 +5,17 @@ import { analyzeContract } from '../utils/openai-client'
 import { createClient } from '@supabase/supabase-js'
 
 export default defineNitroPlugin((_nitroApp) => {
-    const config = useRuntimeConfig()
+    // config removed as it is unused
 
     // Create Supabase Admin client to bypass RLS in background jobs
-    const supabaseAdmin = createClient(
-        process.env.SUPABASE_URL || '',
-        config.supabaseServiceKey
-    )
+    const supabaseUrl = process.env.SUPABASE_URL || ''
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || ''
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+        console.error('[Worker] Missing Supabase configuration!')
+    }
+
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
 
     const worker = new Worker('analysis-queue', async (job) => {
         const { analysisId, userId, storagePath, analysisType } = job.data
@@ -25,12 +29,14 @@ export default defineNitroPlugin((_nitroApp) => {
                 .eq('id', analysisId)
 
             // 2. Download from Storage
+            console.log(`[Worker] Downloading file: ${storagePath} from bucket 'contracts'`)
             const { data: fileData, error: downloadError } = await supabaseAdmin.storage
                 .from('contracts')
                 .download(storagePath)
 
             if (downloadError || !fileData) {
-                throw new Error(`Failed to download file from storage: ${downloadError?.message}`)
+                console.error('[Worker] Supabase Download Error:', JSON.stringify(downloadError, null, 2))
+                throw new Error(`Failed to download file from storage: ${downloadError?.message || JSON.stringify(downloadError)}`)
             }
 
             // 3. Extract text
