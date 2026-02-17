@@ -90,8 +90,7 @@ export function getWorkerSupabaseClient(): WorkerSupabaseClient {
 
             // Build update payload with only allowed fields
             const updateData: any = {
-                status,
-                updated_at: new Date().toISOString()
+                status
             }
 
             // Only include provided optional fields
