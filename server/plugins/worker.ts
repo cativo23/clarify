@@ -3,6 +3,7 @@ import { getRedisConnection } from '../utils/queue'
 import { extractTextFromPDF } from '../utils/pdf-parser'
 import { analyzeContract } from '../utils/openai-client'
 import { getWorkerSupabaseClient } from '../utils/worker-supabase'
+import { sanitizeErrorMessage } from '../utils/error-handler'
 
 export default defineNitroPlugin((_nitroApp) => {
     const worker = new Worker('analysis-queue', async (job) => {
@@ -80,7 +81,7 @@ export default defineNitroPlugin((_nitroApp) => {
 
             // Mark as failed in DB using scoped client
             await supabase.updateAnalysisStatus(analysisId, 'failed', {
-                error_message: errorMessage,
+                error_message: sanitizeErrorMessage(errorMessage),
                 summary_json: debugData ? { _debug: debugData } : null
             })
         }
