@@ -11,30 +11,19 @@
 
 This report consolidates findings from multiple security audits (Code Review, Threat Model, and Vulnerability Assessment). A total of **20 unique vulnerabilities** were identified across the platform. While structural security (RLS, Auth) is in place, significant logic and configuration flaws exist that require immediate attention.
 
-| Severity | Count | Status |
-| :--- | :--- | :--- |
-| 🔴 **Critical** | 4 | Open |
+| 🔴 **Critical** | 3 | Open |
 | 🟠 **High** | 6 | Open |
 | 🟡 **Medium** | 6 | Open |
 | 🟢 **Low** | 2 | Open |
-| ✅ **Resolved** | 3 | Fixed (C1, H1, Deps) |
+| ✅ **Resolved** | 4 | Fixed (C1, C2, H1, Deps) |
 
 **Overall Risk Score: 7.8/10 (High)**
-
 ---
-
 ## 🔴 Critical Vulnerabilities
-
-### C2: Server-Side Request Forgery (SSRF) via `file_url`
-- **Location:** `server/api/analyze.post.ts`, `server/api/check-tokens.post.ts`
-- **Description:** `file_url` is used without validating it belongs to the official Supabase bucket.
-- **Impact:** Internal network scanning or unauthorized data access.
-
 ### C3: Open Redirect / Phishing Vector
 - **Location:** `server/api/stripe/checkout.post.ts`
 - **Description:** `successUrl` and `cancelUrl` are accepted from the client without origin validation.
 - **Impact:** Users can be redirected to malicious phishing sites after a legitimate payment.
-
 ### C4: Admin Pricing Endpoint Missing Authentication
 - **Location:** `server/api/admin/pricing.get.ts`
 - **Description:** Uses service key to bypass RLS but lacks any user/admin validation.
@@ -107,6 +96,11 @@ This report consolidates findings from multiple security audits (Code Review, Th
 - **Status:** ✅ FIXED (Feb 16, 2026)
 - **Location:** `server/api/analyze.post.ts`, `database/init.sql`, `database/migrations/001_...sql`
 - **Description:** Fixed the TOCTOU race condition using `FOR UPDATE` row locking. Additionally resolved an IDOR vulnerability by removing `p_user_id` from the RPC and using `auth.uid()` securely on the server.
+
+### Resolved: C2 - Server-Side Request Forgery (SSRF) Protection
+- **Status:** ✅ FIXED (Feb 16, 2026)
+- **Location:** `server/api/analyze.post.ts`, `server/api/check-tokens.post.ts`, `server/utils/ssrf-protection.ts`
+- **Description:** Implemented strict URL validation for Supabase Storage. Added hostname whitelisting, bucket restrictions (contracts only), path traversal prevention, and protocol enforcement (HTTPS-only). Enforced use of relative storage paths in the database instead of raw external URLs.
 
 ---
 

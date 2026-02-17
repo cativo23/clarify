@@ -66,7 +66,7 @@ ON CONFLICT (email) DO NOTHING;
 -- Uses FOR UPDATE lock to prevent race conditions
 CREATE OR REPLACE FUNCTION process_analysis_transaction(
     p_contract_name TEXT,
-    p_file_url TEXT,
+    p_storage_path TEXT,
     p_analysis_type TEXT DEFAULT 'premium',
     p_credit_cost INTEGER DEFAULT 3,
     p_summary_json JSONB DEFAULT NULL,
@@ -116,7 +116,7 @@ BEGIN
     ) VALUES (
         v_user_id,
         p_contract_name,
-        p_file_url,
+        p_storage_path,
         p_summary_json,
         p_risk_level,
         'pending',
