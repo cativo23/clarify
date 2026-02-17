@@ -78,27 +78,26 @@ const renderChart = async () => {
   }
 }
 
-function getTokenCountsFromSummary(summary: any) {
-  const debug = summary?._debug || {}
-  if (!debug.usage) return { input: 0, output: 0 }
-  const input = debug.usage.input_tokens || debug.usage.prompt_tokens || debug.usage.total_input_tokens || debug.usage.tokens_in || debug.usage.input || debug.usage.prompt || 0
-  const output = debug.usage.output_tokens || debug.usage.completion_tokens || debug.usage.total_output_tokens || debug.usage.tokens_out || debug.usage.output || 0
-  return { input: Number(input) || 0, output: Number(output) || 0 }
-}
-
 const estimateUserCost = async (userId: string) => {
   if (estimates.value[userId] !== undefined) return
   
   try {
     const res = await $fetch(`/api/admin/user/${userId}`) as any
     const analyses = res.analyses || []
+    // fetch prompt config to know fallback models
     const promptConfig = await $fetch('/api/admin/config') as any
     let total = 0
     
     for (const a of analyses) {
       const summary = a.summary_json || {}
-      const { input, output } = getTokenCountsFromSummary(summary)
-      const model = summary?._debug?.model || promptConfig?.tiers?.premium?.model || 'gpt-5-mini'
+      const debug = summary?._debug || {}
+      if (!debug.usage) {
+        // Skip if no usage data
+        continue
+      }
+      const input = debug.usage.input_tokens || debug.usage.prompt_tokens || debug.usage.total_input_tokens || debug.usage.tokens_in || debug.usage.input || debug.usage.prompt || 0
+      const output = debug.usage.output_tokens || debug.usage.completion_tokens || debug.usage.total_output_tokens || debug.usage.tokens_out || debug.usage.output || 0
+      const model = debug.model_used || promptConfig?.tiers?.premium?.model || 'gpt-5-mini'
       const priceRow = pricing.value.find((p: any) => p.model === model) || pricing.value[0]
       const inputCost = (priceRow?.input_cost || 0)
       const outputCost = (priceRow?.output_cost || 0)
