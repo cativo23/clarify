@@ -19,7 +19,9 @@ export const fetchUserProfile = async () => {
     if (!user.value?.id) return null
 
     try {
-        const profile = await $fetch<User>('/api/user/profile')
+        const profile = await $fetch<User>('/api/user/profile', {
+            headers: useRequestHeaders(['cookie']) as any
+        })
         if (profile) {
             creditsState.value = profile.credits
             userState.value = profile
