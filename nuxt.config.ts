@@ -52,7 +52,6 @@ export default defineNuxtConfig({
     port: 3001,
   },
 
-
   // App configuration
   app: {
     head: {
@@ -65,6 +64,13 @@ export default defineNuxtConfig({
           content: 'Traduce contratos complejos a un formato visual tipo semáforo. Entiende qué estás firmando en segundos.'
         },
         { name: 'theme-color', content: '#0f172a' },
+        // [SECURITY FIX M5] Security headers
+        { 'http-equiv': 'Content-Security-Policy', content: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co https://api.openai.com https://api.stripe.com;" },
+        { 'http-equiv': 'X-Content-Type-Options', content: 'nosniff' },
+        { 'http-equiv': 'X-Frame-Options', content: 'DENY' },
+        { 'http-equiv': 'X-XSS-Protection', content: '1; mode=block' },
+        { 'http-equiv': 'Referrer-Policy', content: 'strict-origin-when-cross-origin' },
+        { 'http-equiv': 'Permissions-Policy', content: 'geolocation=(), microphone=(), camera=()' },
       ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
@@ -79,6 +85,20 @@ export default defineNuxtConfig({
   // Nitro configuration for serverless functions
   nitro: {
     preset: 'vercel',
+    // [SECURITY FIX M5] Security headers at server level
+    routeRules: {
+      '/**': {
+        headers: {
+          'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
+          'X-Content-Type-Options': 'nosniff',
+          'X-Frame-Options': 'DENY',
+          'X-XSS-Protection': '1; mode=block',
+          'Referrer-Policy': 'strict-origin-when-cross-origin',
+          'Permissions-Policy': 'geolocation=(), microphone=(), camera=()',
+          'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co https://api.openai.com https://api.stripe.com;",
+        }
+      }
+    }
   },
 
   // Vite configuration for Hot Module Replacement (HMR) in Docker
