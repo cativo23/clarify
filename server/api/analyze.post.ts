@@ -1,6 +1,7 @@
 import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server'
 import { getAnalysisQueue } from '../utils/queue'
 import { validateSupabaseStorageUrl } from '../utils/ssrf-protection'
+import { handleApiError } from '../utils/error-handler'
 
 export default defineEventHandler(async (event) => {
     try {
@@ -13,7 +14,10 @@ export default defineEventHandler(async (event) => {
         const { file_url, contract_name, analysis_type = 'premium' } = body
 
         if (!file_url || !contract_name) {
-            throw createError({ statusCode: 400, message: 'Missing required fields' })
+            throw createError({ 
+                statusCode: 400, 
+                message: 'Missing required fields: file_url and contract_name are required' 
+            })
         }
 
         // [SECURITY FIX C2] Validate file_url to prevent SSRF attacks
@@ -23,7 +27,7 @@ export default defineEventHandler(async (event) => {
         if (!validation.isValid) {
             throw createError({
                 statusCode: 400,
-                message: `Invalid file URL: ${validation.error}`
+                message: 'Invalid file URL. Files must be uploaded to the contracts storage bucket.'
             })
         }
 
@@ -32,7 +36,6 @@ export default defineEventHandler(async (event) => {
         const client = await serverSupabaseClient(event)
 
         // Create analysis record using RPC - credit check and deduction are now atomic
-        // Note: Parameters must match the function signature exactly (order matters for RPC)
         const { data: analysisId, error: txError } = await client
             .rpc('process_analysis_transaction', {
                 p_contract_name: contract_name,
@@ -45,16 +48,19 @@ export default defineEventHandler(async (event) => {
 
         if (txError) {
             console.error('Transaction error:', txError)
-            // Check for insufficient credits error
+            
+            // Check for insufficient credits error - safe to show
             if (txError.message && txError.message.includes('Insufficient credits')) {
                 throw createError({
                     statusCode: 402,
-                    message: txError.message,
+                    message: 'Insufficient credits. Please purchase more credits to continue.',
                 })
             }
+            
+            // [SECURITY FIX H3] Don't expose database error details
             throw createError({
                 statusCode: 500,
-                message: txError.message || 'Failed to process analysis transaction',
+                message: 'Failed to create analysis record. Please try again.',
             })
         }
 
@@ -78,10 +84,11 @@ export default defineEventHandler(async (event) => {
             analysisId
         }
     } catch (error: any) {
-        console.error('Error in analyze endpoint:', error)
-        return {
-            success: false,
-            error: error.message || 'An error occurred during analysis initiation',
-        }
+        // [SECURITY FIX H3] Use safe error handling
+        handleApiError(error, {
+            userId: user?.id,
+            endpoint: '/api/analyze',
+            operation: 'create_analysis'
+        })
     }
 })

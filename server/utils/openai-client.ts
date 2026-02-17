@@ -39,7 +39,8 @@ export const analyzeContract = async (contractText: string, analysisType: 'basic
         systemPrompt = await fs.readFile(promptPath, 'utf-8')
     } catch (error) {
         console.error(`CRITICAL: Failed to load prompt from ${promptPath}`)
-        throw new Error('System configuration error: Prompt file missing.')
+        // [SECURITY FIX H3] Don't expose file paths
+        throw new Error('System configuration error. Please contact support.')
     }
 
     // 4. Preprocessing & Token Control
@@ -123,7 +124,8 @@ ${processedText}
 
             if (message?.refusal) {
                 console.error('OpenAI Refusal:', message.refusal)
-                throw new Error(`OpenAI Refusal: ${message.refusal}`)
+                // [SECURITY FIX H3] Don't expose OpenAI refusal details
+                throw new Error('Unable to analyze contract. Please try again or contact support.')
             }
 
             if (choice?.finish_reason === 'length') {
@@ -131,8 +133,9 @@ ${processedText}
                 throw new Error('El análisis es demasiado complejo para el límite de tokens actual. Intenta con un contrato más corto o aumenta el límite en configuración.')
             }
 
-            console.error('Empty response choices[0]:', JSON.stringify(choice, null, 2))
-            throw new Error('No response from OpenAI')
+            console.error('Empty response choices[0]')
+            // [SECURITY FIX H3] Don't expose OpenAI response structure
+            throw new Error('Failed to process AI response. Please try again.')
         }
 
         let result: any
@@ -150,16 +153,14 @@ ${processedText}
                 result = JSON.parse(cleanContent)
             }
         } catch (parseError: any) {
-            // CRITICAL: We caught a JSON error. We must THROW a specific error that contains the RAW content
-            // so the upper layer (Worker) can save it to the DB for debugging, while we eventually show a friendly error to user.
+            // [SECURITY FIX H3] Log full error but throw safe message
+            console.error('JSON parse error:', parseError.message)
             const debugInfo = {
                 errorType: 'INVALID_JSON',
-                rawContent: rawContent,
-                parseError: parseError.message,
                 model_used: model
             }
-            const error: any = new Error('Failed to parse analysis results')
-            error.debugInfo = debugInfo // Attach for upstream handling
+            const error: any = new Error('Failed to parse analysis results. Please try again.')
+            error.debugInfo = debugInfo
             throw error
         }
 
@@ -181,18 +182,27 @@ ${processedText}
         return result
 
     } catch (error: any) {
-        console.error('Error analyzing contract with OpenAI:', error)
+        // [SECURITY FIX H3] Log full error but wrap with safe message
+        console.error('Error analyzing contract with OpenAI:', error.message)
 
         // If it's already our custom error with debugInfo, rethrow it
         if (error.debugInfo) {
             throw error
         }
 
-        // Otherwise wrap it
-        const wrappedError: any = new Error(error.message || 'Error during AI analysis')
+        // Check for specific error types and provide safe messages
+        if (error.message?.includes('token')) {
+            throw new Error('Token limit exceeded. Please try with a shorter contract.')
+        }
+        
+        if (error.message?.includes('API') || error.message?.includes('connection')) {
+            throw new Error('AI service temporarily unavailable. Please try again later.')
+        }
+
+        // Generic safe error
+        const wrappedError: any = new Error('Error during AI analysis. Please try again.')
         wrappedError.debugInfo = {
             errorType: 'API_ERROR',
-            rawError: error,
             model_used: model
         }
         throw wrappedError
