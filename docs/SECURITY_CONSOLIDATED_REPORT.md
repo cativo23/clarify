@@ -13,22 +13,17 @@ This report consolidates findings from multiple security audits (Code Review, Th
 
 | Severity | Count | Status |
 | :--- | :--- | :--- |
-| 🔴 **Critical** | 5 | Open |
+| 🔴 **Critical** | 4 | Open |
 | 🟠 **High** | 6 | Open |
 | 🟡 **Medium** | 6 | Open |
 | 🟢 **Low** | 2 | Open |
-| ✅ **Resolved** | 2 | Fixed (H1, Deps) |
+| ✅ **Resolved** | 3 | Fixed (C1, H1, Deps) |
 
 **Overall Risk Score: 7.8/10 (High)**
 
 ---
 
 ## 🔴 Critical Vulnerabilities
-
-### C1: Race Condition in Credit Deduction (TOCTOU)
-- **Location:** `server/api/analyze.post.ts` and `database/init.sql`
-- **Description:** A Time-of-Check to Time-of-Use gap exists between credit checking and deduction. Furthermore, the stored procedure ignores the requested credit cost and hardcodes 1 credit.
-- **Impact:** Financial loss (Premium analyses charged as basic) and potential credit bypass.
 
 ### C2: Server-Side Request Forgery (SSRF) via `file_url`
 - **Location:** `server/api/analyze.post.ts`, `server/api/check-tokens.post.ts`
@@ -108,13 +103,18 @@ This report consolidates findings from multiple security audits (Code Review, Th
 - **Status:** FIXED (Feb 16, 2026)
 - **Description:** High and Medium severity vulnerabilities found by `npm audit` (including `@isaacs/brace-expansion`) were fully resolved using `npm audit fix` and dependency pinning. 
 
+### Resolved: C1 - Race Condition & IDOR in Credit Deduction
+- **Status:** ✅ FIXED (Feb 16, 2026)
+- **Location:** `server/api/analyze.post.ts`, `database/init.sql`, `database/migrations/001_...sql`
+- **Description:** Fixed the TOCTOU race condition using `FOR UPDATE` row locking. Additionally resolved an IDOR vulnerability by removing `p_user_id` from the RPC and using `auth.uid()` securely on the server.
+
 ---
 
 ## 🛡️ Remediation Checklist
 
 - [x] **Auth**: Move admin check to server-side and hide email.
 - [ ] **Uploads**: Add `Buffer.subarray(0, 4)` magic byte check for `%PDF`.
-- [ ] **Atomic**: Refactor `increment_user_credits` into an atomic SQL function.
+- [x] **Atomic**: Refactor `increment_user_credits` into an atomic SQL function. (C1 Fixed)
 - [ ] **SSL**: Enable TLS for Redis connections.
 - [ ] **Headers**: Add `nuxt-security` module or custom CSP/HSTS middleware.
 
