@@ -32,12 +32,12 @@ export default defineNuxtConfig({
     supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY || '',
     redisHost: process.env.REDIS_HOST || 'localhost',
     redisPort: parseInt(process.env.REDIS_PORT || '6379'),
+    adminEmail: process.env.ADMIN_EMAIL || '',
 
     // Public keys (exposed to client)
     public: {
       baseUrl: process.env.BASE_URL || 'http://localhost:3000',
       stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY || '',
-      adminEmail: process.env.ADMIN_EMAIL || '',
     },
   },
 
