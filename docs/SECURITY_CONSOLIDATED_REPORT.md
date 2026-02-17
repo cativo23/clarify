@@ -11,19 +11,16 @@
 
 This report consolidates findings from multiple security audits (Code Review, Threat Model, and Vulnerability Assessment). A total of **20 unique vulnerabilities** were identified across the platform. While structural security (RLS, Auth) is in place, significant logic and configuration flaws exist that require immediate attention.
 
-| 🔴 **Critical** | 3 | Open |
-| 🟠 **High** | 6 | Open |
+| 🔴 **Critical** | 2 | Open |
+| 🟠 **High** | 5 | Open |
 | 🟡 **Medium** | 6 | Open |
 | 🟢 **Low** | 2 | Open |
-| ✅ **Resolved** | 4 | Fixed (C1, C2, H1, Deps) |
+| ✅ **Resolved** | 6 | Fixed (C1-C3, H1, H4, Deps) |
 
 **Overall Risk Score: 7.8/10 (High)**
 ---
 ## 🔴 Critical Vulnerabilities
-### C3: Open Redirect / Phishing Vector
-- **Location:** `server/api/stripe/checkout.post.ts`
-- **Description:** `successUrl` and `cancelUrl` are accepted from the client without origin validation.
-- **Impact:** Users can be redirected to malicious phishing sites after a legitimate payment.
+
 ### C4: Admin Pricing Endpoint Missing Authentication
 - **Location:** `server/api/admin/pricing.get.ts`
 - **Description:** Uses service key to bypass RLS but lacks any user/admin validation.
@@ -53,12 +50,6 @@ This report consolidates findings from multiple security audits (Code Review, Th
 - **Location:** Multiple endpoints
 - **Description:** Raw database and API errors (Stripe/OpenAI) are returned to the client.
 - **Impact:** Reconnaissance information for attackers.
-
-### H4: Non-Atomic Credit Updates (Stripe)
-- **Location:** `server/utils/stripe-client.ts`
-- **Description:** Read-update-write pattern in webhook handling leads to race conditions.
-- **Impact:** Lost credit purchases if webhooks fire concurrently.
-
 ### H5: Client-Side Credit Update Risk
 - **Location:** `composables/useSupabase.ts`
 - **Description:** Client-side function exists that could allow setting arbitrary credit amounts if RLS is relaxed.
@@ -97,10 +88,17 @@ This report consolidates findings from multiple security audits (Code Review, Th
 - **Location:** `server/api/analyze.post.ts`, `database/init.sql`, `database/migrations/001_...sql`
 - **Description:** Fixed the TOCTOU race condition using `FOR UPDATE` row locking. Additionally resolved an IDOR vulnerability by removing `p_user_id` from the RPC and using `auth.uid()` securely on the server.
 
-### Resolved: C2 - Server-Side Request Forgery (SSRF) Protection
-- **Status:** ✅ FIXED (Feb 16, 2026)
-- **Location:** `server/api/analyze.post.ts`, `server/api/check-tokens.post.ts`, `server/utils/ssrf-protection.ts`
 - **Description:** Implemented strict URL validation for Supabase Storage. Added hostname whitelisting, bucket restrictions (contracts only), path traversal prevention, and protocol enforcement (HTTPS-only). Enforced use of relative storage paths in the database instead of raw external URLs.
+
+### Resolved: C3 - Open Redirect Protection
+- **Status:** ✅ FIXED (Feb 17, 2026)
+- **Location:** `server/api/stripe/checkout.post.ts`, `server/utils/redirect-validation.ts`
+- **Description:** Removed client-side control of Stripe redirect URLs. Destinations are now constructed server-side using trusted origins and validated paths.
+
+### Resolved: H4 - Atomic Stripe Credit Updates
+- **Status:** ✅ FIXED (Feb 17, 2026)
+- **Location:** `server/utils/stripe-client.ts`, `database/migrations/002_...sql`
+- **Description:** Replaced dangerous Read-Modify-Write pattern with a single atomic PostgreSQL function (`increment_user_credits`). This ensures credit balances remains consistent even if multiple payment webhooks fire concurrently.
 
 ---
 
@@ -108,7 +106,7 @@ This report consolidates findings from multiple security audits (Code Review, Th
 
 - [x] **Auth**: Move admin check to server-side and hide email.
 - [ ] **Uploads**: Add `Buffer.subarray(0, 4)` magic byte check for `%PDF`.
-- [x] **Atomic**: Refactor `increment_user_credits` into an atomic SQL function. (C1 Fixed)
+- [x] **Atomic**: Refactor `increment_user_credits` into an atomic SQL function. (C1 & H4 Fixed)
 - [ ] **SSL**: Enable TLS for Redis connections.
 - [ ] **Headers**: Add `nuxt-security` module or custom CSP/HSTS middleware.
 

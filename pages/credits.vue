@@ -197,12 +197,11 @@ const handlePurchase = async (pack: any) => {
     }
 
     // Create checkout session
+    // Note: Redirect URLs are now constructed server-side for security (C3 fix)
     const { data } = await $fetch('/api/stripe/checkout', {
       method: 'POST',
       body: {
         packageId: pack.id,
-        successUrl: `${window.location.origin}/dashboard?payment=success`,
-        cancelUrl: `${window.location.origin}/credits?payment=cancelled`,
       },
     })
 
