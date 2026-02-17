@@ -14,10 +14,10 @@ This report consolidates findings from multiple security audits (Code Review, Th
 | Severity | Count | Status |
 | :--- | :--- | :--- |
 | 🔴 **Critical** | 0 | ✅ All Resolved |
-| 🟠 **High** | 5 | Open |
+| 🟠 **High** | 4 | Open |
 | 🟡 **Medium** | 6 | Open |
 | 🟢 **Low** | 2 | Open |
-| ✅ **Resolved** | 8 | Fixed (C1-C5, H1, H4, Deps) |
+| ✅ **Resolved** | 9 | Fixed (C1-C5, H1, H4, Deps) |
 
 **Overall Risk Score: 3.5/10 (Low-Medium)**
 
@@ -39,12 +39,6 @@ This report consolidates findings from multiple security audits (Code Review, Th
 ---
 
 ## 🟠 High Severity Issues
-
-### H1: Admin Email Exposed in Public Config
-- **Status:** ✅ FIXED (Feb 16, 2026)
-- **Location:** `nuxt.config.ts`
-- **Description:** `adminEmail` was moved from `runtimeConfig.public` to private `runtimeConfig`.
-- **Remediation:** Admin status is now calculated on the server and exposed via the user profile API as a boolean `is_admin` flag. API routes are protected by a centralized `requireAdmin` utility that checks the private runtime config.
 
 ### H2: Missing Server-Side File Validation
 - **Location:** `server/api/upload.post.ts`
@@ -84,6 +78,11 @@ This report consolidates findings from multiple security audits (Code Review, Th
 ---
 
 ## ✅ Resolved Issues
+
+### Resolved: H1 - Admin Email Exposed in Public Config
+- **Status:** ✅ FIXED (Feb 16, 2026)
+- **Location:** `nuxt.config.ts`
+- **Description:** `adminEmail` was moved from `runtimeConfig.public` to private `runtimeConfig`. Admin status is now calculated on the server and exposed via the user profile API as a boolean `is_admin` flag. API routes are protected by a centralized `requireAdmin` utility.
 
 ### Resolved: Library Vulnerabilities
 - **Status:** FIXED (Feb 16, 2026)
