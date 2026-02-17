@@ -63,28 +63,47 @@ VALUES ('demo@clarify.app', 10)
 ON CONFLICT (email) DO NOTHING;
 
 -- Function to process analysis and deduct credit atomically
+-- Uses FOR UPDATE lock to prevent race conditions
 CREATE OR REPLACE FUNCTION process_analysis_transaction(
-    p_user_id UUID,
     p_contract_name TEXT,
     p_file_url TEXT,
+    p_analysis_type TEXT DEFAULT 'premium',
+    p_credit_cost INTEGER DEFAULT 3,
     p_summary_json JSONB DEFAULT NULL,
     p_risk_level TEXT DEFAULT NULL
 )
 RETURNS UUID AS $$
 DECLARE
+    v_user_id UUID;
     v_analysis_id UUID;
+    v_current_credits INTEGER;
 BEGIN
-    -- 1. Check if user has credits
-    IF NOT EXISTS (SELECT 1 FROM users WHERE id = p_user_id AND credits >= 1) THEN
-        RAISE EXCEPTION 'Insufficient credits';
+    -- [SECURITY FIX] Get user ID securely from the session
+    v_user_id := auth.uid();
+    
+    -- Ensure user is authenticated
+    IF v_user_id IS NULL THEN
+        RAISE EXCEPTION 'Unauthorized: User must be logged in';
     END IF;
 
-    -- 2. Deduct credit
-    UPDATE users 
-    SET credits = credits - 1 
-    WHERE id = p_user_id;
+    -- 1. Lock the user row FOR UPDATE to prevent concurrent modifications
+    SELECT credits INTO v_current_credits
+    FROM users
+    WHERE id = v_user_id
+    FOR UPDATE;
 
-    -- 3. Insert analysis
+    -- 2. Check if user has enough credits
+    IF v_current_credits IS NULL OR v_current_credits < p_credit_cost THEN
+        RAISE EXCEPTION 'Insufficient credits. Required: %, Available: %', p_credit_cost, v_current_credits;
+    END IF;
+
+    -- 3. Deduct credits atomically (row is still locked)
+    UPDATE users
+    SET credits = credits - p_credit_cost,
+        updated_at = CURRENT_TIMESTAMP
+    WHERE id = v_user_id;
+
+    -- 4. Insert analysis with actual credit cost
     INSERT INTO analyses (
         user_id,
         contract_name,
@@ -95,19 +114,19 @@ BEGIN
         credits_used,
         created_at
     ) VALUES (
-        p_user_id,
+        v_user_id,
         p_contract_name,
         p_file_url,
         p_summary_json,
         p_risk_level,
         'pending',
-        1,
+        p_credit_cost,
         CURRENT_TIMESTAMP
     ) RETURNING id INTO v_analysis_id;
 
     RETURN v_analysis_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 -- Enable Realtime for the analyses table
 ALTER PUBLICATION supabase_realtime ADD TABLE analyses;

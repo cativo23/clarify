@@ -16,36 +16,16 @@ export default defineEventHandler(async (event) => {
         }
 
         const creditCost = analysis_type === 'premium' ? 3 : 1
-
         const client = await serverSupabaseClient(event)
 
-        // 1. Check credits
-        const { data: userData, error: userError } = await client
-            .from('users')
-            .select('credits')
-            .eq('id', user.id)
-            .single()
-
-        if (userError || !userData) {
-            throw createError({ statusCode: 500, message: 'Failed to fetch user data' })
-        }
-
-        if (userData.credits < creditCost) {
-            throw createError({
-                statusCode: 402,
-                message: `Insufficient credits. ${analysis_type === 'premium' ? 'Premium' : 'Basic'} analysis requires ${creditCost} credit(s).`
-            })
-        }
-
-        // 2. Extract storage path from file_url
+        // Extract storage path from file_url
         // file_url looks like: .../storage/v1/object/public/contracts/USER_ID/FILENAME.pdf
         const filename = file_url.split('/').pop() || ''
         const storagePath = `${user.id}/${filename}`
 
-        // 3. Create analysis record as 'pending' using RPC to handle credit deduction atomically
+        // Create analysis record using RPC - credit check and deduction are now atomic
         const { data: analysisId, error: txError } = await client
             .rpc('process_analysis_transaction', {
-                p_user_id: user.id,
                 p_contract_name: contract_name,
                 p_file_url: file_url,
                 p_analysis_type: analysis_type,
@@ -56,13 +36,20 @@ export default defineEventHandler(async (event) => {
 
         if (txError) {
             console.error('Transaction error:', txError)
+            // Check for insufficient credits error
+            if (txError.message && txError.message.includes('Insufficient credits')) {
+                throw createError({
+                    statusCode: 402,
+                    message: txError.message,
+                })
+            }
             throw createError({
                 statusCode: 500,
                 message: txError.message || 'Failed to process analysis transaction',
             })
         }
 
-        // 4. Enqueue job
+        // Enqueue job
         const queue = getAnalysisQueue()
         await queue.add('analyze-contract', {
             analysisId,
