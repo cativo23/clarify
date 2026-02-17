@@ -4,32 +4,36 @@ import type { User, Analysis } from '~/types'
 
 // Shared state for credits
 export const useCreditsState = () => useState<number>('user-credits', () => 0)
+// Shared state for full user profile (including is_admin)
+export const useUserState = () => useState<User | null>('user-profile', () => null)
 
-// Fetch user profile with credits
-// Fetch user profile with credits
+// Fetch user profile with credits and admin status
 export const fetchUserProfile = async () => {
     const user = useSupabaseUser()
     const creditsState = useCreditsState()
+    const userState = useUserState()
+    // Capture client and router at start to preserve context
+    const supabase = useSupabaseClient()
+    const router = useRouter()
 
     if (!user.value?.id) return null
 
     try {
-        const headers = useRequestHeaders(['cookie'])
-        const fetchOptions: any = {}
-
-        // Only forward headers if we have a cookie (important for SSR)
-        // On client, browser handles cookies automatically if we don't override headers
-        if (headers.cookie) {
-            fetchOptions.headers = headers
-        }
-
-        const profile = await $fetch<User>('/api/user/profile', fetchOptions)
+        const profile = await $fetch<User>('/api/user/profile')
         if (profile) {
             creditsState.value = profile.credits
+            userState.value = profile
             return profile
         }
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error fetching user profile:', error)
+        if (error.statusCode === 401 || error.response?.status === 401) {
+            // Token invalid, force logout using captive client
+            await supabase.auth.signOut()
+            userState.value = null
+            // Use captured router for navigation
+            return router.push('/login')
+        }
     }
 
     return null
