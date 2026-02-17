@@ -1,5 +1,6 @@
 import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server'
 import { getAnalysisQueue } from '../utils/queue'
+import { validateSupabaseStorageUrl } from '../utils/ssrf-protection'
 
 export default defineEventHandler(async (event) => {
     try {
@@ -15,13 +16,20 @@ export default defineEventHandler(async (event) => {
             throw createError({ statusCode: 400, message: 'Missing required fields' })
         }
 
+        // [SECURITY FIX C2] Validate file_url to prevent SSRF attacks
+        const supabaseUrl = process.env.SUPABASE_URL || ''
+        const validation = validateSupabaseStorageUrl(file_url, supabaseUrl)
+        
+        if (!validation.isValid) {
+            throw createError({
+                statusCode: 400,
+                message: `Invalid file URL: ${validation.error}`
+            })
+        }
+
+        const storagePath = validation.storagePath!
         const creditCost = analysis_type === 'premium' ? 3 : 1
         const client = await serverSupabaseClient(event)
-
-        // Extract storage path from file_url
-        // file_url looks like: .../storage/v1/object/public/contracts/USER_ID/FILENAME.pdf
-        const filename = file_url.split('/').pop() || ''
-        const storagePath = `${user.id}/${filename}`
 
         // Create analysis record using RPC - credit check and deduction are now atomic
         const { data: analysisId, error: txError } = await client

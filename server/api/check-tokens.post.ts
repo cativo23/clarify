@@ -2,6 +2,7 @@ import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server'
 import { extractTextFromPDF } from '~/server/utils/pdf-parser'
 import { preprocessDocument } from '~/server/utils/preprocessing'
 import { getPromptConfig } from '~/server/utils/config'
+import { validateSupabaseStorageUrl } from '~/server/utils/ssrf-protection'
 
 export default defineEventHandler(async (event) => {
     try {
@@ -17,13 +18,19 @@ export default defineEventHandler(async (event) => {
             throw createError({ statusCode: 400, message: 'Missing file_url' })
         }
 
-        // 1. Download file from Storage
-        const client = await serverSupabaseClient(event)
+        // [SECURITY FIX C2] Validate file_url to prevent SSRF attacks
+        const supabaseUrl = process.env.SUPABASE_URL || ''
+        const validation = validateSupabaseStorageUrl(file_url, supabaseUrl)
+        
+        if (!validation.isValid) {
+            throw createError({
+                statusCode: 400,
+                message: `Invalid file URL: ${validation.error}`
+            })
+        }
 
-        // Extract storage path from file_url (assuming standard Supabase URL format)
-        // .../storage/v1/object/public/contracts/USER_ID/FILENAME.pdf
-        const filename = file_url.split('/').pop() || ''
-        const storagePath = `${user.id}/${filename}`
+        const storagePath = validation.storagePath!
+        const client = await serverSupabaseClient(event)
 
         const { data: fileData, error: downloadError } = await client.storage
             .from('contracts')
