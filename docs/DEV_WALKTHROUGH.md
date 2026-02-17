@@ -19,18 +19,19 @@ Our core value proposition is the multi-tier analysis system:
 
 ### 2. 🏗️ Tech Stack & Infrastructure
 - **Nuxt 3 (Fullstack)**: Single-origin deployment using Nitro.
-- **Dockerized Environment**: Optimized for Node 20 and PostgreSQL. [docker-compose.yml](../docker-compose.yml) manages the full stack.
-- **Persistence Layer**: Relational schema with trigram indices for fast analysis searches. [database/init.sql](../database/init.sql).
+- **Scoped Client Architecture**: Decoupled database access using `WorkerSupabaseClient` and `AdminSupabaseClient` for enhanced security.
+- **Dockerized Environment**: Managed via [docker-compose.yml](../docker-compose.yml).
+- **Migration System**: Laravel-style migrations for consistent schema management. [scripts/migrate.ts](../scripts/migrate.ts).
 
 ### 3. 💳 Financial Infrastructure
-- **Stripe Integration**: Complete Checkout and Webhook flow. Ensures credits are granted only after Stripe confirmation.
+- **Stripe Integration**: Complete Checkout and Webhook flow.
 - **Atomic Billing**: Credit deductions are performed via PostgreSQL RPCs to prevent race conditions.
 - **Reference**: See [Stripe Setup](STRIPE_SETUP.md).
 
-### 4. 📊 User & Admin Dashboards
-- **User Dashboard**: Real-time status updates via Supabase Realtime and drag-and-drop file uploads.
-- **Admin Analytics**: Private dashboard for monitoring token costs, model performance, and user growth.
-- **Risk Visualization**: The "Traffic Light" indicator system (`RiskCard.vue`) provides an executive summary of legal risks.
+### 4. 🔐 Security & Hardening
+- **Centralized Validation**: Strict file magic byte verification and URL redirect validation.
+- **Error Sanitization**: Centralized error handler prevents information disclosure via generic safe messages.
+- **SSRF Protection**: Hostname whitelisting and protocol enforcement for external requests.
 
 ---
 
@@ -51,8 +52,8 @@ Before moving to production, ensure these critical steps are completed:
 
 - [ ] **Domain Setup**: Point DNS to your hosting provider (Vercel/Self-hosted).
 - [ ] **Secret Management**: Configure the 7+ mandatory environment variables (OpenAI, Stripe, Supabase).
-- [ ] **Whitelisting**: Add production origins to "Allowed Domains" in Supabase Auth and Stripe settings.
-- [ ] **Webhooks**: Confirm the production Stripe Webhook Secret is correctly set.
+- [ ] **Database Setup**: Run `npm run db:init` and apply the generated SQL to create the migrations table.
+- [ ] **Migrations**: Execute all pending migrations to set up the schema.
 - [ ] **Admin Security**: Ensure the `ADMIN_EMAIL` environment variable matches the intended administrator account.
 
 ---

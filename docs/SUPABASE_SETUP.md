@@ -22,31 +22,45 @@ This guide will help you set up Supabase for the Clarify project.
    SUPABASE_SERVICE_KEY=<your-service-role-key>
    ```
 
-## 3. Run Database Migrations
+## 3. Database Migrations (Recommended)
 
-1. Go to **SQL Editor** in your Supabase dashboard
-2. Click "New Query"
-3. Copy and paste the contents of `database/init.sql`
-4. Click "Run" to execute the SQL
+Clarify uses a Laravel-style migration system to manage database schema changes consistently across environments.
 
-This will create:
-- `users` table
-- `analyses` table
-- `transactions` table
-- Indexes and triggers
+### First-Time Setup
+1. Run the initialization script to prepare the migrations table:
+   ```bash
+   npm run db:init
+   ```
+2. Copy the SQL printed in your terminal (or from `database/00_INIT_MIGRATIONS_TABLE.sql`).
+3. Paste it into the **Supabase SQL Editor** and click **Run**.
+
+### Applying Migrations
+Once the migrations table is ready, you can apply all pending migrations:
+```bash
+npm run db:migrate
+```
+*Note: Due to Supabase API limitations for complex DDL, you should still copy the content of newly created `.sql` files in `database/migrations/` and execute them in the SQL Editor. The `db:migrate` command records that they have been run to prevent duplicate execution.*
+
+### Migration Commands
+- `npm run db:status`: Check which migrations are pending.
+- `npm run db:rollback`: Rollback the last batch of migrations (records only).
+- `npm run db:seed`: Populate the database with initial/test data.
+- `npm run migrate:make <name>`: Create a new timestamped migration file.
+
+---
 
 ## 4. Create Storage Bucket
 
-1. Go to **Storage** in your Supabase dashboard
-2. Click "New bucket"
+1. Go to **Storage** in your Supabase dashboard.
+2. Click "New bucket".
 3. Name it: `contracts`
-4. Set it to **Public** (so users can access their PDFs)
-5. Click "Create bucket"
+4. Set it to **Public** (so users can access their PDFs).
+5. Click "Create bucket".
 
 ### Set Storage Policies
 
-1. Click on the `contracts` bucket
-2. Go to "Policies"
+1. Click on the `contracts` bucket.
+2. Go to "Policies".
 3. Add the following policies:
 
 **Upload Policy:**
@@ -65,73 +79,38 @@ TO authenticated
 USING (bucket_id = 'contracts' AND (storage.foldername(name))[1] = auth.uid()::text);
 ```
 
+---
+
 ## 5. Configure Authentication
 
-1. Go to **Authentication** → **Providers**
-2. Enable **Email** provider (already enabled by default)
-3. (Optional) Enable **Google** provider:
-   - Click on Google
-   - Follow instructions to set up Google OAuth
-   - Add your Client ID and Client Secret
+1. Go to **Authentication** → **Providers**.
+2. Enable **Email** provider.
+3. (Optional) Enable **Google** provider if needed for production.
+
+---
 
 ## 6. Set Up Row Level Security (RLS)
 
-The SQL script already includes RLS policies, but verify in **Database** → **Tables**:
+The migration files include RLS policies. Verify these in **Database** → **Tables**:
 
-### users table policies:
-- Users can view their own profile
-- Users can update their own profile
+- **users table**: Users can only view/update their own profile.
+- **analyses table**: Users can only view their own analyses.
+- **transactions table**: Users can only view their own transactions.
 
-### analyses table policies:
-- Users can view their own analyses
-- Users can create analyses
-- Service role can manage all analyses
+---
 
-### transactions table policies:
-- Users can view their own transactions
-- Service role can manage all transactions
+## 7. Admin Configuration
 
-## 7. Test the Connection
+To grant administrative access to an account:
+1. Set the `ADMIN_EMAIL` in your `.env` file.
+2. The system uses server-side validation to assign the `is_admin` flag to this specific email.
 
-Run your Nuxt app locally:
-```bash
-npm run dev
-```
-
-Try to:
-1. Sign up for a new account
-2. Check if the user appears in the `users` table
-3. Upload a test PDF
-4. Check if it appears in the `contracts` bucket
-
-## 8. (Optional) Set Up Email Templates
-
-1. Go to **Authentication** → **Email Templates**
-2. Customize the email templates for:
-   - Confirm signup
-   - Magic Link
-   - Reset password
+---
 
 ## Troubleshooting
 
-### Can't upload files
-- Check that the `contracts` bucket exists
-- Verify storage policies are correctly set
-- Check that bucket is public
+### "Auth session missing!" Error
+Ensure your `SUPABASE_URL` and `SUPABASE_ANON_KEY` are correctly set in `.env`.
 
-### Authentication not working
-- Verify API keys in `.env`
-- Check that email provider is enabled
-- Look at browser console for errors
-
-### Database queries failing
-- Verify RLS policies are set
-- Check that tables exist
-- Look at Supabase logs in the dashboard
-
-## Next Steps
-
-Once Supabase is configured:
-1. Update your `.env` file with the correct values
-2. Restart your development server
-3. Test the full flow: signup → upload → analyze
+### Migrations not reflecting in DB
+The `db:migrate` command currently **records** the migration as run. You must still execute the SQL content manually in the Supabase Dashboard until a full direct DDL integration is implemented.
