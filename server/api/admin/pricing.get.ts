@@ -1,21 +1,19 @@
-import { defineEventHandler } from 'h3'
 import { serverSupabaseServiceRole } from '#supabase/server'
+import { requireAdmin } from '../../utils/auth'
 
 export default defineEventHandler(async (event) => {
-    try {
-        const supabase = serverSupabaseServiceRole(event)
+    // [SECURITY FIX C4] Require admin authentication
+    await requireAdmin(event)
 
-        const { data, error } = await supabase
-            .from('pricing_tables')
-            .select('*')
+    const supabase = serverSupabaseServiceRole(event)
 
-        if (error) {
-            throw error
-        }
+    const { data, error } = await supabase
+        .from('pricing_tables')
+        .select('*')
 
-        return { pricing: data || [] }
-    } catch (err: any) {
-        event.node.res.statusCode = err?.status || 500
-        return { error: err?.message || 'Failed to fetch pricing' }
+    if (error) {
+        throw createError({ statusCode: 500, message: error.message })
     }
+
+    return { pricing: data || [] }
 })
