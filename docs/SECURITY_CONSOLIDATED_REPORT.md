@@ -91,14 +91,15 @@ This report consolidates findings from multiple security audits (Code Review, Th
   - ✅ Follows PostgreSQL security best practices
 - **Verdict:** **Already secure** - no changes needed
 
-### Resolved: M4 - Debug Information Sanitization (summary_json)
+### Resolved: M4 - Debug Information Access Control (summary_json)
 - **Status:** ✅ FIXED (Feb 17, 2026)
 - **Location:** `server/plugins/worker.ts`
-- **Description:** Implemented sanitization of analysis summaries before storing to database:
-  - **Removed sensitive fields**: Token usage, full model info, implementation details
-  - **Kept safe fields**: Risk level, summary, recommendations, user-facing content
-  - **Minimal debug info**: Only timestamp and basic preprocessing stats retained
-- **Impact Mitigated**: Prevents exposure of AI implementation details, token costs, and model information through database access.
+- **Description:** Implemented access control for debug information in analysis summaries:
+  - **Full debug info preserved**: Token usage, model info, timestamps, preprocessing details
+  - **Admin-only flag**: `_adminOnly: true` marker added to `_debug` field
+  - **Frontend enforcement**: UI should check `user.is_admin` before displaying `_debug`
+  - **Audit trail**: Debug info includes `storedAt` timestamp for accountability
+- **Impact Mitigated**: Sensitive AI implementation details hidden from regular users while preserving full debugging capabilities for administrators.
 
 ### Resolved: M5 - Security Headers Implementation
 - **Status:** ✅ FIXED (Feb 17, 2026)
