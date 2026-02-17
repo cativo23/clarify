@@ -32,6 +32,7 @@ export default defineEventHandler(async (event) => {
         const client = await serverSupabaseClient(event)
 
         // Create analysis record using RPC - credit check and deduction are now atomic
+        // Note: Parameters must match the function signature exactly (order matters for RPC)
         const { data: analysisId, error: txError } = await client
             .rpc('process_analysis_transaction', {
                 p_contract_name: contract_name,

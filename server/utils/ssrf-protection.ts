@@ -62,27 +62,50 @@ export function validateSupabaseStorageUrl(
   }
 
   // 6. Verify the path structure for Supabase Storage
-  // Expected: /storage/v1/object/{bucket}/{path}
+  // Two possible formats:
+  // - Public URL: /storage/v1/object/public/{bucket}/{path}
+  // - Auth URL: /storage/v1/object/auth/{bucket}/{path}
+  // - Internal URL: /storage/v1/object/{bucket}/{path}
   const pathSegments = parsedUrl.pathname.split('/').filter(Boolean)
-  
-  if (pathSegments.length < 4) {
-    return {
-      isValid: false,
-      error: 'Invalid storage URL structure'
+
+  let storagePath: string
+  let bucket: string
+
+  // Check for public/auth URL format: /storage/v1/object/public/{bucket}/{path}
+  if (pathSegments[0] === 'storage' && pathSegments[1] === 'v1' && pathSegments[2] === 'object') {
+    // Check if there's a visibility modifier (public/auth)
+    const hasVisibility = pathSegments[3] === 'public' || pathSegments[3] === 'auth'
+    
+    if (hasVisibility) {
+      // Format: /storage/v1/object/public/{bucket}/{path}
+      if (pathSegments.length < 6) {
+        return {
+          isValid: false,
+          error: 'Invalid storage URL structure'
+        }
+      }
+      bucket = pathSegments[4]
+      storagePath = pathSegments.slice(5).join('/')
+    } else {
+      // Internal format: /storage/v1/object/{bucket}/{path}
+      if (pathSegments.length < 5) {
+        return {
+          isValid: false,
+          error: 'Invalid storage URL structure'
+        }
+      }
+      bucket = pathSegments[3]
+      storagePath = pathSegments.slice(4).join('/')
     }
   }
-
-  const [storagePrefix, version, objectPrefix, bucket, ...pathParts] = pathSegments
-
-  // 7. Validate Supabase Storage URL pattern
-  if (storagePrefix !== 'storage' || version !== 'v1' || objectPrefix !== 'object') {
+  else {
     return {
       isValid: false,
       error: 'URL must be a valid Supabase Storage URL'
     }
   }
 
-  // 8. Verify it's from the 'contracts' bucket (our application bucket)
+  // 7. Verify it's from the 'contracts' bucket (our application bucket)
   if (bucket !== 'contracts') {
     return {
       isValid: false,
@@ -90,9 +113,7 @@ export function validateSupabaseStorageUrl(
     }
   }
 
-  // 9. Reconstruct and validate the storage path
-  const storagePath = pathParts.join('/')
-
+  // 8. Validate storage path exists
   if (!storagePath || storagePath.length === 0) {
     return {
       isValid: false,

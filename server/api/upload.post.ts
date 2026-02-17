@@ -1,5 +1,6 @@
 import type { UploadResponse } from '../../types'
 import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server'
+import { validateFileUpload, logFileValidation } from '../utils/file-validation'
 
 export default defineEventHandler(async (event): Promise<UploadResponse> => {
     try {
@@ -33,12 +34,19 @@ export default defineEventHandler(async (event): Promise<UploadResponse> => {
         const fileName = fileEntry.filename || 'contract.pdf'
         const fileBuffer = fileEntry.data
 
-        // Validate file size (max 10MB)
-        const maxSize = 10 * 1024 * 1024
-        if (fileBuffer.length > maxSize) {
+        // [SECURITY FIX H2] Comprehensive file validation with magic byte checking
+        const validation = validateFileUpload(fileBuffer, fileName, {
+            maxSizeMB: 10,
+            allowedExtensions: ['pdf']
+        })
+
+        // Log validation for security auditing
+        logFileValidation(fileName, fileBuffer.length, validation, user.id)
+
+        if (!validation.isValid) {
             throw createError({
                 statusCode: 400,
-                message: 'File size exceeds 10MB limit',
+                message: validation.error,
             })
         }
 
@@ -46,14 +54,14 @@ export default defineEventHandler(async (event): Promise<UploadResponse> => {
         const client = await serverSupabaseClient(event)
 
         // Generate unique file name
-        const fileExt = fileName.split('.').pop()
+        const fileExt = validation.file?.detectedExtension || 'pdf'
         const uniqueFileName = `${user.id}/${Date.now()}.${fileExt}`
 
-        // Upload to Supabase Storage
+        // Upload to Supabase Storage with correct content type
         const { data: _uploadData, error } = await client.storage
             .from('contracts')
             .upload(uniqueFileName, fileBuffer, {
-                contentType: 'application/pdf',
+                contentType: validation.file?.detectedType || 'application/pdf',
                 upsert: false,
             })
 
@@ -69,6 +77,13 @@ export default defineEventHandler(async (event): Promise<UploadResponse> => {
         const { data: { publicUrl } } = client.storage
             .from('contracts')
             .getPublicUrl(uniqueFileName)
+
+        console.log('[Upload] File validated and uploaded successfully:', {
+            userId: user.id,
+            fileName,
+            detectedType: validation.file?.detectedType,
+            fileSize: validation.file?.size
+        })
 
         return {
             success: true,
