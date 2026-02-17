@@ -14,10 +14,10 @@ This report consolidates findings from multiple security audits (Code Review, Th
 | Severity | Count | Status |
 | :--- | :--- | :--- |
 | 🔴 **Critical** | 0 | ✅ All Resolved |
-| 🟠 **High** | 4 | Open |
+| 🟠 **High** | 3 | Open |
 | 🟡 **Medium** | 6 | Open |
 | 🟢 **Low** | 2 | Open |
-| ✅ **Resolved** | 9 | Fixed (C1-C5, H1, H4, Deps) |
+| ✅ **Resolved** | 10 | Fixed (C1-C5, H1, H2, H4, Deps) |
 
 **Overall Risk Score: 3.5/10 (Low-Medium)**
 
@@ -40,10 +40,7 @@ This report consolidates findings from multiple security audits (Code Review, Th
 
 ## 🟠 High Severity Issues
 
-### H2: Missing Server-Side File Validation
-- **Location:** `server/api/upload.post.ts`
-- **Description:** No magic byte check; only extension and size are validated.
-- **Impact:** Potential malware hosting or bypass of intended file types.
+
 
 ### H3: Information Disclosure in Error Responses
 - **Location:** Multiple endpoints
@@ -122,6 +119,11 @@ This report consolidates findings from multiple security audits (Code Review, Th
   - Full numbers displayed (not abbreviated) for financial transparency
 - **Impact Mitigated**: Unauthorized access to business-sensitive pricing data prevented.
 
+### Resolved: H2 - Server-Side File Validation (Magic Bytes)
+- **Status:** ✅ FIXED (Feb 17, 2026)
+- **Location:** `server/api/upload.post.ts`, `server/utils/file-validation.ts`
+- **Description:** Implemented strict file validation using magic byte signatures (file signatures) to prevent malware hosting and file type bypass attacks. Added specific structural validation for PDFs (checking for `%PDF` header and required elements) and a detection mechanism for rejected files to aid in security auditing.
+
 ### Resolved: H4 - Atomic Stripe Credit Updates
 - **Status:** ✅ FIXED (Feb 17, 2026)
 - **Location:** `server/utils/stripe-client.ts`, `database/migrations/002_...sql`
@@ -133,7 +135,7 @@ This report consolidates findings from multiple security audits (Code Review, Th
 
 - [x] **Auth**: Move admin check to server-side and hide email.
 - [x] **Scoped Service Role**: Implement worker and admin scoped clients with audit logging. (C4 & C5 Fixed)
-- [ ] **Uploads**: Add `Buffer.subarray(0, 4)` magic byte check for `%PDF`.
+- [x] **Uploads**: Add `Buffer.subarray(0, 4)` magic byte check for `%PDF`.
 - [x] **Atomic**: Refactor `increment_user_credits` into an atomic SQL function. (C1 & H4 Fixed)
 - [ ] **SSL**: Enable TLS for Redis connections.
 - [ ] **Headers**: Add `nuxt-security` module or custom CSP/HSTS middleware.
