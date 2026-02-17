@@ -1,5 +1,5 @@
 import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server'
-import { sanitizeAnalysisSummary, getRequestUserContext } from '../../../utils/analysis-security'
+import { sanitizeAnalysisSummary, getRequestUserContext, isTokenDebugEnabled } from '../../../utils/analysis-security'
 
 export default defineEventHandler(async (event) => {
     try {
@@ -16,6 +16,9 @@ export default defineEventHandler(async (event) => {
 
         // Get user context including admin status
         const userContext = await getRequestUserContext(event)
+        
+        // Check if tokenDebug is enabled (development/testing mode)
+        const tokenDebug = await isTokenDebugEnabled(event)
 
         const client = await serverSupabaseClient(event)
 
@@ -30,10 +33,10 @@ export default defineEventHandler(async (event) => {
             throw createError({ statusCode: 404, message: 'Analysis not found' })
         }
 
-        // [SECURITY FIX M4] Strip debug info for non-admin users
+        // [SECURITY FIX M4] Strip debug info for non-admin users (unless tokenDebug enabled)
         const sanitizedAnalysis = {
             ...analysis,
-            summary_json: sanitizeAnalysisSummary(analysis.summary_json, userContext.isAdmin)
+            summary_json: sanitizeAnalysisSummary(analysis.summary_json, userContext.isAdmin, tokenDebug)
         }
 
         return {
