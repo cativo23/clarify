@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
         // [SECURITY FIX C2] Validate file_url to prevent SSRF attacks
         const supabaseUrl = process.env.SUPABASE_URL || ''
         const validation = validateSupabaseStorageUrl(file_url, supabaseUrl)
-        
+
         if (!validation.isValid) {
             throw createError({
                 statusCode: 400,
@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
         const { data: analysisId, error: txError } = await client
             .rpc('process_analysis_transaction', {
                 p_contract_name: contract_name,
-                p_file_url: file_url,
+                p_storage_path: storagePath,
                 p_analysis_type: analysis_type,
                 p_credit_cost: creditCost,
                 p_summary_json: null,
