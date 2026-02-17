@@ -79,9 +79,9 @@ const SENSITIVE_PATTERNS = [
 /**
  * Sanitize error message to remove sensitive information
  */
-function sanitizeErrorMessage(message: string): string {
+export function sanitizeErrorMessage(message: string): string {
   let sanitized = message
-  
+
   // Check for sensitive patterns
   for (const pattern of SENSITIVE_PATTERNS) {
     if (pattern.test(sanitized)) {
@@ -89,18 +89,18 @@ function sanitizeErrorMessage(message: string): string {
       return ERROR_MESSAGES[ErrorType.SERVER]
     }
   }
-  
+
   // Remove technical details in parentheses
   sanitized = sanitized.replace(/\s*\([^)]*\)/g, '')
-  
+
   // Remove file paths
   sanitized = sanitized.replace(/[/\\][\w/.-]+/g, '[path]')
-  
+
   // Limit length
   if (sanitized.length > 150) {
     sanitized = sanitized.substring(0, 147) + '...'
   }
-  
+
   return sanitized.trim() || ERROR_MESSAGES[ErrorType.SERVER]
 }
 
@@ -109,49 +109,49 @@ function sanitizeErrorMessage(message: string): string {
  */
 function categorizeError(error: any): ErrorType {
   if (!error) return ErrorType.SERVER
-  
+
   const message = (error.message || '').toLowerCase()
   const statusCode = error.statusCode || error.status
-  
+
   // Authentication errors
   if (statusCode === 401 || message.includes('unauthenticated') || message.includes('login')) {
     return ErrorType.AUTHENTICATION
   }
-  
+
   // Authorization errors
   if (statusCode === 403 || message.includes('unauthorized') || message.includes('permission')) {
     return ErrorType.AUTHORIZATION
   }
-  
+
   // Validation errors
   if (statusCode === 400 || message.includes('invalid') || message.includes('required')) {
     return ErrorType.VALIDATION
   }
-  
+
   // Payment errors
   if (statusCode === 402 || message.includes('credit') || message.includes('payment')) {
     return ErrorType.PAYMENT_REQUIRED
   }
-  
+
   // Not found
   if (statusCode === 404 || message.includes('not found')) {
     return ErrorType.NOT_FOUND
   }
-  
+
   // Rate limiting
   if (statusCode === 429 || message.includes('rate limit') || message.includes('too many')) {
     return ErrorType.RATE_LIMIT
   }
-  
+
   // External service errors
-  if (error.code?.startsWith('ECONN') || 
-      error.code === 'ETIMEDOUT' ||
-      message.includes('openai') ||
-      message.includes('stripe') ||
-      message.includes('network')) {
+  if (error.code?.startsWith('ECONN') ||
+    error.code === 'ETIMEDOUT' ||
+    message.includes('openai') ||
+    message.includes('stripe') ||
+    message.includes('network')) {
     return ErrorType.EXTERNAL_SERVICE
   }
-  
+
   // Default to server error
   return ErrorType.SERVER
 }
@@ -160,9 +160,9 @@ function categorizeError(error: any): ErrorType {
  * Log error for debugging and security auditing
  */
 function logError(error: any, context: {
-  userId?: string
-  endpoint?: string
-  operation?: string
+  userId?: string | undefined
+  endpoint?: string | undefined
+  operation?: string | undefined
 }) {
   const errorDetails = {
     timestamp: new Date().toISOString(),
@@ -175,7 +175,7 @@ function logError(error: any, context: {
     code: error?.code,
     statusCode: error?.statusCode || error?.status
   }
-  
+
   // Log full error details server-side (never exposed to client)
   console.error('[SECURITY ERROR LOG]', JSON.stringify(errorDetails, null, 2))
 }
@@ -190,10 +190,10 @@ function logError(error: any, context: {
 export function createSafeError(
   error: any,
   options?: {
-    userId?: string
-    endpoint?: string
-    operation?: string
-    defaultMessage?: string
+    userId?: string | undefined
+    endpoint?: string | undefined
+    operation?: string | undefined
+    defaultMessage?: string | undefined
   }
 ): SafeError {
   // Log the full error server-side
@@ -202,13 +202,13 @@ export function createSafeError(
     endpoint: options?.endpoint,
     operation: options?.operation
   })
-  
+
   // Categorize the error
   const errorType = categorizeError(error)
-  
+
   // Get safe message
   let message: string
-  
+
   if (options?.defaultMessage) {
     message = options.defaultMessage
   } else if (errorType === ErrorType.VALIDATION) {
@@ -218,7 +218,7 @@ export function createSafeError(
     // For all other errors, use the safe default
     message = ERROR_MESSAGES[errorType]
   }
-  
+
   return {
     type: errorType,
     message,
@@ -236,19 +236,19 @@ export function createSafeError(
 export function handleApiError(
   error: any,
   options?: {
-    userId?: string
-    endpoint?: string
-    operation?: string
-    statusCode?: number
+    userId?: string | undefined
+    endpoint?: string | undefined
+    operation?: string | undefined
+    statusCode?: number | undefined
   }
 ): never {
   const safeError = createSafeError(error, options)
-  
-  const statusCode = options?.statusCode || 
-                    error?.statusCode || 
-                    error?.status ||
-                    getStatusCodeForErrorType(safeError.type)
-  
+
+  const statusCode = options?.statusCode ||
+    error?.statusCode ||
+    error?.status ||
+    getStatusCodeForErrorType(safeError.type)
+
   throw createError({
     statusCode,
     message: safeError.message,
@@ -293,10 +293,10 @@ function getStatusCodeForErrorType(errorType: ErrorType): number {
 export async function withSafeErrorHandling<T>(
   promise: Promise<T>,
   options: {
-    userId?: string
-    endpoint?: string
+    userId?: string | undefined
+    endpoint?: string | undefined
     operation: string
-    errorMessage?: string
+    errorMessage?: string | undefined
   }
 ): Promise<T> {
   try {
