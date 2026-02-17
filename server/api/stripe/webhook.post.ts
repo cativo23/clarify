@@ -1,5 +1,5 @@
 import Stripe from 'stripe'
-
+import { handleApiError } from '~/server/utils/error-handler'
 
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig()
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     if (!body || !signature) {
         throw createError({
             statusCode: 400,
-            message: 'Missing body or signature',
+            message: 'Invalid webhook request',
         })
     }
 
@@ -31,10 +31,10 @@ export default defineEventHandler(async (event) => {
 
         return { received: true }
     } catch (error: any) {
-        console.error('Webhook error:', error.message)
-        throw createError({
-            statusCode: 400,
-            message: `Webhook Error: ${error.message}`,
+        // [SECURITY FIX H3] Don't expose Stripe error details or webhook secrets
+        handleApiError(error, {
+            endpoint: '/api/stripe/webhook',
+            operation: 'stripe_webhook_verification'
         })
     }
 })
