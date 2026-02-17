@@ -339,10 +339,9 @@ const downloadPDF = () => {
 }
 
 // Debug & Admin Logic
-const config = useRuntimeConfig()
-const user = useSupabaseUser()
+const userState = useUserState()
 const isAdmin = computed(() => {
-    return user.value?.email === config.public.adminEmail
+    return userState.value?.is_admin === true
 })
 
 onMounted(async () => {

@@ -372,7 +372,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Analysis } from '~/types'
+import type { Analysis, User } from '~/types'
 
 definePageMeta({
   middleware: 'auth',
@@ -380,8 +380,8 @@ definePageMeta({
 
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
-const config = useRuntimeConfig()
-const isAdmin = computed(() => user.value?.email === config.public.adminEmail)
+const userState = useUserState()
+const isAdmin = computed(() => userState.value?.is_admin === true)
 
 const userProfile = ref<any>(null)
 const sharedCredits = useCreditsState()
@@ -516,10 +516,14 @@ const setupRealtimeSubscription = () => {
         // If job completed or failed, refresh user profile to ensure credits are correct
         if (updatedAnalysis.status === 'completed' || updatedAnalysis.status === 'failed') {
           try {
-             const profile = await fetchUserProfile()
+             // Use $fetch directly instead of fetchUserProfile composable to avoid Nuxt context loss in callback
+             const profile = await $fetch<User>('/api/user/profile')
              if (profile) {
                 userProfile.value = profile
                 sharedCredits.value = profile.credits
+                if (userState.value) {
+                    userState.value = profile
+                }
              }
           } catch (err) {
              console.error('Error refreshing profile in realtime callback:', err)
