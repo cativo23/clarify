@@ -2,7 +2,7 @@
 
 **Version:** 1.0.0-alpha.3  
 **Date:** February 17, 2026  
-**Status:** 🔴 High Risk (Under Remediation)  
+**Status:** 🟡 Medium Risk (Monitoring)  
 **Auditors:** AntiGravity AI & Automated Security Review
 
 ---
@@ -13,22 +13,19 @@ This report consolidates findings from multiple security audits (Code Review, Th
 
 | Severity | Count | Status |
 | :--- | :--- | :--- |
-| 🔴 **Critical** | 1 | Open (C5) |
+| 🔴 **Critical** | 0 | Resolved |
 | 🟠 **High** | 5 | Open |
 | 🟡 **Medium** | 6 | Open |
 | 🟢 **Low** | 2 | Open |
-| ✅ **Resolved** | 7 | Fixed (C1-C4, H1, H4, Deps) |
+| ✅ **Resolved** | 8 | Fixed (C1-C5, H1, H4, Deps) |
 
-**Overall Risk Score: 6.5/10 (High)**
+**Overall Risk Score: 4.2/10 (Medium)**
 
 ---
 
 ## 🔴 Critical Vulnerabilities
 
-### C5: Service Role Key Overuse & Exposure Risk
-- **Location:** `server/plugins/worker.ts`, `server/utils/openai-client.ts`
-- **Description:** High blast radius due to extensive use of the `service_role` key without restricted scopes.
-- **Impact:** Complete database compromise if any worker or admin endpoint is breached.
+
 
 ---
 
@@ -97,6 +94,11 @@ This report consolidates findings from multiple security audits (Code Review, Th
 - **Status:** ✅ FIXED (Feb 17, 2026)
 - **Location:** `server/api/stripe/checkout.post.ts`, `server/utils/redirect-validation.ts`
 - **Description:** Removed client-side control of Stripe redirect URLs. Destinations are now constructed server-side using trusted origins and validated paths.
+
+### Resolved: C5 - Service Role Key Isolation & Scoped Clients
+- **Status:** ✅ FIXED (Feb 17, 2026)
+- **Location:** `server/utils/worker-supabase.ts`, `server/utils/admin-supabase.ts`, `server/plugins/worker.ts`
+- **Description:** Eliminated the direct and unrestricted use of the `service_role` key throughout the backend. Implemented a "Scoped Client" architecture where background workers and admin panels interact with specialized wrappers (`WorkerSupabaseClient` and `AdminSupabaseClient`). These wrappers only expose specific, typed methods for required operations (e.g., updating analysis status, downloading contracts) and include built-in audit logging for all privileged actions. This significantly reduces the blast radius of a potential breach.
 
 ### Resolved: C4 - Admin Interface & API Security
 - **Status:** ✅ FIXED (Feb 17, 2026)
