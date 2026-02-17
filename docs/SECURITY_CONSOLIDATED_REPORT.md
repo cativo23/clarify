@@ -14,10 +14,10 @@ This report consolidates findings from multiple security audits (Code Review, Th
 | Severity | Count | Status |
 | :--- | :--- | :--- |
 | 🔴 **Critical** | 5 | Open |
-| 🟠 **High** | 7 | Open |
+| 🟠 **High** | 6 | Open |
 | 🟡 **Medium** | 6 | Open |
 | 🟢 **Low** | 2 | Open |
-| ✅ **Resolved** | 1 | Fixed (Dependencies) |
+| ✅ **Resolved** | 2 | Fixed (H1, Deps) |
 
 **Overall Risk Score: 7.8/10 (High)**
 
@@ -55,9 +55,10 @@ This report consolidates findings from multiple security audits (Code Review, Th
 ## 🟠 High Severity Issues
 
 ### H1: Admin Email Exposed in Public Config
+- **Status:** ✅ FIXED (Feb 16, 2026)
 - **Location:** `nuxt.config.ts`
-- **Description:** `adminEmail` is in `runtimeConfig.public`, making it visible to all clients.
-- **Impact:** Target discovery for administrative attacks.
+- **Description:** `adminEmail` was moved from `runtimeConfig.public` to private `runtimeConfig`.
+- **Remediation:** Admin status is now calculated on the server and exposed via the user profile API as a boolean `is_admin` flag. API routes are protected by a centralized `requireAdmin` utility that checks the private runtime config.
 
 ### H2: Missing Server-Side File Validation
 - **Location:** `server/api/upload.post.ts`
@@ -111,7 +112,7 @@ This report consolidates findings from multiple security audits (Code Review, Th
 
 ## 🛡️ Remediation Checklist
 
-- [ ] **Auth**: Move admin check to `server/utils/auth.ts` and hide email.
+- [x] **Auth**: Move admin check to server-side and hide email.
 - [ ] **Uploads**: Add `Buffer.subarray(0, 4)` magic byte check for `%PDF`.
 - [ ] **Atomic**: Refactor `increment_user_credits` into an atomic SQL function.
 - [ ] **SSL**: Enable TLS for Redis connections.
