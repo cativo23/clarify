@@ -41,7 +41,7 @@ const DEFAULT_CONFIG: PromptConfig = {
     },
     features: {
         preprocessing: true,
-        tokenDebug: true,
+        tokenDebug: false, // SECURITY: Disabled by default (production-safe)
     },
 }
 

@@ -306,15 +306,9 @@ const fetchAnalysis = async () => {
   const id = route.params.id as string
 
   try {
-    const { data, error } = await supabase
-      .from('analyses')
-      .select('*')
-      .eq('id', id)
-      .single()
-
-    if (error) throw error
-
-    analysis.value = data
+    // [SECURITY FIX M4] Fetch analysis via API endpoint (not direct Supabase query)
+    const response = await $fetch(`/api/analyses/${id}/status`)
+    analysis.value = response.analysis
   } catch (error) {
     console.error('Error fetching analysis:', error)
   } finally {

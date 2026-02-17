@@ -182,16 +182,12 @@ const fetchAnalyses = async () => {
     loading.value = true
 
     try {
-        const { data, error } = await supabase
-            .from('analyses')
-            .select('*')
-            .eq('user_id', user.value.id)
-            .order('created_at', { ascending: false })
-
-        if (error) throw error
-        analyses.value = data || []
+        // [SECURITY FIX M4] Fetch analyses via API endpoint (not direct Supabase query)
+        const response = await $fetch('/api/analyses')
+        analyses.value = response.analyses || []
     } catch (err) {
         console.error('Error fetching analyses:', err)
+        analyses.value = []
     } finally {
         loading.value = false
     }
