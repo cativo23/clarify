@@ -6,6 +6,7 @@ export interface User {
     id: string
     email: string
     credits: number
+    is_admin?: boolean
     created_at: string
     updated_at: string
 }

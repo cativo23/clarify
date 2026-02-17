@@ -1,10 +1,9 @@
 import { defineEventHandler } from 'h3'
-import { createClient } from '@supabase/supabase-js'
+import { serverSupabaseServiceRole } from '#supabase/server'
 
 export default defineEventHandler(async (event) => {
     try {
-        const config = useRuntimeConfig()
-        const supabase = createClient(process.env.SUPABASE_URL || '', config.supabaseServiceKey)
+        const supabase = serverSupabaseServiceRole(event)
 
         const { data, error } = await supabase
             .from('pricing_tables')
