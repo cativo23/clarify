@@ -91,15 +91,19 @@ This report consolidates findings from multiple security audits (Code Review, Th
   - ✅ Follows PostgreSQL security best practices
 - **Verdict:** **Already secure** - no changes needed
 
-### Resolved: M4 - Debug Information Access Control (summary_json)
+### Resolved: M4 - Debug Information Access Control (Backend Enforcement)
 - **Status:** ✅ FIXED (Feb 17, 2026)
-- **Location:** `server/plugins/worker.ts`
-- **Description:** Implemented access control for debug information in analysis summaries:
-  - **Full debug info preserved**: Token usage, model info, timestamps, preprocessing details
-  - **Admin-only flag**: `_adminOnly: true` marker added to `_debug` field
-  - **Frontend enforcement**: UI should check `user.is_admin` before displaying `_debug`
-  - **Audit trail**: Debug info includes `storedAt` timestamp for accountability
-- **Impact Mitigated**: Sensitive AI implementation details hidden from regular users while preserving full debugging capabilities for administrators.
+- **Location:** `server/utils/analysis-security.ts`, `server/api/analyses/[id]/status.get.ts`, `server/plugins/worker.ts`
+- **Description:** Implemented **backend enforcement** of debug information access control:
+  - **Full debug info stored**: Token usage, model info, timestamps, preprocessing details preserved in database
+  - **Backend stripping**: `sanitizeAnalysisSummary()` removes `_debug` field for non-admin users
+  - **API-level enforcement**: Analysis endpoint checks admin status and strips debug before sending response
+  - **Security principle**: Backend stripping (secure) vs Frontend hiding (bypassable)
+- **Implementation**:
+  - `server/utils/analysis-security.ts` - Centralized sanitization utilities
+  - `server/api/analyses/[id]/status.get.ts` - Enforces stripping at API layer
+  - `getRequestUserContext()` - Determines admin status from authenticated user
+- **Impact Mitigated**: Sensitive AI implementation details (token costs, model info, processing details) are **physically not sent** to non-admin users, preventing DevTools inspection or API manipulation attacks.
 
 ### Resolved: M5 - Security Headers Implementation
 - **Status:** ✅ FIXED (Feb 17, 2026)

@@ -1,4 +1,5 @@
 import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server'
+import { sanitizeAnalysisSummary, getRequestUserContext } from '../../../utils/analysis-security'
 
 export default defineEventHandler(async (event) => {
     try {
@@ -13,6 +14,9 @@ export default defineEventHandler(async (event) => {
             throw createError({ statusCode: 400, message: 'Missing analysis ID' })
         }
 
+        // Get user context including admin status
+        const userContext = await getRequestUserContext(event)
+
         const client = await serverSupabaseClient(event)
 
         const { data: analysis, error } = await client
@@ -26,9 +30,15 @@ export default defineEventHandler(async (event) => {
             throw createError({ statusCode: 404, message: 'Analysis not found' })
         }
 
+        // [SECURITY FIX M4] Strip debug info for non-admin users
+        const sanitizedAnalysis = {
+            ...analysis,
+            summary_json: sanitizeAnalysisSummary(analysis.summary_json, userContext.isAdmin)
+        }
+
         return {
             success: true,
-            analysis
+            analysis: sanitizedAnalysis
         }
     } catch (error: any) {
         return {

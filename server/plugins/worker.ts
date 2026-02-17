@@ -6,30 +6,14 @@ import { getWorkerSupabaseClient } from '../utils/worker-supabase'
 import { sanitizeErrorMessage } from '../utils/error-handler'
 
 /**
- * [SECURITY FIX M4] Separate user-facing summary from debug info
- * Stores full data but marks debug fields for admin-only access
- * Debug info is hidden from regular users by default in API responses
+ * [SECURITY FIX M4] Prepare summary for storage with full debug info
+ * Backend access control will strip debug info when serving to non-admin users
+ * No flags needed - security enforced at API layer
  */
 function prepareSummaryForStorage(summary: any): any {
-  // Keep the full summary intact including all debug info
-  // The _debug field contains:
-  // - Token usage (input/output tokens)
-  // - Model information
-  // - Processing timestamps
-  // - Preprocessing details
-  
-  // Mark the summary as having admin-only debug info
-  // Frontend should check user.is_admin before displaying _debug
-  const summaryWithMetadata = {
-    ...summary,
-    _debug: {
-      ...summary._debug,
-      _adminOnly: true, // Flag for frontend to hide from non-admins
-      storedAt: new Date().toISOString()
-    }
-  }
-  
-  return summaryWithMetadata
+  // Store complete summary with ALL debug information
+  // Backend enforces access control via sanitizeAnalysisSummary()
+  return summary
 }
 
 export default defineNitroPlugin((_nitroApp) => {
