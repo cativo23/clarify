@@ -5,6 +5,61 @@ import { analyzeContract } from '../utils/openai-client'
 import { getWorkerSupabaseClient } from '../utils/worker-supabase'
 import { sanitizeErrorMessage } from '../utils/error-handler'
 
+/**
+ * [SECURITY FIX M4] Sanitize analysis summary before storing to database
+ * Removes sensitive debug information that shouldn't be publicly accessible
+ */
+function sanitizeSummaryForStorage(summary: any): any {
+  // Create a copy to avoid mutating the original
+  const sanitized = { ...summary }
+  
+  // Remove or sanitize _debug field which contains:
+  // - Token usage data
+  // - Model information
+  // - Timestamps
+  // - Other implementation details
+  if (sanitized._debug) {
+    // Keep only safe, non-sensitive fields
+    const safeDebug = {
+      timestamp: sanitized._debug.timestamp,
+      preprocessing: sanitized._debug.preprocessing ? {
+        originalTokens: sanitized._debug.preprocessing.originalTokens,
+        processedTokens: sanitized._debug.preprocessing.processedTokens,
+        truncated: sanitized._debug.preprocessing.truncated
+      } : undefined
+    }
+    sanitized._debug = safeDebug
+  }
+  
+  // Remove any fields that might contain sensitive data
+  // Keep only user-facing analysis results
+  const safeFields = [
+    'nivel_riesgo_general',
+    'nivel_riesgo',
+    'resumen_ejecutivo',
+    'clausulas_problematicas',
+    'recomendaciones',
+    'puntos_criticos',
+    'riesgos_detectados',
+    'clausulas_beneficiosas'
+  ]
+  
+  // Create minimal safe summary for storage
+  const minimalSummary: any = {}
+  for (const field of safeFields) {
+    if (sanitized[field] !== undefined) {
+      minimalSummary[field] = sanitized[field]
+    }
+  }
+  
+  // Add sanitized debug if exists
+  if (sanitized._debug) {
+    minimalSummary._debug = sanitized._debug
+  }
+  
+  return minimalSummary
+}
+
 export default defineNitroPlugin((_nitroApp) => {
     const worker = new Worker('analysis-queue', async (job) => {
         const { analysisId, userId, storagePath, analysisType } = job.data
@@ -55,8 +110,11 @@ export default defineNitroPlugin((_nitroApp) => {
             const dbRiskLevel = riskMapping[riskLevelStr] || 'medium'
 
             // 6. Save results and complete
+            // [SECURITY FIX M4] Sanitize summary before storing to database
+            const sanitizedSummary = sanitizeSummaryForStorage(analysisSummary)
+            
             const completeResult = await supabase.updateAnalysisStatus(analysisId, 'completed', {
-                summary_json: analysisSummary,
+                summary_json: sanitizedSummary,
                 risk_level: dbRiskLevel
             })
 
@@ -80,9 +138,12 @@ export default defineNitroPlugin((_nitroApp) => {
             }
 
             // Mark as failed in DB using scoped client
+            // [SECURITY FIX M4] Sanitize debug info before storing
+            const sanitizedDebug = debugData ? sanitizeSummaryForStorage({ _debug: debugData })._debug : null
+            
             await supabase.updateAnalysisStatus(analysisId, 'failed', {
                 error_message: sanitizeErrorMessage(errorMessage),
-                summary_json: debugData ? { _debug: debugData } : null
+                summary_json: sanitizedDebug ? { _debug: sanitizedDebug } : null
             })
         }
     }, {
