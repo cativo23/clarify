@@ -15,18 +15,33 @@ This system provides:
 ### First Time Setup
 
 ```bash
-# Install dependencies
+# 1. Install dependencies
 npm install
 
-# Set environment variables (copy from .env.example)
+# 2. Set environment variables
 cp .env.example .env
 
-# Run all migrations
+# 3. Create migrations table (ONE TIME ONLY)
+# Run this in Supabase SQL Editor:
+npm run db:init
+
+# 4. Run migrations
 npm run db:migrate
 
-# Seed demo data (optional, for development)
+# 5. Seed demo data (optional)
 npm run db:seed
 ```
+
+### Quick Init Command
+
+The `db:init` command shows the SQL to create the migrations table:
+
+```bash
+npm run db:init
+# Copy the SQL output and paste into Supabase SQL Editor
+```
+
+Or run the SQL file directly: `database/00_INIT_MIGRATIONS_TABLE.sql`
 
 ## 📖 Available Commands
 
@@ -59,16 +74,38 @@ npm run migrate:make create_users_table
 ```
 database/
 ├── migrations/
-│   ├── 000_create_migrations_table.sql    # Migration tracking (auto-run)
-│   ├── 20260216000001_fix_credit_...sql   # C1: Atomic credit deduction
-│   ├── 20260217000001_atomic_credit_...sql # H4: Atomic credit increment
+│   ├── 000_create_migrations_table.sql       # Migration tracking (auto-created)
+│   ├── 20260216000000_create_core_schema.sql # Tables: users, analyses, transactions
+│   ├── 20260216000001_fix_credit_...sql      # C1: Atomic credit deduction
+│   ├── 20260216000002_enable_rls_...sql      # RLS policies
+│   ├── 20260216000003_add_async_...sql       # Async analysis support
+│   ├── 20260216000004_add_prompt_...sql      # Configurations table
+│   ├── 20260216000005_create_pricing_...sql  # Pricing tables
+│   ├── 20260216000006_add_analysis_...sql    # Basic/Premium types
+│   ├── 20260216000007_create_admin_...sql    # Admin views
+│   ├── 20260217000001_atomic_credit_...sql   # H4: Credit increment function
 │   └── ...
 ├── seeders/
-│   ├── 001_demo_users.seeder.sql          # Demo users & analyses
-│   ├── 002_pricing_tables.seeder.sql      # AI model pricing
+│   ├── 001_demo_users.seeder.sql             # Demo users & analyses
+│   ├── 002_pricing_tables.seeder.sql         # AI model pricing
 │   └── ...
-└── MIGRATIONS.md                          # This file
+└── MIGRATIONS.md                             # This file
 ```
+
+## 🗂️ Migration Order
+
+Migrations run in alphabetical order by filename:
+
+1. **000_create_migrations_table.sql** - Tracking table (internal)
+2. **20260216000000_create_core_schema.sql** - Base tables
+3. **20260216000001_fix_credit_deduction_race_condition.sql** - C1 fix (atomic RPC)
+4. **20260216000002_enable_rls_policies.sql** - Security policies
+5. **20260216000003_add_async_analysis_support.sql** - Status columns
+6. **20260216000004_add_prompt_versioning.sql** - Configurations
+7. **20260216000005_create_pricing_tables.sql** - AI pricing
+8. **20260216000006_add_analysis_types.sql** - Basic/Premium
+9. **20260216000007_create_admin_views.sql** - Admin dashboard views
+10. **20260217000001_atomic_credit_increment.sql** - H4 fix (increment function)
 
 ## 🔧 Migration File Format
 

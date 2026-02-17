@@ -62,10 +62,50 @@ const MIGRATIONS_DIR = join(__dirname, '..', 'database', 'migrations')
 const SEEDERS_DIR = join(__dirname, '..', 'database', 'seeders')
 
 /**
+ * Ensure migrations table exists
+ * In Laravel style, this is created automatically on first migrate
+ */
+async function ensureMigrationsTable() {
+  // Try to query the table
+  const { error } = await supabase
+    .from('_migrations')
+    .select('id')
+    .limit(1)
+
+  if (error && error.message.includes('relation')) {
+    log('')
+    log('⚠  Migrations table not found!', 'yellow')
+    log('')
+    log('First-time setup required. Run this SQL in Supabase SQL Editor:', 'cyan')
+    log('')
+    log('─'.repeat(60), 'gray')
+    log('CREATE TABLE IF NOT EXISTS _migrations (', 'gray')
+    log('  id SERIAL PRIMARY KEY,', 'gray')
+    log('  migration_name VARCHAR(255) NOT NULL UNIQUE,', 'gray')
+    log('  batch_number INTEGER NOT NULL,', 'gray')
+    log('  executed_at TIMESTAMPTZ DEFAULT NOW()', 'gray')
+    log(');', 'gray')
+    log('CREATE INDEX idx_migrations_batch ON _migrations(batch_number);', 'gray')
+    log('CREATE INDEX idx_migrations_name ON _migrations(migration_name);', 'gray')
+    log('─'.repeat(60), 'gray')
+    log('')
+    log('Or run: database/00_INIT_MIGRATIONS_TABLE.sql', 'cyan')
+    log('')
+    log('Then re-run: npm run db:migrate', 'gray')
+    log('')
+    
+    // Exit gracefully - user needs to run SQL manually
+    process.exit(0)
+  }
+}
+
+/**
  * Get list of executed migrations
  */
 async function getExecutedMigrations(): Promise<string[]> {
   try {
+    await ensureMigrationsTable()
+    
     const { data, error } = await supabase
       .from('_migrations')
       .select('migration_name')
@@ -119,27 +159,15 @@ async function getMigrationFiles(): Promise<string[]> {
 }
 
 /**
- * Execute SQL file
+ * Execute SQL file (placeholder - actual execution must be done in Supabase SQL Editor)
  */
 async function executeSqlFile(filePath: string, description: string): Promise<boolean> {
   try {
-    const content = await readFile(filePath, 'utf-8')
-    
-    // Remove comments and split into statements
-    const statements = content
-      .split(';')
-      .map(s => s.trim())
-      .filter(s => s.length > 0 && !s.startsWith('--') && !s.startsWith('COMMENT'))
-    
-    log(`  Executing: ${description}`, 'gray')
-    
-    // Note: Supabase JS client doesn't support raw SQL execution directly
-    // We need to use the REST API or admin interface
-    // For now, we'll track migrations but they need to be run manually or via SQL editor
-    
+    await readFile(filePath, 'utf-8')
+    log(`  Recorded: ${description}`, 'gray')
     return true
   } catch (error: any) {
-    logError(`Failed to execute ${description}: ${error.message}`)
+    logError(`Failed to read ${description}: ${error.message}`)
     return false
   }
 }
@@ -181,6 +209,8 @@ async function migrate() {
   log('🚀 Running migrations...', 'cyan')
   log('')
   
+  await ensureMigrationsTable()
+  
   const executed = await getExecutedMigrations()
   const files = await getMigrationFiles()
   const pending = files.filter(f => !executed.includes(f))
@@ -194,6 +224,8 @@ async function migrate() {
   let successCount = 0
   
   logInfo(`Found ${pending.length} pending migration(s)`)
+  log('')
+  logWarning('⚠  SQL files must be executed manually in Supabase SQL Editor')
   log('')
   
   for (const migration of pending) {
@@ -212,7 +244,11 @@ async function migrate() {
   
   log('')
   log(`✅ ${successCount}/${pending.length} migrations recorded (batch #${batch})`, 'green')
-  logWarning('⚠  SQL must be executed in Supabase SQL Editor for full effect')
+  log('')
+  log('Next steps:', 'cyan')
+  log('1. Copy SQL from migration files', 'gray')
+  log('2. Paste into Supabase SQL Editor', 'gray')
+  log('3. Execute to apply schema changes', 'gray')
 }
 
 /**
@@ -289,6 +325,9 @@ async function fresh() {
   }
   
   logWarning('⚠  Dropping all migration records...', 'red')
+  
+  // Ensure table exists first
+  await ensureMigrationsTable()
   
   const { error } = await supabase
     .from('_migrations')
@@ -402,6 +441,27 @@ async function makeMigration() {
 }
 
 /**
+ * COMMAND: db:init
+ * Shows SQL to create migrations table (Laravel style - auto-check on first migrate)
+ */
+async function init() {
+  console.log('\x1b[36m🗄️  Database Initialization\x1b[0m\n')
+  console.log('Run this SQL in Supabase SQL Editor:\n\x1b[36m')
+  console.log('\x1b[90m' + '─'.repeat(70) + '\x1b[0m')
+  console.log('\x1b[37mCREATE TABLE IF NOT EXISTS _migrations (\x1b[0m')
+  console.log('\x1b[37m  id SERIAL PRIMARY KEY,\x1b[0m')
+  console.log('\x1b[37m  migration_name VARCHAR(255) NOT NULL UNIQUE,\x1b[0m')
+  console.log('\x1b[37m  batch_number INTEGER NOT NULL,\x1b[0m')
+  console.log('\x1b[37m  executed_at TIMESTAMPTZ DEFAULT NOW()\x1b[0m')
+  console.log('\x1b[37m);\x1b[0m')
+  console.log('\x1b[37mCREATE INDEX IF NOT EXISTS idx_migrations_batch ON _migrations(batch_number);\x1b[0m')
+  console.log('\x1b[37mCREATE INDEX IF NOT EXISTS idx_migrations_name ON _migrations(migration_name);\x1b[0m')
+  console.log('\x1b[90m' + '─'.repeat(70) + '\x1b[0m')
+  console.log('\n\x1b[36mOr run the file: database/00_INIT_MIGRATIONS_TABLE.sql\x1b[0m')
+  console.log('\n\x1b[90mThen run: npm run db:migrate\x1b[0m\n')
+}
+
+/**
  * Main CLI handler
  */
 async function main() {
@@ -415,23 +475,27 @@ async function main() {
     'migrate:fresh': fresh,
     'db:seed': seed,
     'db:wipe': wipe,
+    'db:init': init,
     'migrate:make': makeMigration,
   }
   
   if (!command || !commands[command]) {
     log('🗄️  Database Migration Tool', 'cyan')
     log('')
-    log('Usage: npm run migrate <command> [options]', 'gray')
+    log('Usage: npm run <command> [options]', 'gray')
     log('')
     log('Commands:', 'cyan')
-    log('  migrate          Run all pending migrations')
-    log('  migrate:status   Show migration status')
-    log('  migrate:rollback Rollback last batch')
-    log('  migrate:fresh    Reset migrations table (--force)')
-    log('  db:seed          Run database seeders')
-    log('  db:wipe          Delete all data (--force)')
-    log('  migrate:make     Create new migration')
+    log('  db:init          Show SQL to create migrations table (first-time setup)', 'gray')
+    log('  db:migrate       Run all pending migrations', 'gray')
+    log('  db:status        Show migration status', 'gray')
+    log('  db:rollback      Rollback last batch', 'gray')
+    log('  db:fresh         Reset migrations table (--force)', 'gray')
+    log('  db:seed          Run database seeders', 'gray')
+    log('  db:wipe          Delete all data (--force)', 'gray')
+    log('  db:refresh       Wipe + re-migrate + seed (--force)', 'gray')
+    log('  migrate:make     Create new migration', 'gray')
     log('')
+    log('First time? Run: npm run db:init', 'yellow')
     return
   }
   
