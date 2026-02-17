@@ -1,7 +1,7 @@
 # Consolidated Security Report - Clarify
 
 **Version:** 1.0.0-alpha.3  
-**Date:** February 16, 2026  
+**Date:** February 17, 2026  
 **Status:** 🔴 High Risk (Under Remediation)  
 **Auditors:** AntiGravity AI & Automated Security Review
 
@@ -11,20 +11,19 @@
 
 This report consolidates findings from multiple security audits (Code Review, Threat Model, and Vulnerability Assessment). A total of **20 unique vulnerabilities** were identified across the platform. While structural security (RLS, Auth) is in place, significant logic and configuration flaws exist that require immediate attention.
 
-| 🔴 **Critical** | 2 | Open |
+| Severity | Count | Status |
+| :--- | :--- | :--- |
+| 🔴 **Critical** | 1 | Open (C5) |
 | 🟠 **High** | 5 | Open |
 | 🟡 **Medium** | 6 | Open |
 | 🟢 **Low** | 2 | Open |
-| ✅ **Resolved** | 6 | Fixed (C1-C3, H1, H4, Deps) |
+| ✅ **Resolved** | 7 | Fixed (C1-C4, H1, H4, Deps) |
 
-**Overall Risk Score: 7.8/10 (High)**
+**Overall Risk Score: 6.5/10 (High)**
+
 ---
-## 🔴 Critical Vulnerabilities
 
-### C4: Admin Pricing Endpoint Missing Authentication
-- **Location:** `server/api/admin/pricing.get.ts`
-- **Description:** Uses service key to bypass RLS but lacks any user/admin validation.
-- **Impact:** Unauthenticated access to business-sensitive pricing data.
+## 🔴 Critical Vulnerabilities
 
 ### C5: Service Role Key Overuse & Exposure Risk
 - **Location:** `server/plugins/worker.ts`, `server/utils/openai-client.ts`
@@ -50,6 +49,7 @@ This report consolidates findings from multiple security audits (Code Review, Th
 - **Location:** Multiple endpoints
 - **Description:** Raw database and API errors (Stripe/OpenAI) are returned to the client.
 - **Impact:** Reconnaissance information for attackers.
+
 ### H5: Client-Side Credit Update Risk
 - **Location:** `composables/useSupabase.ts`
 - **Description:** Client-side function exists that could allow setting arbitrary credit amounts if RLS is relaxed.
@@ -88,12 +88,20 @@ This report consolidates findings from multiple security audits (Code Review, Th
 - **Location:** `server/api/analyze.post.ts`, `database/init.sql`, `database/migrations/001_...sql`
 - **Description:** Fixed the TOCTOU race condition using `FOR UPDATE` row locking. Additionally resolved an IDOR vulnerability by removing `p_user_id` from the RPC and using `auth.uid()` securely on the server.
 
+### Resolved: C2 - Server-Side Request Forgery (SSRF) Protection
+- **Status:** ✅ FIXED (Feb 16, 2026)
+- **Location:** `server/api/analyze.post.ts`, `server/api/check-tokens.post.ts`, `server/utils/ssrf-protection.ts`
 - **Description:** Implemented strict URL validation for Supabase Storage. Added hostname whitelisting, bucket restrictions (contracts only), path traversal prevention, and protocol enforcement (HTTPS-only). Enforced use of relative storage paths in the database instead of raw external URLs.
 
 ### Resolved: C3 - Open Redirect Protection
 - **Status:** ✅ FIXED (Feb 17, 2026)
 - **Location:** `server/api/stripe/checkout.post.ts`, `server/utils/redirect-validation.ts`
 - **Description:** Removed client-side control of Stripe redirect URLs. Destinations are now constructed server-side using trusted origins and validated paths.
+
+### Resolved: C4 - Admin Interface & API Security
+- **Status:** ✅ FIXED (Feb 17, 2026)
+- **Location:** `server/api/admin/**/*`, `pages/admin/**/*`, `server/utils/auth.ts`
+- **Description:** Enforced a secure admin perimeter. All admin API endpoints now use `requireAdmin` which verifies the user against a private server-side admin list. Frontend routes are protected by admin middleware and UI elements are restricted.
 
 ### Resolved: H4 - Atomic Stripe Credit Updates
 - **Status:** ✅ FIXED (Feb 17, 2026)
