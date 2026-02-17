@@ -43,23 +43,25 @@ export const fetchUserProfile = async () => {
 
 // Fetch user's analyses
 export const useUserAnalyses = async () => {
-    const client = useSupabaseClient()
     const user = useSupabaseUser()
 
     if (!user.value?.id) return []
 
-    const { data, error } = await client
-        .from('analyses')
-        .select('*')
-        .eq('user_id', user.value.id)
-        .order('created_at', { ascending: false })
+    try {
+        // [SECURITY FIX M4] Use API endpoint instead of direct Supabase query
+        // This ensures debug info is stripped for non-admin users
+        const { data, error } = await $fetch('/api/analyses')
 
-    if (error) {
+        if (error) {
+            console.error('Error fetching analyses:', error)
+            return []
+        }
+
+        return data.analyses || []
+    } catch (error: any) {
         console.error('Error fetching analyses:', error)
         return []
     }
-
-    return data as Analysis[]
 }
 
 
