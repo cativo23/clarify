@@ -62,24 +62,6 @@ export const useUserAnalyses = async () => {
     return data as Analysis[]
 }
 
-// Update user credits
-export const updateUserCredits = async (credits: number) => {
-    const client = useSupabaseClient()
-    const user = useSupabaseUser()
-
-    if (!user.value?.id) throw new Error('User not authenticated')
-
-    const { data, error } = await client
-        .from('users')
-        .update({ credits })
-        .eq('id', user.value.id)
-        .select()
-        .single()
-
-    if (error) throw error
-
-    return data as User
-}
 
 // Save analysis to database
 export const saveAnalysis = async (analysis: Omit<Analysis, 'id' | 'created_at'>) => {
