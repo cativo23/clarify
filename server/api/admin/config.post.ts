@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
         .upsert({
             key: 'prompt_settings',
             value: body,
-            updated_by: user.id
+            updated_by: user!.id
         }, { onConflict: 'key' })
 
     if (error) {
