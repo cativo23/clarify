@@ -66,8 +66,9 @@
           <button
             type="submit"
             :disabled="loading"
-            class="w-full bg-secondary text-white py-4 rounded-2xl font-black text-lg hover:shadow-glow hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            class="w-full bg-secondary text-white py-4 rounded-2xl font-black text-lg hover:shadow-glow hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
           >
+            <LoadingSpinner v-if="loading" size="sm" color="white" />
             {{ loading ? 'Procesando...' : (isSignUp ? 'Empezar ahora' : 'Ingresar') }}
           </button>
         </form>

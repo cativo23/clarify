@@ -46,12 +46,7 @@
 
             <!-- Content -->
             <div v-if="loading" class="flex flex-col items-center justify-center py-24">
-                <div class="relative w-16 h-16">
-                    <div class="absolute inset-0 border-4 border-secondary/20 rounded-full"></div>
-                    <div
-                        class="absolute inset-0 border-4 border-secondary border-t-transparent rounded-full animate-spin">
-                    </div>
-                </div>
+                <LoadingSpinner size="xl" />
                 <p class="mt-6 text-slate-400 font-bold uppercase tracking-widest text-[10px] animate-pulse">
                     Sincronizando con la nube...</p>
             </div>
@@ -103,8 +98,8 @@
                                     <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                         d="M5 13l4 4L19 7" />
                                 </svg>
-                                <div v-else-if="analysis.status === 'processing'"
-                                    class="w-6 h-6 border-2 border-secondary/30 border-t-secondary rounded-full animate-spin">
+                                <div v-else-if="analysis.status === 'processing'">
+                                    <LoadingSpinner size="sm" color="white" />
                                 </div>
                                 <svg v-else class="w-7 h-7 text-slate-400" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
@@ -162,7 +157,6 @@ definePageMeta({
     middleware: 'auth'
 })
 
-const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 
 const analyses = ref<Analysis[]>([])
