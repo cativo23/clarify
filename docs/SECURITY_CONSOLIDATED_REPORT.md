@@ -1,6 +1,6 @@
 # Consolidated Security Report - Clarify
 
-**Version:** 1.0.0-alpha.7
+**Version:** 1.0.0-alpha.8
 **Date:** February 17, 2026
 **Status:** 🟢 Very Low Risk (All Critical, High & Most Medium Issues Resolved)
 **Auditors:** AntiGravity AI & Automated Security Review
@@ -15,16 +15,16 @@ This report consolidates findings from multiple security audits (Code Review, Th
 | :--- | :--- | :--- |
 | 🔴 **Critical** | 0 | ✅ All Resolved |
 | 🟠 **High** | 0 | ✅ All Resolved |
-| 🟡 **Medium** | 3 | Open (M1, M3, M6 - Infrastructure) |
+| 🟡 **Medium** | 2 | Open (M3, M6 - Infrastructure/Feature) |
 | 🟢 **Low** | 2 | Open |
-| ✅ **Resolved** | 16 | Fixed (C1-C5, H1-H7, M2, M4, M5, Deps) |
+| ✅ **Resolved** | 17 | Fixed (C1-C5, H1-H7, M1, M2, M4, M5, Deps) |
 
-**Overall Risk Score: 1.5/10 (Very Low)**
+**Overall Risk Score: 1.2/10 (Very Low)**
 
 ### Key Achievements
 - ✅ **All 5 Critical vulnerabilities eliminated** (C1-C5)
 - ✅ **All 7 High vulnerabilities resolved** (H1-H7)
-- ✅ **3/6 Medium vulnerabilities resolved** (M2, M4, M5)
+- ✅ **4/6 Medium vulnerabilities resolved** (M1, M2, M4, M5)
 - ✅ **Zero direct service_role key exposure** - Scoped client architecture implemented
 - ✅ **Admin perimeter secured** - Authentication + authorization enforced
 - ✅ **Financial integrity protected** - Atomic operations for credit handling
@@ -34,6 +34,7 @@ This report consolidates findings from multiple security audits (Code Review, Th
 - ✅ **SQL injection prevention verified** - All stored procedures use parameterized queries
 - ✅ **Security headers implemented** - HSTS, CSP, X-Frame-Options, and more
 - ✅ **Database debug info sanitized** - Sensitive AI metadata removed from storage
+- ✅ **Rate limiting implemented** - DoS protection with Redis-based limiting
 
 ---
 
@@ -52,14 +53,6 @@ This report consolidates findings from multiple security audits (Code Review, Th
 ---
 
 ## 🟡 Medium Severity Issues
-
-### M1: Missing Rate Limiting
-- **Status:** ⚠️ ACCEPTED RISK (Infrastructure)
-- **Location:** All API endpoints
-- **Description:** All endpoints allow unlimited requests.
-- **Impact:** Potential DoS or cost escalation.
-- **Mitigation:** Future enhancement - requires rate limiting middleware or API gateway.
-- **Note:** Low priority due to authenticated-only access and Supabase backend protections.
 
 ### M3: Redis without Auth/TLS
 - **Status:** ⚠️ ACCEPTED RISK (Infrastructure)
@@ -80,6 +73,23 @@ This report consolidates findings from multiple security audits (Code Review, Th
 ---
 
 ### ✅ Resolved Medium Issues
+
+### Resolved: M1 - Rate Limiting Implementation
+- **Status:** ✅ FIXED (Feb 17, 2026)
+- **Location:** `server/utils/rate-limit.ts`, `server/api/analyze.post.ts`, `server/api/upload.post.ts`, `server/api/stripe/checkout.post.ts`
+- **Description:** Implemented comprehensive rate limiting to prevent DoS attacks and cost escalation:
+  - **Redis-based limiting**: Distributed rate limiting using existing Redis infrastructure
+  - **Memory fallback**: Graceful degradation to in-memory limiting if Redis unavailable
+  - **Preset configurations**: Different limits for different endpoint types
+  - **Standard headers**: Returns `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`, `Retry-After`
+- **Rate Limits Applied**:
+  - **Analyze endpoints**: 3 requests/minute (expensive AI operations)
+  - **Upload endpoints**: 5 requests/minute (storage + processing)
+  - **Payment endpoints**: 5 requests/minute (financial operations)
+  - **Token check**: 30 requests/minute (moderate cost)
+  - **General API**: 60 requests/minute (read-only operations)
+  - **Auth endpoints**: 10 requests/15 minutes (brute force prevention)
+- **Impact Mitigated**: Prevents denial-of-service attacks, API abuse, and uncontrolled cost escalation from excessive AI/processing requests.
 
 ### Resolved: M2 - SECURITY DEFINER Search Path Hardening
 - **Status:** ✅ FIXED (Feb 17, 2026) - Audit Confirmed
@@ -228,8 +238,8 @@ This report consolidates findings from multiple security audits (Code Review, Th
 - [x] **Headers**: Add security headers (HSTS, CSP, X-Frame-Options, etc.). (M5 Fixed)
 - [x] **Database**: Sanitize debug info from summary_json. (M4 Fixed)
 - [x] **SQL Security**: Verify SECURITY DEFINER search_path. (M2 - Already Secure)
+- [x] **Rate Limiting**: Add request rate limiting middleware. (M1 Fixed)
 - [ ] **SSL**: Enable TLS for Redis connections. (M3 - Infrastructure)
-- [ ] **Rate Limiting**: Add request rate limiting middleware. (M1 - Infrastructure)
 - [ ] **Email Verification**: Enable Supabase email confirmation. (M6 - Feature)
 
 ---
