@@ -168,8 +168,7 @@
                 <button @click="handleAnalyze"
                   :disabled="analyzing || checkingTokens || !uploadedFileUrl || !contractName || (sharedCredits || 0) < (analysisType === 'premium' ? 3 : 1)"
                   class="px-10 py-4 bg-secondary text-white rounded-2xl font-black text-lg hover:shadow-glow hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex items-center gap-3">
-                  <span v-if="analyzing || checkingTokens"
-                    class="w-5 h-5 border-2 rounded-full border-white/30 border-t-white animate-spin"></span>
+                  <LoadingSpinner v-if="analyzing || checkingTokens" size="sm" color="white" />
                   {{ analyzeButtonText }}
                 </button>
               </div>
@@ -261,8 +260,8 @@
         </div>
 
         <div v-if="loading" class="py-12 text-center">
-          <div class="inline-block w-12 h-12 border-b-2 rounded-full animate-spin border-secondary"></div>
-          <p class="mt-4 text-slate-400 font-bold uppercase tracking-widest text-[10px]">Sincronizando...</p>
+          <LoadingSpinner size="lg" />
+          <p class="mt-4 text-slate-400 font-bold uppercase tracking-widest text-[10px]">Sincronizando contrato...</p>
         </div>
 
         <div v-else-if="analyses.length === 0"
@@ -359,7 +358,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Analysis, User } from '~/types'
+import type { Analysis } from '~/types'
 
 definePageMeta({
   middleware: 'auth',
@@ -368,7 +367,6 @@ definePageMeta({
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 const userState = useUserState()
-const isAdmin = computed(() => userState.value?.is_admin === true)
 
 const userProfile = ref<any>(null)
 const sharedCredits = useCreditsState()

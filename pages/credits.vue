@@ -84,12 +84,13 @@
             @click="handlePurchase(pack)"
             :disabled="purchasing"
             :class="[
-              'w-full py-4 rounded-lg font-bold text-lg transition-all',
+              'w-full py-4 rounded-lg font-bold text-lg transition-all flex items-center justify-center gap-3',
               pack.popular
                 ? 'bg-accent-indigo text-white hover:bg-accent-purple'
                 : 'bg-primary-900 text-white hover:bg-primary-800'
             ]"
           >
+            <LoadingSpinner v-if="purchasing" size="sm" color="white" />
             {{ purchasing ? 'Procesando...' : 'Comprar Ahora' }}
           </button>
         </div>

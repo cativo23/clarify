@@ -4,8 +4,9 @@
     <!-- Main Content -->
     <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div v-if="loading" class="text-center py-20">
-        <div class="inline-block animate-spin rounded-full h-16 w-16 border-b-2 border-accent-indigo"></div>
-        <p class="mt-4 text-primary-600 text-lg">Cargando análisis...</p>
+        <LoadingSpinner size="xl" />
+        <p class="mt-6 text-slate-500 font-bold uppercase tracking-widest text-[10px] animate-pulse">
+            Preparando tu análisis legal...</p>
       </div>
 
       <div v-else-if="!analysis" class="text-center py-20">
@@ -277,8 +278,6 @@ definePageMeta({
 })
 
 const route = useRoute()
-const supabase = useSupabaseClient()
-
 const analysis = ref<Analysis | null>(null)
 const loading = ref(true)
 
@@ -307,7 +306,7 @@ const fetchAnalysis = async () => {
 
   try {
     // [SECURITY FIX M4] Fetch analysis via API endpoint (not direct Supabase query)
-    const response = await $fetch(`/api/analyses/${id}/status`)
+    const response = await $fetch(`/api/analyses/${id}/status`) as any
     analysis.value = response.analysis
   } catch (error) {
     console.error('Error fetching analysis:', error)

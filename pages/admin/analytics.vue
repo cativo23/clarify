@@ -144,8 +144,8 @@ const formatDate = (dateString: string | null) => {
 
       <!-- Loading State -->
       <div v-if="loading" class="py-20 text-center">
-        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-secondary"></div>
-        <p class="mt-4 text-slate-400 font-bold uppercase tracking-widest text-[10px]">Loading...</p>
+        <LoadingSpinner size="lg" />
+        <p class="mt-4 text-slate-400 font-bold uppercase tracking-widest text-[10px]">Cargando analíticas...</p>
       </div>
 
       <!-- Error State -->

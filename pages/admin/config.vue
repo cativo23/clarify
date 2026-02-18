@@ -161,8 +161,8 @@ const vClickOutside = {
         </div>
 
             <div v-if="loading" class="py-20 text-center">
-                 <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-secondary mb-4"></div>
-                 <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">Cargando configuración...</p>
+                 <LoadingSpinner size="lg" />
+                 <p class="mt-6 text-slate-400 font-bold uppercase tracking-widest text-xs">Cargando configuración...</p>
             </div>
 
             <div v-else class="space-y-8 animate-slide-up">
@@ -411,7 +411,7 @@ const vClickOutside = {
                         @click="saveConfig" 
                         :disabled="saving"
                         class="px-8 py-4 bg-gradient-to-r from-secondary to-secondary-dark text-white rounded-2xl font-black text-lg hover:shadow-glow hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3 shadow-xl shadow-secondary/20">
-                        <span v-if="saving" class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                        <LoadingSpinner v-if="saving" size="sm" color="white" />
                         {{ saving ? 'Guardando...' : 'Guardar Configuración' }}
                     </button>
                 </div>
