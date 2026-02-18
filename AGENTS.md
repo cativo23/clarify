@@ -1,113 +1,80 @@
-# AGENTS.md - Clarify
+# 🧠 AI Agent Instructions
 
-> **Welcome Agent!** This document serves as your primary source of truth for working on the **Clarify** codebase. Read this carefully to understand the project structure, architectural patterns, and coding standards.
+This document provides guidance for AI agents working in the **Clarify** repository.
 
-## 🧠 Project Context
+## 🚀 Project Overview
+Clarify is an AI-powered contract auditing platform (Micro-SaaS) that analyzes legal documents and produces risk assessments. Democratizing legal advice by translating legalese into plain language.
 
-**Clarify** is an AI-powered legal audit platform (Micro-SaaS) that allows users to upload PDF contracts and receive simplified, risk-focused analyses.
-
--   **Core Value**: Democratizing legal advice by translating complex legalese into plain language.
--   **Key Features**: PDF Upload, AI Analysis (OpenAI), Credit System (Stripe), Dashboard.
-
-## 🛠️ Technology Stack
-
+### Technology Stack
 | Component | Technology | Notes |
 | :--- | :--- | :--- |
 | **Framework** | **Nuxt 3** | Vue 3, Composition API, TypeScript everywhere. |
-| **Language** | **TypeScript** | Strict typing is enforced. Avoid `any`. |
-| **Database** | **Supabase** | PostgreSQL. **Relies heavily on RLS (Row Level Security)**. |
-| **Auth** | **Supabase Auth** | Integrated with Nuxt sidebase/supabase. |
-| **AI** | **OpenAI API** | GPT-4o-mini, GPT-5-mini, and GPT-5. See 3-tier strategy. |
+| **Database** | **Supabase** | PostgreSQL. **Strict Row Level Security (RLS)**. |
+| **AI** | **OpenAI API** | 3-tier strategy (gpt-4o-mini, gpt-5-mini, gpt-5). |
 | **Payments** | **Stripe** | Webhook-based credit fulfillment. |
-| **Styling** | **Tailwind CSS** | "Premium" aesthetic. Dark mode optimization. |
+| **Queue** | **BullMQ/Redis** | Async job processing (Upstash in production). |
+| **Styling** | **Tailwind CSS** | "Premium" aesthetic (glassmorphism/dark mode). |
 
-## 🏗️ 3-Tier Strategy
-The system offers three analysis levels:
+## 🏗️ Architecture & Core Flows
+
+### 3-Tier Analysis Strategy
 - **Basic**: `gpt-4o-mini` (1 credit) - Fast red-flag scan.
-- **Premium**: `gpt-5-mini` (3 credits) - Reasoning-based forensic audit.
+- **Premium**: `gpt-5-mini` (3 credits) - Reasoning-based audit (Recommended).
 - **Forensic**: `gpt-5` (10 credits) - Exhaustive high-precision audit.
 
-Configuration is handled in `server/utils/config.ts`.
+### Core Flows
+1.  **Analysis**: Client upload -> `/api/upload` (Magic Byte Validation) -> Supabase Storage -> BullMQ Task -> OpenAI -> DB.
+2.  **Credits**: Stripe Checkout -> Webhook -> **Atomic PostgreSQL RPC** (prevents race conditions).
+3.  **Authentication**: Supabase Auth with RLS. Admin checks use `is_admin` + `admin_emails` table.
 
-## 📂 Architecture & Directory Structure
-
-This is a **monorepo-style** Nuxt application.
-
+## 📂 Directory Structure
 ```text
-/
-├── components/          # Vue UI Components (Atoms/Molecules)
-│   └── ...              # Prefixed (e.g., AppHeader.vue, RiskCard.vue)
-├── pages/               # File-based Routing
-│   ├── index.vue        # Landing Page
-│   ├── dashboard.vue    # User Dashboard
-│   └── login.vue        # Auth Page
-├── server/              # Nitro Backend Engine
-│   ├── api/             # API Endpoints (e.g., /api/analyze)
-│   │   ├── stripe/      # Stripe specific endpoints (webhooks)
-│   │   └── upload.post.ts # File upload handler
-│   ├── utils/           # Server-side helpers (OpenAI client, formatting)
-│   └── prompts/         # Text files containing system prompts
-├── types/               # TypeScript Definitions
-├── docs/                # Human documentation (Architecture, Setup)
-└── utils/               # Client-side helpers
+├── components/          # Vue UI Components (<script setup lang="ts">)
+├── pages/               # File-based routing (dashboard, login, admin/)
+├── server/              # Backend
+│   ├── api/             # Endpoints (Zod validation, error handling)
+│   ├── prompts/         # AI Prompts (Read via fs, do not hardcode)
+│   └── utils/           # Helpers (auth, openai, stripe, redis)
+├── database/            # SQL Migrations & Seeders
+├── types/               # TypeScript definitions
+└── docs/                # Technical documentation
 ```
 
-### Key Architectural Patterns
+## 🔐 Security & Coding Guidelines
+- **Strict RLS**: Every table MUST have Row Level Security.
+- **Atomic Ops**: All credit/financial changes must use PostgreSQL RPCs to avoid race conditions.
+- **TypeScript**: Use `<script setup lang="ts">`. Avoid `any`. Strict typing is mandatory.
+- **Style**: Use glassmorphism (`backdrop-blur`), subtle borders, and `Inter` typography.
+- **Server Safety**: Never import Node modules (`fs`, `path`) or service-role keys in client code.
 
-1.  **Server-Side Heavy Processing**:
-    *   PDF parsing and OpenAI calls happen strictly in `server/api` to protect API keys and manage memory.
-    *   **Do not** import server-only modules (like `fs` or `openai`) in client-side components.
+### Git Guidelines
+Follow [Conventional Commits](https://www.conventionalcommits.org/) with [Gitmoji](https://gitmoji.dev/).
+Format: `<type>(<scope>): <gitmoji> <description>`
+Types: `feat` ✨, `fix` 🐛, `docs` 📝, `refactor` ♻️, `chore` 🔧, `security` 🔐, `cleanup` 🔥, `perf` ⚡, `style` 🎨, `test` ✅.
 
-2.  **Supabase RLS**:
-    *   Security is handled at the database level.
-    *   Always ensure RL policies cover new tables.
-    *   Users can only see *their own* data (`auth.uid() = user_id`).
-
-3.  **Credit System**:
-    *   Credits are deduced *atomically* on the server side after a successful analysis request.
-    *   Top-ups happen asynchronously via Stripe Webhooks.
-
-## 📝 Coding Guidelines
-
-### TypeScript & Vue
--   Use `<script setup lang="ts">` for all components.
--   Use explicit types for props and emits.
--   **State Management**: Use `useState` (Nuxt) or `ref/computed` (Vue). avoid external state libraries unless necessary.
-
-### Styling (Tailwind)
--   Use utility classes directly in the template.
--   Maintain the "Premium" look:
-    -   Use `backdrop-blur` and semi-transparent backgrounds for glassmorphism.
-    -   Use generic font families like `Inter` or `sans-serif`.
-    -   **Colors**: Stick to the defined palette (likely extended in `tailwind.config.js`).
-
-### AI & Prompts
--   Prompts are text files in `server/prompts/`.
--   **Do not hardcode prompts** in TypeScript files. Read them using `fs` in the server handler.
--   When modifying prompts, increment the version or create a new file if testing major changes.
-
-## 🚀 Common Workflows
-
-### Running the Project
+## 🛠️ Common Commands
 ```bash
-npm run dev
-# Server starts at http://localhost:3000
+# Development
+npm run dev              # Starts dev server on port 3001
+npm run lint / typecheck # Quality checks
+
+# Database
+npm run db:migrate       # Apply migrations
+npm run db:status        # Show migration status
+npm run migrate:make     # Create new migration
+npm run db:refresh       # Wipe + re-migrate + seed (--force required)
+
+# Security & Infrastructure
+npm run security:audit   # Check vulnerabilities
+docker compose up -d     # Start development infra
+scripts/test-redis.ts    # Verify Redis connectivity
 ```
 
-### Database Changes
-If you modify the schema, ensure you update local types:
-```bash
-npx supabase gen types typescript --project-id <your-project-id> > types/supabase.ts
-```
-*(Note: Check if `types/supabase.ts` exists and follow the project's specific generation pattern)*
-
-### Adding a New API Endpoint
-1.  Create file in `server/api/my-endpoint.get.ts`.
-2.  Use `defineEventHandler(async (event) => { ... })`.
-3.  Always handle errors with `createError({ statusCode: ... })`.
+## ⚙️ Environment Variables
+Required in `.env`: `SUPABASE_URL`, `SUPABASE_KEY`, `SUPABASE_SERVICE_KEY`, `OPENAI_API_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `REDIS_HOST`, `REDIS_PORT`, `REDIS_TOKEN`, `ADMIN_EMAIL`.
 
 ## ⚠️ Critical Reminders
-
-1.  **Security**: Never commit `.env` files.
-2.  **RLS**: If you add a table, YOU MUST ADD RLS POLICIES.
-3.  **PDFs**: PDF parsing is fragile. Ensure `pdf-parse` is used only in the server context.
+1.  **Never commit .env files**.
+2.  **Prompt Management**: Do not hardcode prompts in TS; use `server/prompts/`.
+3.  **Error Handling**: Use Nuxt `createError({ statusCode: ..., message: ... })`.
+4.  **Documentation**: See `docs/SECURITY.md` for operational security standards.

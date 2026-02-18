@@ -1,190 +1,80 @@
-# CLAUDE.md
+# 🧠 AI Agent Instructions
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This document provides guidance for AI agents working in the **Clarify** repository.
 
-## Project Overview
+## 🚀 Project Overview
+Clarify is an AI-powered contract auditing platform (Micro-SaaS) that analyzes legal documents and produces risk assessments. Democratizing legal advice by translating legalese into plain language.
 
-Clarify is an AI-powered contract auditing platform that analyzes legal documents and produces risk assessments. Built with Nuxt 3 (full-stack), Supabase (PostgreSQL + Auth + Storage), OpenAI (GPT models), Stripe (payments), and BullMQ/Redis (job queues).
+### Technology Stack
+| Component | Technology | Notes |
+| :--- | :--- | :--- |
+| **Framework** | **Nuxt 3** | Vue 3, Composition API, TypeScript everywhere. |
+| **Database** | **Supabase** | PostgreSQL. **Strict Row Level Security (RLS)**. |
+| **AI** | **OpenAI API** | 3-tier strategy (gpt-4o-mini, gpt-5-mini, gpt-5). |
+| **Payments** | **Stripe** | Webhook-based credit fulfillment. |
+| **Queue** | **BullMQ/Redis** | Async job processing (Upstash in production). |
+| **Styling** | **Tailwind CSS** | "Premium" aesthetic (glassmorphism/dark mode). |
 
-## Commands
+## 🏗️ Architecture & Core Flows
 
-```bash
-# Development
-npm run dev              # Start dev server on port 3001
-npm run build            # Build for production
-npm run preview          # Preview production build
-
-# Code Quality
-npm run lint             # Run ESLint
-npm run typecheck        # Run TypeScript type check
-
-# Database (Laravel-style migrations)
-npm run db:init          # Show SQL to create _migrations table
-npm run db:migrate       # Run pending migrations
-npm run db:status        # Show migration status
-npm run db:rollback      # Rollback last batch
-npm run db:seed          # Run database seeders
-npm run db:wipe          # Delete all data (--force required)
-npm run db:refresh       # Wipe + re-migrate + seed (--force required)
-npm run migrate:make     # Create new migration <name>
-
-# Docker
-docker compose up -d     # Start all services (app, postgres, redis, pgadmin)
-docker compose down      # Stop all services
-
-# Security
-npm run security:audit   # Run npm audit
-npm run security:fix     # Auto-fix vulnerabilities
-```
-
-## Architecture
-
-### Directory Structure
-
-```
-├── app/                 # Nuxt app root
-├── components/          # Vue components (AppHeader, RiskCard, Dropzone)
-├── composables/         # Vue composables (useSupabase, shared state)
-├── database/
-│   ├── migrations/      # SQL migration files
-│   └── seeders/         # SQL seeder files
-├── docs/                # Technical documentation
-├── middleware/          # Route guards (auth.ts, admin.ts)
-├── pages/               # Nuxt pages (dashboard, analyze, login, admin/)
-├── server/
-│   ├── api/             # Nitro API endpoints
-│   │   ├── admin/       # Admin-only endpoints
-│   │   ├── analyses/    # Analysis-related endpoints
-│   │   ├── stripe/      # Stripe webhook/checkout
-│   │   └── *.ts         # Main endpoints (analyze, upload, user)
-│   ├── prompts/         # AI prompt templates (v2/current, v1_deprecated)
-│   └── utils/           # Server utilities (auth, queue, openai, stripe, etc.)
-├── types/               # TypeScript type definitions
-└── scripts/             # Utility scripts (migrate.ts, test-redis.ts)
-```
+### 3-Tier Analysis Strategy
+- **Basic**: `gpt-4o-mini` (1 credit) - Fast red-flag scan.
+- **Premium**: `gpt-5-mini` (3 credits) - Reasoning-based audit (Recommended).
+- **Forensic**: `gpt-5` (10 credits) - Exhaustive high-precision audit.
 
 ### Core Flows
+1.  **Analysis**: Client upload -> `/api/upload` (Magic Byte Validation) -> Supabase Storage -> BullMQ Task -> OpenAI -> DB.
+2.  **Credits**: Stripe Checkout -> Webhook -> **Atomic PostgreSQL RPC** (prevents race conditions).
+3.  **Authentication**: Supabase Auth with RLS. Admin checks use `is_admin` + `admin_emails` table.
 
-**Contract Analysis (Async Job Queue)**
-1. Client uploads PDF to `/api/upload` → validated (magic bytes) → stored in Supabase Storage
-2. Client calls `/api/analyze` with `file_url`, `analysis_type` (basic/premium/forensic)
-3. Server validates input (Zod), checks SSRF protection, creates analysis record via RPC
-4. Job enqueued to BullMQ/Redis → worker processes with OpenAI → results saved to DB
-5. Client polls `/api/analyses/[id]/status` for completion
-
-**Payment & Credits**
-1. User initiates Stripe checkout → `/api/stripe/checkout.post.ts`
-2. Payment success → Stripe webhook → `/api/stripe/webhook.post.ts`
-3. Credits atomically incremented via PostgreSQL RPC (prevents race conditions)
-
-**Authentication**
-- Supabase Auth with email verification
-- Middleware: `auth.ts` (require login), `admin.ts` (require admin role)
-- Admin status checked via `is_admin` field in user profile + `admin_emails` table
-
-### Analysis Tiers
-
-| Tier | Model | Credits | Use Case |
-|------|-------|---------|----------|
-| Basic | gpt-4o-mini | 1 | Simple contracts, red-flag only |
-| Premium | gpt-5-mini | 3 | Full reasoning, recommended |
-| Forensic | gpt-5 | 10 | High-stakes, exhaustive analysis |
-
-Configuration in `server/utils/config.ts`, overrideable via `configurations` DB table.
-
-### Security Architecture
-
-**Key Principles**
-- Zero Trust: All inputs validated, outputs sanitized
-- Scoped Supabase Clients: `WorkerSupabaseClient`, `AdminSupabaseClient`, `serverSupabaseClient`
-- Atomic Operations: Credit changes via PostgreSQL RPCs only
-- RLS: Row Level Security enforced on all Supabase tables
-
-**Critical Files**
-- `server/utils/auth.ts` - Admin auth with email normalization (homograph attack prevention)
-- `server/utils/ssrf-protection.ts` - URL validation for Supabase Storage URLs
-- `server/utils/error-handler.ts` - Centralized error sanitization
-- `server/utils/rate-limit.ts` - Rate limiting presets
-- `nuxt.config.ts` - Security headers (CSP, HSTS, X-Frame-Options, etc.)
-
-**Admin Access**
-- Primary: `ADMIN_EMAIL` env variable
-- Secondary: `admin_emails` database table (multiple admins, soft-delete via `is_active`)
-- See `server/utils/auth.ts:isAdminUser()` for defense-in-depth implementation
-
-## Database Schema
-
-Key tables (see `database/migrations/` for DDL):
-- `users` - User profiles with `credits`, `is_admin`
-- `analyses` - Contract analysis jobs (status, results, tier)
-- `transactions` - Credit purchase history
-- `admin_emails` - Additional admin emails beyond `ADMIN_EMAIL` env
-- `configurations` - Dynamic config overrides (feature flags, pricing)
-- `pricing_tables` - Model pricing for cost estimation
-- `_migrations` - Migration tracking
-
-## Environment Variables
-
-Required (`.env` - never committed):
-```env
-# Supabase
-SUPABASE_URL=https://xxx.supabase.co
-SUPABASE_KEY=eyxxx...          # Anon key (client-safe)
-SUPABASE_SERVICE_KEY=eyxxx...  # Service role (server-only)
-
-# OpenAI
-OPENAI_API_KEY=sk-xxx...
-
-# Stripe
-STRIPE_SECRET_KEY=sk_xxx...
-STRIPE_WEBHOOK_SECRET=whsec_xxx...
-STRIPE_PUBLISHABLE_KEY=pk_xxx...
-
-# Redis (Upstash for production)
-REDIS_HOST=localhost
-REDIS_PORT=6379
-REDIS_TOKEN=xxx          # Required for Upstash (triggers TLS)
-
-# Admin
-ADMIN_EMAIL=admin@example.com
+## 📂 Directory Structure
+```text
+├── components/          # Vue UI Components (<script setup lang="ts">)
+├── pages/               # File-based routing (dashboard, login, admin/)
+├── server/              # Backend
+│   ├── api/             # Endpoints (Zod validation, error handling)
+│   ├── prompts/         # AI Prompts (Read via fs, do not hardcode)
+│   └── utils/           # Helpers (auth, openai, stripe, redis)
+├── database/            # SQL Migrations & Seeders
+├── types/               # TypeScript definitions
+└── docs/                # Technical documentation
 ```
 
-## CI/CD
+## 🔐 Security & Coding Guidelines
+- **Strict RLS**: Every table MUST have Row Level Security.
+- **Atomic Ops**: All credit/financial changes must use PostgreSQL RPCs to avoid race conditions.
+- **TypeScript**: Use `<script setup lang="ts">`. Avoid `any`. Strict typing is mandatory.
+- **Style**: Use glassmorphism (`backdrop-blur`), subtle borders, and `Inter` typography.
+- **Server Safety**: Never import Node modules (`fs`, `path`) or service-role keys in client code.
 
-GitHub Actions (`.github/workflows/ci-cd.yml`):
-- Lint & typecheck on every push/PR
-- Build verification
-- Vercel deployment (main → production, PR → preview)
-
-## Testing
-
-No formal test suite currently. Manual testing via:
-- Dev server: `npm run dev`
-- Redis test: `scripts/test-redis.ts`
-- Health check: `GET /api/health`
-
-## Git Guidelines
-
+### Git Guidelines
 Follow [Conventional Commits](https://www.conventionalcommits.org/) with [Gitmoji](https://gitmoji.dev/).
+Format: `<type>(<scope>): <gitmoji> <description>`
+Types: `feat` ✨, `fix` 🐛, `docs` 📝, `refactor` ♻️, `chore` 🔧, `security` 🔐, `cleanup` 🔥, `perf` ⚡, `style` 🎨, `test` ✅.
 
-**Format:** `<type>(<scope>): <gitmoji> <description>` (scope is optional)
+## 🛠️ Common Commands
+```bash
+# Development
+npm run dev              # Starts dev server on port 3001
+npm run lint / typecheck # Quality checks
 
-**Common Types & Emojis:**
-- `feat`: ✨ New feature
-- `fix`: 🐛 Bug fix
-- `docs`: 📝 Documentation changes
-- `style`: 🎨 Code style (formatting, linting)
-- `refactor`: ♻️ Code refactoring
-- `test`: ✅ Adding or fixing tests
-- `chore`: 🔧 Maintenance or configuration
-- `perf`: ⚡ Performance improvements
-- `security`: 🔐 Security improvements/fixes
-- `cleanup`: 🔥 Removing code or files
+# Database
+npm run db:migrate       # Apply migrations
+npm run db:status        # Show migration status
+npm run migrate:make     # Create new migration
+npm run db:refresh       # Wipe + re-migrate + seed (--force required)
 
-## Documentation
+# Security & Infrastructure
+npm run security:audit   # Check vulnerabilities
+docker compose up -d     # Start development infra
+scripts/test-redis.ts    # Verify Redis connectivity
+```
 
-- `docs/DEV_WALKTHROUGH.md` - MVP overview, module guide
-- `docs/ARCHITECTURE.md` - Technical architecture, data flows
-- `docs/ANALYSIS_TIERS.md` - Model strategy, token optimization
-- `docs/SECURITY.md` - Security audit, maintenance, incident response
-- `docs/STRIPE_SETUP.md` - Stripe integration guide
+## ⚙️ Environment Variables
+Required in `.env`: `SUPABASE_URL`, `SUPABASE_KEY`, `SUPABASE_SERVICE_KEY`, `OPENAI_API_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `REDIS_HOST`, `REDIS_PORT`, `REDIS_TOKEN`, `ADMIN_EMAIL`.
+
+## ⚠️ Critical Reminders
+1.  **Never commit .env files**.
+2.  **Prompt Management**: Do not hardcode prompts in TS; use `server/prompts/`.
+3.  **Error Handling**: Use Nuxt `createError({ statusCode: ..., message: ... })`.
+4.  **Documentation**: See `docs/SECURITY.md` for operational security standards.
