@@ -16,9 +16,9 @@ export default defineEventHandler(async (event) => {
 
         // Get user context including admin status
         const userContext = await getRequestUserContext(event)
-        
+
         // Check if tokenDebug is enabled (development/testing mode)
-        const tokenDebug = await isTokenDebugEnabled(event)
+        const tokenDebug = await isTokenDebugEnabled()
 
         const client = await serverSupabaseClient(event)
 

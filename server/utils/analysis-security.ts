@@ -30,9 +30,9 @@ export function sanitizeAnalysisSummary(summary: any, isAdmin: boolean, tokenDeb
   }
 
   // Show debug info if:
-  // 1. User is admin, OR
+  // 1. User is admin, AND
   // 2. tokenDebug is enabled (development/testing mode)
-  if (isAdmin || tokenDebugEnabled) {
+  if (isAdmin && tokenDebugEnabled) {
     return summary
   }
 
@@ -71,16 +71,15 @@ export function sanitizeAnalysesList(analyses: Analysis[], isAdmin: boolean, tok
  */
 export async function getRequestUserContext(event: any) {
   const { serverSupabaseUser } = await import('#supabase/server')
-  
+
   try {
     const user = await serverSupabaseUser(event)
-    
+
     if (!user) {
       return { userId: null, email: null, isAdmin: false, authenticated: false }
     }
 
     // Check admin status by comparing with admin email from runtime config
-    const { useRuntimeConfig } = await import('h3')
     const config = useRuntimeConfig(event)
     const isAdmin = user.email === config.adminEmail
 
@@ -100,14 +99,12 @@ export async function getRequestUserContext(event: any) {
  * Get tokenDebug config setting
  * When enabled, debug info is shown to all users (development/testing)
  */
-export async function isTokenDebugEnabled(event: any): Promise<boolean> {
+export async function isTokenDebugEnabled(): Promise<boolean> {
   try {
     const { getPromptConfig } = await import('./config')
-    const { serverSupabaseClient } = await import('#supabase/server')
-    
-    const client = await serverSupabaseClient(event)
-    const config = await getPromptConfig(client)
-    
+
+    const config = await getPromptConfig()
+
     return config.features?.tokenDebug || false
   } catch (error) {
     console.error('[Analysis Security] Error checking tokenDebug config:', error)

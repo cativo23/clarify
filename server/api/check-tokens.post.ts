@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
         // [SECURITY FIX C2] Validate file_url to prevent SSRF attacks
         const supabaseUrl = process.env.SUPABASE_URL || ''
         const validation = validateSupabaseStorageUrl(file_url, supabaseUrl)
-        
+
         if (!validation.isValid) {
             throw createError({
                 statusCode: 400,
@@ -54,7 +54,7 @@ export default defineEventHandler(async (event) => {
         }
 
         // 3. Get Limits
-        const config = await getPromptConfig(client)
+        const config = await getPromptConfig()
         const { tiers } = config
 
         // 4. Calculate Tokens
