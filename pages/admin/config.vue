@@ -153,7 +153,7 @@ const vClickOutside = {
 </script>
 
 <template>
-    <div class="w-full">
+    <div class="w-full animate-slide-up">
         <!-- Header -->
         <div class="mb-12">
             <h1 class="text-4xl font-black mb-2">Configuración del Sistema</h1>

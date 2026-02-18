@@ -95,6 +95,8 @@ export default defineNuxtConfig({
 
   // App configuration
   app: {
+    pageTransition: { name: 'page', mode: 'out-in' },
+    layoutTransition: { name: 'layout', mode: 'out-in' },
     head: {
       title: 'Clarify - Análisis Inteligente de Contratos',
       meta: [
