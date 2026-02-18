@@ -457,6 +457,9 @@ const fetchUserData = async () => {
   loading.value = true
 
   try {
+    // Get headers for SSR (cookies)
+    const headers = useRequestHeaders(['cookie'])
+    
     // Fetch user profile via shared composable (updates state)
     const profile = await fetchUserProfile()
     if (profile) {
@@ -466,7 +469,9 @@ const fetchUserData = async () => {
     // [SECURITY FIX M4] Fetch analyses via API endpoint (not direct Supabase query)
     // This ensures debug info is stripped for non-admin users
     try {
-      const response = await $fetch('/api/analyses')
+      const response = await $fetch('/api/analyses', {
+        headers: headers as any
+      })
       analyses.value = response.analyses?.slice(0, 10) || []
     } catch (error) {
       console.error('Error fetching analyses:', error)
@@ -502,23 +507,51 @@ const setupRealtimeSubscription = () => {
         // Find and update the analysis in the list
         const index = analyses.value.findIndex(a => a.id === updatedAnalysis.id)
         if (index !== -1) {
-          analyses.value[index] = updatedAnalysis
+          // Update existing analysis
+          analyses.value[index] = { ...analyses.value[index], ...updatedAnalysis }
         } else {
-          // If not in our current page list, we could choose to add it or ignore
-          // Unshift if it's new (though we usually handle insertions manually or on refresh)
+          // Add to the list if it's not already there
           analyses.value.unshift(updatedAnalysis)
         }
 
         // If job completed or failed, refresh user profile to ensure credits are correct
         if (updatedAnalysis.status === 'completed' || updatedAnalysis.status === 'failed') {
           try {
-             // Use $fetch directly instead of fetchUserProfile composable to avoid Nuxt context loss in callback
-             const profile = await $fetch<User>('/api/user/profile')
-             if (profile) {
+             // Use the Supabase client directly instead of the API endpoint to avoid auth context issues
+             const { data: profile, error } = await supabase
+               .from('users')
+               .select('*')
+               .eq('id', user.value.id)
+               .single()
+
+             if (error) {
+               console.error('Error fetching profile in realtime callback:', error)
+               // Alternative: try to refresh the session first, then fetch
+               try {
+                 await supabase.auth.refreshSession()
+                 const { data: refreshedProfile, error: refreshError } = await supabase
+                   .from('users')
+                   .select('*')
+                   .eq('id', user.value.id)
+                   .single()
+
+                 if (refreshError) {
+                   console.error('Error fetching profile after refresh:', refreshError)
+                 } else if (refreshedProfile) {
+                   userProfile.value = refreshedProfile
+                   sharedCredits.value = refreshedProfile.credits
+                   if (userState.value) {
+                       userState.value = { ...userState.value, ...refreshedProfile }
+                   }
+                 }
+               } catch (refreshErr) {
+                 console.error('Error refreshing session:', refreshErr)
+               }
+             } else if (profile) {
                 userProfile.value = profile
                 sharedCredits.value = profile.credits
                 if (userState.value) {
-                    userState.value = profile
+                    userState.value = { ...userState.value, ...profile }
                 }
              }
           } catch (err) {
@@ -537,9 +570,9 @@ onUnmounted(() => {
 })
 
 // Watch for user changes to fetch data and setup realtime
-watch(() => user.value, (newUser) => {
+watch(() => user.value, async (newUser) => {
   if (newUser?.id) {
-    fetchUserData()
+    await fetchUserData()
     setupRealtimeSubscription()
   }
 }, { immediate: true })
