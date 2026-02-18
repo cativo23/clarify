@@ -2,23 +2,52 @@ import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server'
 import { getAnalysisQueue } from '../utils/queue'
 import { validateSupabaseStorageUrl } from '../utils/ssrf-protection'
 import { handleApiError } from '../utils/error-handler'
+import { z } from 'zod'
+
+/**
+ * Request validation schema
+ * [SECURITY FIX #2] Input sanitization to prevent injection and DoS attacks
+ */
+const analyzeRequestSchema = z.object({
+    file_url: z.string().url('file_url must be a valid URL'),
+    contract_name: z
+        .string()
+        .min(1, 'contract_name cannot be empty')
+        .max(255, 'contract_name must be less than 255 characters')
+        .regex(/^[a-zA-Z0-9_\-\s]+$/, 'contract_name can only contain letters, numbers, hyphens, underscores and spaces'),
+    analysis_type: z.enum(['basic', 'premium', 'forensic']).default('premium')
+})
 
 export default defineEventHandler(async (event) => {
+    const user = await serverSupabaseUser(event)
+    if (!user) {
+        throw createError({ statusCode: 401, message: 'Unauthorized' })
+    }
+
     try {
-        const user = await serverSupabaseUser(event)
-        if (!user) {
-            throw createError({ statusCode: 401, message: 'Unauthorized' })
-        }
-
         const body = await readBody(event)
-        const { file_url, contract_name, analysis_type = 'premium' } = body
 
-        if (!file_url || !contract_name) {
-            throw createError({ 
-                statusCode: 400, 
-                message: 'Missing required fields: file_url and contract_name are required' 
+        // [SECURITY FIX #2] Validate and sanitize input using zod
+        const parseResult = analyzeRequestSchema.safeParse(body)
+
+        if (!parseResult.success) {
+            const errors = parseResult.error.errors.map((e: any) => ({
+                field: e.path.join('.'),
+                message: e.message
+            }))
+            console.warn('[SECURITY] Invalid analyze request:', {
+                userId: user.id,
+                errors,
+                receivedKeys: Object.keys(body)
+            })
+            throw createError({
+                statusCode: 400,
+                message: 'Invalid request format',
+                data: { errors }
             })
         }
+
+        const { file_url, contract_name, analysis_type } = parseResult.data
 
         // [SECURITY FIX C2] Validate file_url to prevent SSRF attacks
         const supabaseUrl = process.env.SUPABASE_URL || ''
