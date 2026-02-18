@@ -1,22 +1,37 @@
 import type { User, Analysis } from '~/types'
 
-
+// Cache TTL for user profile (5 minutes)
+const USER_PROFILE_CACHE_TTL = 5 * 60 * 1000
 
 // Shared state for credits
 export const useCreditsState = () => useState<number>('user-credits', () => 0)
 // Shared state for full user profile (including is_admin)
 export const useUserState = () => useState<User | null>('user-profile', () => null)
+// Track last fetch time for cache invalidation
+export const useUserStateLastFetch = () => useState<number>('user-profile-last-fetch', () => 0)
+
+// Check if cached user profile is stale
+export const isUserProfileStale = (): boolean => {
+    const lastFetch = useUserStateLastFetch()
+    return Date.now() - lastFetch.value > USER_PROFILE_CACHE_TTL
+}
 
 // Fetch user profile with credits and admin status
-export const fetchUserProfile = async () => {
+export const fetchUserProfile = async (forceRefresh = false) => {
     const user = useSupabaseUser()
     const creditsState = useCreditsState()
     const userState = useUserState()
+    const lastFetch = useUserStateLastFetch()
     // Capture client and router at start to preserve context
     const supabase = useSupabaseClient()
     const router = useRouter()
 
     if (!user.value?.id) return null
+
+    // Skip fetch if cache is still valid (unless force refresh)
+    if (!forceRefresh && !isUserProfileStale() && userState.value) {
+        return userState.value
+    }
 
     try {
         const profile = await $fetch<User>('/api/user/profile', {
@@ -25,6 +40,7 @@ export const fetchUserProfile = async () => {
         if (profile) {
             creditsState.value = profile.credits
             userState.value = profile
+            lastFetch.value = Date.now() // Update cache timestamp
             return profile
         }
     } catch (error: any) {
@@ -33,6 +49,7 @@ export const fetchUserProfile = async () => {
             // Token invalid, force logout using captive client
             await supabase.auth.signOut()
             userState.value = null
+            lastFetch.value = 0
             // Use captured router for navigation
             return router.push('/login')
         }

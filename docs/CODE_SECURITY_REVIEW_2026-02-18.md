@@ -718,14 +718,14 @@ No high severity vulnerabilities found.
 - **admin_emails RLS policies:** ✅ Already implemented correctly with self-referential admin verification
 - **Frontend admin check:** ✅ Downgraded to LOW - backend is authoritative, frontend check is UX optimization
 
-### Medium (2)
+### Medium (1)
 
 | ID | Finding | Location |
 |----|---------|----------|
 | M1 | ✅ **FIXED** - Rate limiting applied to all endpoints | `server/api/user/profile.get.ts`, `server/api/analyses/[id]/status.get.ts` |
 | M2 | CSP allows 'unsafe-inline' and 'unsafe-eval' | `nuxt.config.ts` |
 | M3 | ✅ **FIXED** - BullMQ default job options added | `server/utils/queue.ts` |
-| M4 | State synchronization risk in composables | `composables/useSupabase.ts` |
+| M4 | ✅ **FIXED** - State synchronization with TTL cache | `composables/useSupabase.ts`, `middleware/admin.ts` |
 | M5 | ✅ **FIXED** - Content-Type validation added | `server/api/analyze.post.ts` |
 
 ### Low (7)
@@ -749,7 +749,8 @@ No high severity vulnerabilities found.
 1. ✅ **M1 FIXED** - Rate limiting applied to `/api/user/profile` and `/api/analyses/[id]/status`
 2. ✅ **M3 FIXED** - BullMQ default job options added (timeout, cleanup)
 3. ✅ **M5 FIXED** - Content-Type validation added to `/api/analyze`
-4. **Standardize error handling pattern** (L4) - Prefer `createError()` over returning error objects
+4. ✅ **M4 FIXED** - State synchronization with TTL cache (5 min)
+5. **Standardize error handling pattern** (L4) - Prefer `createError()` over returning error objects
 
 ### Short-Term (Next Month)
 

@@ -9,9 +9,10 @@ export default defineNuxtRouteMiddleware(async (_to, _from) => {
     // 2. Check Admin Access via Profile State
     const userState = useUserState()
 
-    // Race condition fix: If navigating directly to admin URL, profile might not be laoded
-    if (!userState.value) {
-        await fetchUserProfile()
+    // [SECURITY FIX M4] Refresh profile if stale or not loaded
+    // Ensures admin status is checked against fresh data
+    if (!userState.value || isUserProfileStale()) {
+        await fetchUserProfile(true) // Force refresh
     }
 
     const isAdmin = userState.value?.is_admin
