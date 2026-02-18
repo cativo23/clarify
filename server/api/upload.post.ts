@@ -1,6 +1,7 @@
 import type { UploadResponse } from '../../types'
 import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server'
 import { validateFileUpload, logFileValidation } from '../utils/file-validation'
+import { handleApiError } from '~/server/utils/error-handler'
 
 export default defineEventHandler(async (event): Promise<UploadResponse> => {
     try {
@@ -91,10 +92,10 @@ export default defineEventHandler(async (event): Promise<UploadResponse> => {
         }
     } catch (error: any) {
         console.error('Error in upload endpoint:', error)
-
-        return {
-            success: false,
-            error: error.message || 'An error occurred during upload',
-        }
+        handleApiError(error, {
+            userId: user?.id,
+            endpoint: '/api/upload',
+            operation: 'upload_file'
+        })
     }
 })

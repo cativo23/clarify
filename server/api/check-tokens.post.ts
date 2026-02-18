@@ -3,6 +3,7 @@ import { extractTextFromPDF } from '~/server/utils/pdf-parser'
 import { preprocessDocument } from '~/server/utils/preprocessing'
 import { getPromptConfig } from '~/server/utils/config'
 import { validateSupabaseStorageUrl } from '~/server/utils/ssrf-protection'
+import { handleApiError } from '~/server/utils/error-handler'
 
 export default defineEventHandler(async (event) => {
     try {
@@ -83,9 +84,10 @@ export default defineEventHandler(async (event) => {
 
     } catch (error: any) {
         console.error('Error checking tokens:', error)
-        return {
-            success: false,
-            error: error.message
-        }
+        handleApiError(error, {
+            userId: user?.id,
+            endpoint: '/api/check-tokens',
+            operation: 'check_token_count'
+        })
     }
 })

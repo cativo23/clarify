@@ -1,6 +1,7 @@
 import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server'
 import { sanitizeAnalysisSummary, getRequestUserContext, isTokenDebugEnabled } from '../../../utils/analysis-security'
 import { applyRateLimit, RateLimitPresets } from '~/server/utils/rate-limit'
+import { handleApiError } from '~/server/utils/error-handler'
 
 export default defineEventHandler(async (event) => {
     try {
@@ -48,9 +49,10 @@ export default defineEventHandler(async (event) => {
             analysis: sanitizedAnalysis
         }
     } catch (error: any) {
-        return {
-            success: false,
-            error: error.message || 'Failed to fetch status'
-        }
+        handleApiError(error, {
+            userId: user?.id,
+            endpoint: '/api/analyses/[id]/status',
+            operation: 'get_analysis_status'
+        })
     }
 })
