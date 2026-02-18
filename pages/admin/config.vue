@@ -1,7 +1,7 @@
 <script setup lang="ts">
 definePageMeta({
     middleware: ['admin'],
-    layout: 'default' // Or admin layout if exists
+    layout: 'admin'
 })
 
 const config = ref<any>({
@@ -153,24 +153,12 @@ const vClickOutside = {
 </script>
 
 <template>
-    <div class="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-500">
-        <div class="max-w-4xl mx-auto py-12 px-6">
-            <!-- Header -->
-            <div class="mb-12 flex items-center justify-between">
-                <div>
-                     <NuxtLink to="/dashboard" class="text-xs font-bold text-slate-400 uppercase tracking-widest hover:text-secondary mb-2 block">
-                        &larr; Volver al Dashboard
-                    </NuxtLink>
-                    <h1 class="text-4xl font-black mb-2">Configuración del Sistema</h1>
-                    <p class="text-slate-500 dark:text-slate-400 font-medium">Gestiona parámetros globales de la IA y límites.</p>
-                </div>
-                <div class="flex items-center gap-3">
-                    <NuxtLink to="/admin/analytics" class="px-3 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-600 rounded-lg text-[12px] font-bold uppercase tracking-widest hover:bg-amber-500 hover:text-white transition-all">Analíticas</NuxtLink>
-                    <div class="w-16 h-16 bg-gradient-to-br from-red-500 to-amber-500 rounded-3xl shadow-lg shadow-red-500/20 flex items-center justify-center text-white">
-                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    </div>
-                </div>
-            </div>
+    <div class="w-full">
+        <!-- Header -->
+        <div class="mb-12">
+            <h1 class="text-4xl font-black mb-2">Configuración del Sistema</h1>
+            <p class="text-slate-500 dark:text-slate-400 font-medium">Gestiona parámetros globales de la IA y límites.</p>
+        </div>
 
             <div v-if="loading" class="py-20 text-center">
                  <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-secondary mb-4"></div>
@@ -427,7 +415,6 @@ const vClickOutside = {
                         {{ saving ? 'Guardando...' : 'Guardar Configuración' }}
                     </button>
                 </div>
-            </div>
         </div>
     </div>
 </template>
