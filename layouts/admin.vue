@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-500">
+  <div v-if="isAdmin" class="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-500">
     <!-- Mobile Header -->
     <div class="lg:hidden sticky top-0 z-50 border-b bg-white/80 dark:bg-slate-900/80 border-slate-100 dark:border-slate-800 backdrop-blur-xl">
       <div class="px-4 py-3 flex items-center justify-between">
@@ -149,13 +149,18 @@
       </main>
     </div>
   </div>
+  <div v-else class="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+      <LoadingSpinner size="xl" />
+  </div>
 </template>
 
 <script setup lang="ts">
 const user = useSupabaseUser()
-const supabase = useSupabaseClient()
 const sidebarOpen = ref(false)
 const showUserMenu = ref(false)
+
+const userState = useUserState()
+const isAdmin = computed(() => userState.value?.is_admin === true)
 
 const userInitials = computed(() => {
   const email = user.value?.email || ''
@@ -165,8 +170,7 @@ const userInitials = computed(() => {
 const userEmail = computed(() => user.value?.email || '')
 
 const handleSignOut = async () => {
-  await supabase.auth.signOut()
-  navigateTo('/login')
+  await signOut()
 }
 
 // Click outside directive implementation

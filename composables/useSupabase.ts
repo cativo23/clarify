@@ -58,6 +58,24 @@ export const fetchUserProfile = async (forceRefresh = false) => {
     return null
 }
 
+// Sign out and clear state
+export const signOut = async () => {
+    const supabase = useSupabaseClient()
+    const userState = useUserState()
+    const creditsState = useCreditsState()
+    const lastFetch = useUserStateLastFetch()
+
+    await supabase.auth.signOut()
+
+    // Clear all shared states
+    userState.value = null
+    creditsState.value = 0
+    lastFetch.value = 0
+
+    // Redirect to login
+    return navigateTo('/login')
+}
+
 // Fetch user's analyses
 export const useUserAnalyses = async () => {
     const user = useSupabaseUser()
@@ -67,14 +85,8 @@ export const useUserAnalyses = async () => {
     try {
         // [SECURITY FIX M4] Use API endpoint instead of direct Supabase query
         // This ensures debug info is stripped for non-admin users
-        const { data, error } = await $fetch('/api/analyses')
-
-        if (error) {
-            console.error('Error fetching analyses:', error)
-            return []
-        }
-
-        return data.analyses || []
+        const response = await $fetch<{ analyses: Analysis[] }>('/api/analyses')
+        return response.analyses || []
     } catch (error: any) {
         console.error('Error fetching analyses:', error)
         return []
