@@ -135,7 +135,7 @@ const formatDate = (dateString: string | null) => {
 </script>
 
 <template>
-  <div class="w-full">
+  <div class="w-full animate-slide-up">
     <!-- Header -->
     <div class="mb-8">
       <h1 class="text-3xl font-black text-slate-900 dark:text-white mb-2">Admin Analytics</h1>
