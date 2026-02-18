@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
 
         // If not found (or error), try to create/sync it
         if (!profile) {
-            console.log('User profile not found, creating syncd record for:', user.id)
+            console.log('User profile not found, creating synced record for:', user.id)
 
             const newProfile = {
                 id: user.id,
@@ -44,6 +44,20 @@ export default defineEventHandler(async (event) => {
 
             if (insertError) {
                 console.error('Error creating user profile:', insertError)
+                
+                // Check if it's an email verification issue
+                if (insertError.message?.includes('email') || 
+                    insertError.code === '42501') {
+                    throw createError({
+                        statusCode: 403,
+                        message: 'Please verify your email address before logging in. Check your inbox for the confirmation link.',
+                        data: {
+                            code: 'EMAIL_NOT_VERIFIED',
+                            email: user.email
+                        }
+                    })
+                }
+                
                 throw createError({
                     statusCode: 500,
                     message: 'Failed to create user profile',
