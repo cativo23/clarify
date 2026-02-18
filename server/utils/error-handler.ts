@@ -212,8 +212,12 @@ export function createSafeError(
   if (options?.defaultMessage) {
     message = options.defaultMessage
   } else if (errorType === ErrorType.VALIDATION) {
-    // For validation errors, we can be slightly more specific
-    message = sanitizeErrorMessage(error?.message || ERROR_MESSAGES[errorType])
+    // For validation errors, prefer the first specific error detail
+    if (error?.data?.errors && error.data.errors.length > 0) {
+      message = error.data.errors[0].message
+    } else {
+      message = sanitizeErrorMessage(error?.message || ERROR_MESSAGES[errorType])
+    }
   } else {
     // For all other errors, use the safe default
     message = ERROR_MESSAGES[errorType]
@@ -249,13 +253,21 @@ export function handleApiError(
     error?.status ||
     getStatusCodeForErrorType(safeError.type)
 
+  // Preserve validation error details for client feedback
+  const responseData: any = {
+    type: safeError.type,
+    code: safeError.code
+  }
+
+  // Include validation details if present and it's a validation error
+  if (safeError.type === ErrorType.VALIDATION && error?.data?.errors) {
+    responseData.errors = error.data.errors
+  }
+
   throw createError({
     statusCode,
     message: safeError.message,
-    data: {
-      type: safeError.type,
-      code: safeError.code
-    }
+    data: responseData
   })
 }
 
