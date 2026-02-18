@@ -63,12 +63,16 @@ This report consolidates findings from multiple security audits (Code Review, Th
 - **Note:** Internal Docker network provides basic isolation.
 
 ### M6: Missing Email Verification
-- **Status:** ⚠️ ACCEPTED RISK (Feature)
-- **Location:** Supabase Auth configuration
-- **Description:** Accounts can be used without verified email identities.
-- **Impact:** Potential for fake accounts or spam.
-- **Mitigation:** Enable email confirmation in Supabase dashboard.
-- **Note:** Low priority - no sensitive operations tied to email alone.
+- **Status:** ⚠️ REQUIRES SUPABASE CONFIGURATION
+- **Location:** Supabase Dashboard → Authentication → Email
+- **Description:** Email verification not enabled in Supabase settings.
+- **Impact:** Users can sign up with invalid/fake email addresses.
+- **Resolution Steps:**
+  1. Enable "Email confirmations" in Supabase Dashboard
+  2. Run migration: `20260217000002_add_user_insert_policy.sql`
+  3. Test signup flow with new email
+- **Documentation:** See `docs/EMAIL_VERIFICATION_SETUP.md` for complete guide
+- **Note:** This is a platform configuration, not a code fix.
 
 ---
 
@@ -239,8 +243,11 @@ This report consolidates findings from multiple security audits (Code Review, Th
 - [x] **Database**: Sanitize debug info from summary_json. (M4 Fixed)
 - [x] **SQL Security**: Verify SECURITY DEFINER search_path. (M2 - Already Secure)
 - [x] **Rate Limiting**: Add request rate limiting middleware. (M1 Fixed)
+- [ ] **Email Verification**: Enable "Email confirmations" in Supabase Dashboard. (M6 - Platform Config)
+  - [ ] Enable in Supabase Dashboard → Authentication → Email
+  - [ ] Run migration: `20260217000002_add_user_insert_policy.sql`
+  - [ ] Test signup flow with new email
 - [ ] **SSL**: Enable TLS for Redis connections. (M3 - Infrastructure)
-- [ ] **Email Verification**: Enable Supabase email confirmation. (M6 - Feature)
 
 ---
 
