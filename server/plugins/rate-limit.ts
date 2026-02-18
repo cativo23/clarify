@@ -22,7 +22,7 @@ const routeLimits: Record<string, RateLimitConfig> = {
 }
 
 // Default limit for unmatched routes
-const DEFAULT_LIMIT = RateLimitPresets.read
+const DEFAULT_LIMIT: RateLimitConfig = RateLimitPresets.read
 
 export default defineNitroPlugin((nitroApp) => {
   nitroApp.hooks.hook('request', async (event) => {
