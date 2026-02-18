@@ -38,7 +38,7 @@ export default defineEventHandler(async (event) => {
             throw createError({ statusCode: 404, message: 'Analysis not found' })
         }
 
-        // [SECURITY FIX M4] Strip debug info for non-admin users (unless tokenDebug enabled)
+        // Strip debug info for non-admin users (unless tokenDebug enabled)
         const sanitizedAnalysis = {
             ...analysis,
             summary_json: sanitizeAnalysisSummary(analysis.summary_json, userContext.isAdmin, tokenDebug)
