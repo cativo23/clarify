@@ -1,8 +1,12 @@
 import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server'
 import { sanitizeAnalysisSummary, getRequestUserContext, isTokenDebugEnabled } from '../../../utils/analysis-security'
+import { applyRateLimit, RateLimitPresets } from '~/server/utils/rate-limit'
 
 export default defineEventHandler(async (event) => {
     try {
+        // [SECURITY FIX M1] Rate limiting to prevent information disclosure and DoS
+        await applyRateLimit(event, RateLimitPresets.standard, 'user')
+
         const user = await serverSupabaseUser(event)
         const analysisId = getRouterParam(event, 'id')
 

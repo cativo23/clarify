@@ -223,3 +223,4 @@ WHERE is_active = true;
 - [Architecture Overview](./ARCHITECTURE.md)
 - [Analysis Tiers](./ANALYSIS_TIERS.md)
 - [Stripe Setup](./STRIPE_SETUP.md)
+- [Code and Security Review](./CODE_SECURITY_REVIEW_2026-02-18.md) - Comprehensive security audit and code quality review
