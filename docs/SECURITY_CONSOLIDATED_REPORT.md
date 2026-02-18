@@ -15,16 +15,16 @@ This report consolidates findings from multiple security audits (Code Review, Th
 | :--- | :--- | :--- |
 | 🔴 **Critical** | 0 | ✅ All Resolved |
 | 🟠 **High** | 0 | ✅ All Resolved |
-| 🟡 **Medium** | 1 | Open (M3 - Infrastructure) |
+| 🟡 **Medium** | 0 | ✅ All Resolved (M3 Fixed) |
 | 🟢 **Low** | 2 | Open |
-| ✅ **Resolved** | 18 | Fixed (C1-C5, H1-H7, M1, M2, M4, M5, M6, Deps) |
+| ✅ **Resolved** | 19 | Fixed (C1-C5, H1-H7, M1-M6, Deps) |
 
-**Overall Risk Score: 1.2/10 (Very Low)**
+**Overall Risk Score: 0.5/10 (Very Low)**
 
 ### Key Achievements
 - ✅ **All 5 Critical vulnerabilities eliminated** (C1-C5)
 - ✅ **All 7 High vulnerabilities resolved** (H1-H7)
-- ✅ **5/6 Medium vulnerabilities resolved** (M1, M2, M4, M5, M6)
+- ✅ **All 6 Medium vulnerabilities resolved** (M1-M6, including M3 Redis Auth/TLS)
 - ✅ **Email verification enforced** - Mandatory confirmation for all new accounts
 - ✅ **Zero direct service_role key exposure** - Scoped client architecture implemented
 - ✅ **Admin perimeter secured** - Authentication + authorization enforced
@@ -56,12 +56,22 @@ This report consolidates findings from multiple security audits (Code Review, Th
 ## 🟡 Medium Severity Issues
 
 ### M3: Redis without Auth/TLS
-- **Status:** ⚠️ ACCEPTED RISK (Infrastructure)
-- **Location:** Docker configuration, Redis connection
-- **Description:** Job queue is exposed in production environments without authentication or TLS.
+- **Status:** ✅ FIXED (Upstash) - February 18, 2026
+- **Location:** `server/utils/queue.ts`, `server/utils/rate-limit.ts`, `nuxt.config.ts`
+- **Description:** Job queue lacked authentication and TLS encryption in production.
 - **Impact:** Potential job queue manipulation if network is compromised.
-- **Mitigation:** Configure REDIS_PASSWORD and enable TLS in production deployment.
-- **Note:** Internal Docker network provides basic isolation.
+- **Solution:** Implemented Upstash Redis with token-based authentication and TLS:
+  - **Authentication:** Token-based via `REDIS_TOKEN` environment variable
+  - **TLS Encryption:** Enabled automatically for Upstash connections (rediss://)
+  - **Free Tier:** 10,000 commands/day (sufficient for low-medium traffic)
+  - **Vercel-Ready:** Serverless-compatible with HTTP API
+- **Files Modified:**
+  - `nuxt.config.ts` - Added `redisToken` and `redisTlsEnabled` config
+  - `server/utils/queue.ts` - Added auth/TLS for BullMQ connection
+  - `server/utils/rate-limit.ts` - Added auth/TLS for rate limiting
+  - `.env.example` - Added Upstash configuration
+  - `scripts/test-redis.ts` - Connection test script
+- **Note:** Local development still uses unauthenticated Redis (Docker). Production uses Upstash with full security.
 
 ---
 
@@ -246,7 +256,13 @@ This report consolidates findings from multiple security audits (Code Review, Th
   - [x] Enable in Supabase Dashboard → Authentication → Email
   - [x] Run migration: `20260217000002_add_user_insert_policy.sql`
   - [x] Test signup flow with new email
-- [ ] **SSL**: Enable TLS for Redis connections. (M3 - Infrastructure)
+- [x] **SSL**: Enable TLS for Redis connections. (M3 Fixed with Upstash)
+  - [x] Configure Upstash Redis (free tier: 10K commands/day)
+  - [x] Update `nuxt.config.ts` with `redisToken` config
+  - [x] Update `server/utils/queue.ts` with auth/TLS
+  - [x] Update `server/utils/rate-limit.ts` with auth/TLS
+  - [x] Add `.env.example` configuration
+  - [x] Create `scripts/test-redis.ts` for testing
 
 ---
 

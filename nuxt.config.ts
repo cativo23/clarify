@@ -30,8 +30,11 @@ export default defineNuxtConfig({
     stripeSecretKey: process.env.STRIPE_SECRET_KEY || '',
     stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
     supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY || '',
+    // [SECURITY FIX M3] Redis configuration with Upstash support (auth + TLS)
     redisHost: process.env.REDIS_HOST || 'localhost',
     redisPort: parseInt(process.env.REDIS_PORT || '6379'),
+    redisToken: process.env.REDIS_TOKEN || '', // Upstash authentication token
+    redisTlsEnabled: !!process.env.REDIS_TOKEN, // Enable TLS for Upstash
     adminEmail: process.env.ADMIN_EMAIL || '',
 
     // Public keys (exposed to client)

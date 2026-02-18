@@ -7,11 +7,22 @@ let redisConnection: Redis | null = null
 export const getRedisConnection = () => {
     if (!redisConnection) {
         const config = useRuntimeConfig()
-        redisConnection = new Redis({
+        
+        // [SECURITY FIX M3] Upstash Redis with authentication and TLS
+        // Uses rediss:// protocol (Redis over TLS) with token auth
+        const redisConfig: any = {
             host: config.redisHost,
             port: config.redisPort,
             maxRetriesPerRequest: null, // Required by BullMQ
-        })
+        }
+        
+        // Add authentication and TLS for Upstash (production)
+        if (config.redisToken) {
+            redisConfig.password = config.redisToken
+            redisConfig.tls = {} // Enable TLS (rediss://)
+        }
+        
+        redisConnection = new Redis(redisConfig)
     }
     return redisConnection
 }
