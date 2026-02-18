@@ -74,17 +74,26 @@ export const RateLimitPresets = {
 function getRedisClient(): Redis | null {
   try {
     const config = useRuntimeConfig()
-    
+
     if (!config.redisHost) {
       return null
     }
 
-    return new Redis({
+    // [SECURITY FIX M3] Upstash Redis with authentication and TLS
+    const redisConfig: any = {
       host: config.redisHost,
       port: config.redisPort || 6379,
       maxRetriesPerRequest: 1,
       lazyConnect: true
-    })
+    }
+    
+    // Add authentication and TLS for Upstash (production)
+    if (config.redisToken) {
+      redisConfig.password = config.redisToken
+      redisConfig.tls = {} // Enable TLS
+    }
+
+    return new Redis(redisConfig)
   } catch (error) {
     console.error('[Rate Limit] Failed to create Redis client:', error)
     return null
