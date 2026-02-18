@@ -2,6 +2,8 @@ import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server'
 import { extractTextFromPDF } from '~/server/utils/pdf-parser'
 import { preprocessDocument } from '~/server/utils/preprocessing'
 import { getPromptConfig } from '~/server/utils/config'
+import { validateSupabaseStorageUrl } from '~/server/utils/ssrf-protection'
+import { handleApiError } from '~/server/utils/error-handler'
 
 export default defineEventHandler(async (event) => {
     try {
@@ -17,13 +19,19 @@ export default defineEventHandler(async (event) => {
             throw createError({ statusCode: 400, message: 'Missing file_url' })
         }
 
-        // 1. Download file from Storage
-        const client = await serverSupabaseClient(event)
+        // [SECURITY FIX C2] Validate file_url to prevent SSRF attacks
+        const supabaseUrl = process.env.SUPABASE_URL || ''
+        const validation = validateSupabaseStorageUrl(file_url, supabaseUrl)
 
-        // Extract storage path from file_url (assuming standard Supabase URL format)
-        // .../storage/v1/object/public/contracts/USER_ID/FILENAME.pdf
-        const filename = file_url.split('/').pop() || ''
-        const storagePath = `${user.id}/${filename}`
+        if (!validation.isValid) {
+            throw createError({
+                statusCode: 400,
+                message: `Invalid file URL: ${validation.error}`
+            })
+        }
+
+        const storagePath = validation.storagePath!
+        const client = await serverSupabaseClient(event)
 
         const { data: fileData, error: downloadError } = await client.storage
             .from('contracts')
@@ -47,7 +55,7 @@ export default defineEventHandler(async (event) => {
         }
 
         // 3. Get Limits
-        const config = await getPromptConfig(client)
+        const config = await getPromptConfig()
         const { tiers } = config
 
         // 4. Calculate Tokens
@@ -76,9 +84,10 @@ export default defineEventHandler(async (event) => {
 
     } catch (error: any) {
         console.error('Error checking tokens:', error)
-        return {
-            success: false,
-            error: error.message
-        }
+        handleApiError(error, {
+            userId: user?.id,
+            endpoint: '/api/check-tokens',
+            operation: 'check_token_count'
+        })
     }
 })

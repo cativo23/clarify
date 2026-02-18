@@ -1,24 +1,15 @@
-import { serverSupabaseUser, serverSupabaseServiceRole } from '#supabase/server'
+import { requireAdmin } from '../../utils/auth'
+import { getAdminSupabaseClient } from '../../utils/admin-supabase'
 
 export default defineEventHandler(async (event) => {
-    const user = await serverSupabaseUser(event)
-    const runtimeConfig = useRuntimeConfig()
-    const adminEmail = runtimeConfig.public.adminEmail
+    await requireAdmin(event)
+    const admin = getAdminSupabaseClient()
 
-    if (!user || user.email !== adminEmail) {
-        throw createError({ statusCode: 401, message: 'Unauthorized' })
+    const result = await admin.getUsersSummary()
+
+    if (result.error) {
+        throw createError({ statusCode: 500, message: result.error })
     }
 
-    const client = await serverSupabaseServiceRole(event)
-
-    // Return a summary per user from the view: id, email, credits, analyses_count, last_analysis_at
-    const { data, error } = await client
-        .from('admin_users_summary')
-        .select('*')
-
-    if (error) {
-        throw createError({ statusCode: 500, message: error.message })
-    }
-
-    return { users: data || [] }
+    return { users: result.data || [] }
 })

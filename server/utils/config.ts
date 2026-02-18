@@ -41,7 +41,7 @@ const DEFAULT_CONFIG: PromptConfig = {
     },
     features: {
         preprocessing: true,
-        tokenDebug: true,
+        tokenDebug: false, // SECURITY: Disabled by default (production-safe)
     },
 }
 
@@ -54,22 +54,25 @@ export const clearConfigCache = () => {
     lastFetchTime = 0
 }
 
-export const getPromptConfig = async (supabaseClient?: any, forceRefresh = false): Promise<PromptConfig> => {
+export const getPromptConfig = async (forceRefresh = false): Promise<PromptConfig> => {
     const now = Date.now()
     if (!forceRefresh && cachedConfig && now - lastFetchTime < CACHE_TTL) {
         return cachedConfig
     }
 
     try {
-        let client = supabaseClient
-        if (!client) {
-            // Helper to get admin client if not provided (e.g. inside a utility not passed one)
-            const config = useRuntimeConfig()
-            client = createClient(
-                process.env.SUPABASE_URL || '',
-                config.supabaseServiceKey
-            )
-        }
+        // Always use service role client to bypass RLS on configurations table
+        const config = useRuntimeConfig()
+        const client = createClient(
+            process.env.SUPABASE_URL || '',
+            config.supabaseServiceKey,
+            {
+                auth: {
+                    autoRefreshToken: false,
+                    persistSession: false
+                }
+            }
+        )
 
         const { data, error } = await client
             .from('configurations')
@@ -83,7 +86,7 @@ export const getPromptConfig = async (supabaseClient?: any, forceRefresh = false
             return DEFAULT_CONFIG
         }
 
-        if (!data || data.length === 0) {
+        if (!data || data.length === 0 || !data[0]) {
             return DEFAULT_CONFIG
         }
 

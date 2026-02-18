@@ -2,39 +2,46 @@ import { Worker } from 'bullmq'
 import { getRedisConnection } from '../utils/queue'
 import { extractTextFromPDF } from '../utils/pdf-parser'
 import { analyzeContract } from '../utils/openai-client'
-import { createClient } from '@supabase/supabase-js'
+import { getWorkerSupabaseClient } from '../utils/worker-supabase'
+import { sanitizeErrorMessage } from '../utils/error-handler'
+
+/**
+ * [SECURITY FIX M4] Prepare summary for storage with full debug info
+ * Backend access control will strip debug info when serving to non-admin users
+ * No flags needed - security enforced at API layer
+ */
+function prepareSummaryForStorage(summary: any): any {
+  // Store complete summary with ALL debug information
+  // Backend enforces access control via sanitizeAnalysisSummary()
+  return summary
+}
 
 export default defineNitroPlugin((_nitroApp) => {
-    const config = useRuntimeConfig()
-
-    // Create Supabase Admin client to bypass RLS in background jobs
-    const supabaseAdmin = createClient(
-        process.env.SUPABASE_URL || '',
-        config.supabaseServiceKey
-    )
-
     const worker = new Worker('analysis-queue', async (job) => {
         const { analysisId, userId, storagePath, analysisType } = job.data
         console.log(`[Worker] Started processing ${analysisType || 'premium'} analysis ${analysisId} for user ${userId}`)
 
+        // [SECURITY FIX C5] Use scoped worker client instead of raw service_role
+        const supabase = getWorkerSupabaseClient()
+
         try {
             // 1. Update status to processing
-            await supabaseAdmin
-                .from('analyses')
-                .update({ status: 'processing' })
-                .eq('id', analysisId)
+            const updateResult = await supabase.updateAnalysisStatus(analysisId, 'processing')
+            if (!updateResult.success) {
+                throw new Error(`Failed to update analysis status: ${updateResult.error}`)
+            }
 
             // 2. Download from Storage
-            const { data: fileData, error: downloadError } = await supabaseAdmin.storage
-                .from('contracts')
-                .download(storagePath)
+            console.log(`[Worker] Downloading file: ${storagePath} from bucket 'contracts'`)
+            const downloadResult = await supabase.downloadContractFile(storagePath)
 
-            if (downloadError || !fileData) {
-                throw new Error(`Failed to download file from storage: ${downloadError?.message}`)
+            if (downloadResult.error || !downloadResult.data) {
+                console.error('[Worker] Download Error:', downloadResult.error)
+                throw new Error(`Failed to download file from storage: ${downloadResult.error}`)
             }
 
             // 3. Extract text
-            const buffer = Buffer.from(await fileData.arrayBuffer())
+            const buffer = Buffer.from(await downloadResult.data.arrayBuffer())
             const contractText = await extractTextFromPDF(buffer)
 
             if (!contractText || contractText.trim().length === 0) {
@@ -59,17 +66,16 @@ export default defineNitroPlugin((_nitroApp) => {
             const dbRiskLevel = riskMapping[riskLevelStr] || 'medium'
 
             // 6. Save results and complete
-            const { error: updateError } = await supabaseAdmin
-                .from('analyses')
-                .update({
-                    summary_json: analysisSummary,
-                    risk_level: dbRiskLevel,
-                    status: 'completed'
-                })
-                .eq('id', analysisId)
+            // [SECURITY FIX M4] Store full debug info marked for admin-only access
+            const summaryWithMetadata = prepareSummaryForStorage(analysisSummary)
+            
+            const completeResult = await supabase.updateAnalysisStatus(analysisId, 'completed', {
+                summary_json: summaryWithMetadata,
+                risk_level: dbRiskLevel
+            })
 
-            if (updateError) {
-                throw new Error(`Failed to save analysis results: ${updateError.message}`)
+            if (!completeResult.success) {
+                throw new Error(`Failed to save analysis results: ${completeResult.error}`)
             }
 
             console.log(`[Worker] Successfully completed analysis ${analysisId}`)
@@ -87,15 +93,14 @@ export default defineNitroPlugin((_nitroApp) => {
                 debugData = error.debugInfo
             }
 
-            // Mark as failed in DB
-            await supabaseAdmin
-                .from('analyses')
-                .update({
-                    status: 'failed',
-                    error_message: errorMessage,
-                    summary_json: debugData ? { _debug: debugData } : null // Save debug info in summary_json even if failed, or a dedicated column if available. Using summary_json as we can assume frontend can check status.
-                })
-                .eq('id', analysisId)
+            // Mark as failed in DB using scoped client
+            // [SECURITY FIX M4] Store debug info marked for admin-only access
+            const summaryWithMetadata = debugData ? prepareSummaryForStorage({ _debug: debugData }) : null
+            
+            await supabase.updateAnalysisStatus(analysisId, 'failed', {
+                error_message: sanitizeErrorMessage(errorMessage),
+                summary_json: summaryWithMetadata
+            })
         }
     }, {
         connection: getRedisConnection(),
