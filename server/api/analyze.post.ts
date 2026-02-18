@@ -3,6 +3,7 @@ import { getAnalysisQueue } from '../utils/queue'
 import { validateSupabaseStorageUrl } from '../utils/ssrf-protection'
 import { handleApiError } from '../utils/error-handler'
 import { z } from 'zod'
+import { getHeader } from 'h3'
 
 /**
  * Request validation schema
@@ -25,6 +26,12 @@ export default defineEventHandler(async (event) => {
     }
 
     try {
+        // [SECURITY FIX M5] Validate Content-Type header
+        const contentType = getHeader(event, 'content-type')
+        if (!contentType || !contentType.includes('application/json')) {
+            throw createError({ statusCode: 415, message: 'Unsupported Media Type. Application/json expected.' })
+        }
+
         const body = await readBody(event)
 
         // [SECURITY FIX #2] Validate and sanitize input using zod
