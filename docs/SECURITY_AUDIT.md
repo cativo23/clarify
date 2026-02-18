@@ -138,6 +138,16 @@ const validated = analyzeSchema.parse(body)
 
 ---
 
+**Priority:** MEDIUM
+**Effort:** Low
+
+**Status:** ✅ **FIXED** — Added webhook monitoring in `server/api/stripe/webhook.post.ts`:
+- Rate limiting on webhook endpoint (using payment preset, IP-based)
+- Security alerts on signature verification failures with redacted signature
+- Logs include timestamp, partial signature, and source IP for forensics
+
+---
+
 ### 3. MEDIUM SEVERITY - Webhook Secret Exposure in Error Messages
 
 **Location:** `server/api/stripe/webhook.post.ts:33-38`
