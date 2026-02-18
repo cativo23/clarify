@@ -1,10 +1,14 @@
 import { serverSupabaseUser, serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
 import type { User } from '~/types'
 import { handleApiError } from '../../utils/error-handler'
+import { applyRateLimit, RateLimitPresets } from '~/server/utils/rate-limit'
 
 export default defineEventHandler(async (event) => {
     let user
     try {
+        // [SECURITY FIX M1] Rate limiting to prevent user enumeration and DoS
+        await applyRateLimit(event, RateLimitPresets.standard, 'user')
+
         user = await serverSupabaseUser(event)
 
         if (!user) {
