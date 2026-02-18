@@ -182,16 +182,17 @@ const fetchAnalyses = async () => {
     loading.value = true
 
     try {
-        const { data, error } = await supabase
-            .from('analyses')
-            .select('*')
-            .eq('user_id', user.value.id)
-            .order('created_at', { ascending: false })
-
-        if (error) throw error
-        analyses.value = data || []
+        // Get headers for SSR (cookies)
+        const headers = useRequestHeaders(['cookie'])
+        
+        // [SECURITY FIX M4] Fetch analyses via API endpoint (not direct Supabase query)
+        const response = await $fetch('/api/analyses', {
+            headers: headers as any
+        })
+        analyses.value = response.analyses || []
     } catch (err) {
         console.error('Error fetching analyses:', err)
+        analyses.value = []
     } finally {
         loading.value = false
     }

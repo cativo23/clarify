@@ -105,7 +105,7 @@ Para una configuración más profunda, consulta nuestras guías para desarrollad
 
 1. 🧪 [Analysis Tiers & AI Strategy](docs/ANALYSIS_TIERS.md)
 2. 🏗️ [Technical Architecture](docs/ARCHITECTURE.md)
-3. 🔐 [Security & Risk Report](docs/SECURITY_CONSOLIDATED_REPORT.md)
+3. 🔐 [Security & Risk Report](docs/SECURITY.md)
 4. 💳 [Stripe Setup](docs/STRIPE_SETUP.md)
 5. 🗄️ [Supabase Setup](docs/SUPABASE_SETUP.md)
 6. 📖 [Developer Walkthrough](docs/DEV_WALKTHROUGH.md)

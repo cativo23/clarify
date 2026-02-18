@@ -1,6 +1,6 @@
 {
   "name": "clarify",
-  "version": "1.0.0-alpha.3",
+  "version": "1.0.0-alpha.5",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,7 +12,16 @@
     "lint": "eslint .",
     "typecheck": "nuxt typecheck",
     "security:audit": "npm audit --audit-level=high",
-    "security:fix": "npm audit fix"
+    "security:fix": "npm audit fix",
+    "db:migrate": "NODE_OPTIONS='--import tsx' node scripts/migrate.ts migrate",
+    "db:rollback": "NODE_OPTIONS='--import tsx' node scripts/migrate.ts migrate:rollback",
+    "db:status": "NODE_OPTIONS='--import tsx' node scripts/migrate.ts migrate:status",
+    "db:fresh": "NODE_OPTIONS='--import tsx' node scripts/migrate.ts migrate:fresh",
+    "db:seed": "NODE_OPTIONS='--import tsx' node scripts/migrate.ts db:seed",
+    "db:wipe": "NODE_OPTIONS='--import tsx' node scripts/migrate.ts db:wipe",
+    "db:init": "NODE_OPTIONS='--import tsx' node scripts/migrate.ts db:init",
+    "db:refresh": "npm run db:wipe -- --force && npm run db:fresh -- --force && npm run db:migrate && npm run db:seed",
+    "migrate:make": "NODE_OPTIONS='--import tsx' node scripts/migrate.ts migrate:make"
   },
   "dependencies": {
     "@heroicons/vue": "^2.2.0",
@@ -29,11 +38,14 @@
     "openai": "^4.77.3",
     "pdf-parse": "^1.1.1",
     "stripe": "^17.5.0",
-    "vue": "latest"
+    "vue": "latest",
+    "zod": "^3"
   },
   "devDependencies": {
     "@types/node": "^25.1.0",
     "@types/pdf-parse": "^1.1.4",
+    "supabase": "^2.76.9",
+    "tsx": "^4.21.0",
     "typescript": "^5.7.3"
   }
 }

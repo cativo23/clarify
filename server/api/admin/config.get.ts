@@ -1,25 +1,27 @@
-import { serverSupabaseUser, serverSupabaseServiceRole } from '#supabase/server'
-import { getPromptConfig } from '../../utils/config'
+import { requireAdmin } from '../../utils/auth'
+import { getAdminSupabaseClient } from '../../utils/admin-supabase'
+import type { PromptConfig } from '../../utils/config'
+
+const DEFAULT_CONFIG: PromptConfig = {
+    promptVersion: 'v2',
+    tiers: {
+        basic: { model: 'gpt-4o-mini', credits: 1, tokenLimits: { input: 8000, output: 2500 } },
+        premium: { model: 'gpt-5-mini', credits: 3, tokenLimits: { input: 35000, output: 10000 } },
+        forensic: { model: 'gpt-5', credits: 10, tokenLimits: { input: 120000, output: 30000 } },
+    },
+    features: { preprocessing: true, tokenDebug: true },
+}
 
 export default defineEventHandler(async (event) => {
-    const user = await serverSupabaseUser(event)
-
-    // Auth Check
-    const runtimeConfig = useRuntimeConfig()
-    const adminEmail = runtimeConfig.public.adminEmail
-
-    if (!user || user.email !== adminEmail) {
-        throw createError({
-            statusCode: 401,
-            message: 'Unauthorized',
-        })
+    await requireAdmin(event)
+    const admin = getAdminSupabaseClient()
+    
+    const result = await admin.getConfig()
+    
+    if (result.error) {
+        console.warn('Failed to fetch prompt config (using default):', result.error)
+        return DEFAULT_CONFIG
     }
-
-    // Reuse utility which handles fetching/caching
-    // Use Service Role to bypass RLS policies (since we already verified admin email)
-    const client = await serverSupabaseServiceRole(event)
-    // Force fresh read for admin panel to avoid stale cache
-    const promptConfig = await getPromptConfig(client, true)
-
-    return promptConfig
+    
+    return result.data || DEFAULT_CONFIG
 })

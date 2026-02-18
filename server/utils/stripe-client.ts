@@ -81,26 +81,13 @@ export const updateUserCreditsInDb = async (userId: string, credits: number) => 
         config.supabaseServiceKey
     )
 
-    // First get current credits
-    const { data: user, error: fetchError } = await supabaseAdmin
-        .from('users')
-        .select('credits')
-        .eq('id', userId)
-        .single()
-
-    if (fetchError) {
-        console.error(`Error fetching user ${userId}:`, fetchError)
-        return false
-    }
-
-    const currentCredits = user?.credits || 0
-    const newCredits = currentCredits + credits
-
-    // Update credits
-    const { error: updateError } = await supabaseAdmin
-        .from('users')
-        .update({ credits: newCredits })
-        .eq('id', userId)
+    // [SECURITY FIX H4] Atomic credit increment
+    // Uses RPC to prevent race conditions during concurrent webhook events
+    const { data: newCredits, error: updateError } = await supabaseAdmin
+        .rpc('increment_user_credits', {
+            p_user_id: userId,
+            p_amount: credits
+        })
 
     if (updateError) {
         console.error(`Error updating credits for user ${userId}:`, updateError)

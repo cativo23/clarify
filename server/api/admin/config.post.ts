@@ -1,24 +1,13 @@
-import { serverSupabaseUser, serverSupabaseServiceRole } from '#supabase/server'
+import { serverSupabaseUser } from '#supabase/server'
+import { requireAdmin } from '../../utils/auth'
+import { getAdminSupabaseClient } from '../../utils/admin-supabase'
 import { clearConfigCache } from '../../utils/config'
 
 export default defineEventHandler(async (event) => {
+    await requireAdmin(event)
     const user = await serverSupabaseUser(event)
-
-    // Auth Check
-    const config = useRuntimeConfig()
-    const adminEmail = config.public.adminEmail
-
-    if (!user || user.email !== adminEmail) {
-        throw createError({
-            statusCode: 401,
-            message: 'Unauthorized',
-        })
-    }
-
+    const admin = getAdminSupabaseClient()
     const body = await readBody(event)
-    // Use Service Role to bypass RLS policies
-    const client = await serverSupabaseServiceRole(event)
-
 
     // Validation (Basic) - expect new `tiers` shape
     if (!body || !body.promptVersion || !body.tiers || !body.tiers.basic || !body.tiers.premium || !body.tiers.forensic) {
@@ -28,21 +17,14 @@ export default defineEventHandler(async (event) => {
         })
     }
 
-    const { error } = await client
-        .from('configurations')
-        .upsert({
-            key: 'prompt_settings',
-            value: body,
-            updated_by: user.id
-        }, { onConflict: 'key' })
+    const result = await admin.updateConfig('prompt_settings', body, user!.id)
 
-    if (error) {
+    if (!result.success) {
         throw createError({
             statusCode: 500,
-            message: error.message,
+            message: result.error,
         })
     }
-
 
     clearConfigCache()
 

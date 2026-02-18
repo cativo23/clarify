@@ -1,35 +1,58 @@
 import type { User, Analysis } from '~/types'
 
-
+// Cache TTL for user profile (5 minutes)
+const USER_PROFILE_CACHE_TTL = 5 * 60 * 1000
 
 // Shared state for credits
 export const useCreditsState = () => useState<number>('user-credits', () => 0)
+// Shared state for full user profile (including is_admin)
+export const useUserState = () => useState<User | null>('user-profile', () => null)
+// Track last fetch time for cache invalidation
+export const useUserStateLastFetch = () => useState<number>('user-profile-last-fetch', () => 0)
 
-// Fetch user profile with credits
-// Fetch user profile with credits
-export const fetchUserProfile = async () => {
+// Check if cached user profile is stale
+export const isUserProfileStale = (): boolean => {
+    const lastFetch = useUserStateLastFetch()
+    return Date.now() - lastFetch.value > USER_PROFILE_CACHE_TTL
+}
+
+// Fetch user profile with credits and admin status
+export const fetchUserProfile = async (forceRefresh = false) => {
     const user = useSupabaseUser()
     const creditsState = useCreditsState()
+    const userState = useUserState()
+    const lastFetch = useUserStateLastFetch()
+    // Capture client and router at start to preserve context
+    const supabase = useSupabaseClient()
+    const router = useRouter()
 
     if (!user.value?.id) return null
 
+    // Skip fetch if cache is still valid (unless force refresh)
+    if (!forceRefresh && !isUserProfileStale() && userState.value) {
+        return userState.value
+    }
+
     try {
-        const headers = useRequestHeaders(['cookie'])
-        const fetchOptions: any = {}
-
-        // Only forward headers if we have a cookie (important for SSR)
-        // On client, browser handles cookies automatically if we don't override headers
-        if (headers.cookie) {
-            fetchOptions.headers = headers
-        }
-
-        const profile = await $fetch<User>('/api/user/profile', fetchOptions)
+        const profile = await $fetch<User>('/api/user/profile', {
+            headers: useRequestHeaders(['cookie']) as any
+        })
         if (profile) {
             creditsState.value = profile.credits
+            userState.value = profile
+            lastFetch.value = Date.now() // Update cache timestamp
             return profile
         }
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error fetching user profile:', error)
+        if (error.statusCode === 401 || error.response?.status === 401) {
+            // Token invalid, force logout using captive client
+            await supabase.auth.signOut()
+            userState.value = null
+            lastFetch.value = 0
+            // Use captured router for navigation
+            return router.push('/login')
+        }
     }
 
     return null
@@ -37,43 +60,27 @@ export const fetchUserProfile = async () => {
 
 // Fetch user's analyses
 export const useUserAnalyses = async () => {
-    const client = useSupabaseClient()
     const user = useSupabaseUser()
 
     if (!user.value?.id) return []
 
-    const { data, error } = await client
-        .from('analyses')
-        .select('*')
-        .eq('user_id', user.value.id)
-        .order('created_at', { ascending: false })
+    try {
+        // [SECURITY FIX M4] Use API endpoint instead of direct Supabase query
+        // This ensures debug info is stripped for non-admin users
+        const { data, error } = await $fetch('/api/analyses')
 
-    if (error) {
+        if (error) {
+            console.error('Error fetching analyses:', error)
+            return []
+        }
+
+        return data.analyses || []
+    } catch (error: any) {
         console.error('Error fetching analyses:', error)
         return []
     }
-
-    return data as Analysis[]
 }
 
-// Update user credits
-export const updateUserCredits = async (credits: number) => {
-    const client = useSupabaseClient()
-    const user = useSupabaseUser()
-
-    if (!user.value?.id) throw new Error('User not authenticated')
-
-    const { data, error } = await client
-        .from('users')
-        .update({ credits })
-        .eq('id', user.value.id)
-        .select()
-        .single()
-
-    if (error) throw error
-
-    return data as User
-}
 
 // Save analysis to database
 export const saveAnalysis = async (analysis: Omit<Analysis, 'id' | 'created_at'>) => {

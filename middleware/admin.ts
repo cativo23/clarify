@@ -1,4 +1,4 @@
-export default defineNuxtRouteMiddleware((_to, _from) => {
+export default defineNuxtRouteMiddleware(async (_to, _from) => {
     const user = useSupabaseUser()
 
     // 1. Check Authentication
@@ -6,11 +6,18 @@ export default defineNuxtRouteMiddleware((_to, _from) => {
         return navigateTo('/login')
     }
 
-    // 2. Check Admin Access via Email
-    const config = useRuntimeConfig()
-    const adminEmail = config.public.adminEmail
+    // 2. Check Admin Access via Profile State
+    const userState = useUserState()
 
-    if (!adminEmail || user.value.email !== adminEmail) {
+    // [SECURITY FIX M4] Refresh profile if stale or not loaded
+    // Ensures admin status is checked against fresh data
+    if (!userState.value || isUserProfileStale()) {
+        await fetchUserProfile(true) // Force refresh
+    }
+
+    const isAdmin = userState.value?.is_admin
+
+    if (!isAdmin) {
         // Redirect to dashboard or error page if not authorized
         console.warn('Unauthorized access attempt to admin area by:', user.value.email)
         return navigateTo('/')
