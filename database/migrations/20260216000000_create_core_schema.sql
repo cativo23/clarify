@@ -1,5 +1,6 @@
--- Clarify Database Schema
--- This script initializes the PostgreSQL database for local development
+-- Migration: Create Core Database Schema
+-- Date: 2026-02-16
+-- Description: Initialize base tables (users, analyses, transactions)
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -56,65 +57,3 @@ $$ language 'plpgsql';
 -- Trigger to automatically update updated_at
 CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
--- Insert a demo user for testing (password: demo123)
-INSERT INTO users (email, credits) 
-VALUES ('demo@clarify.app', 10)
-ON CONFLICT (email) DO NOTHING;
-
--- Function to process analysis and deduct credit atomically
-CREATE OR REPLACE FUNCTION process_analysis_transaction(
-    p_user_id UUID,
-    p_contract_name TEXT,
-    p_file_url TEXT,
-    p_summary_json JSONB DEFAULT NULL,
-    p_risk_level TEXT DEFAULT NULL
-)
-RETURNS UUID AS $$
-DECLARE
-    v_analysis_id UUID;
-BEGIN
-    -- 1. Check if user has credits
-    IF NOT EXISTS (SELECT 1 FROM users WHERE id = p_user_id AND credits >= 1) THEN
-        RAISE EXCEPTION 'Insufficient credits';
-    END IF;
-
-    -- 2. Deduct credit
-    UPDATE users 
-    SET credits = credits - 1 
-    WHERE id = p_user_id;
-
-    -- 3. Insert analysis
-    INSERT INTO analyses (
-        user_id,
-        contract_name,
-        file_url,
-        summary_json,
-        risk_level,
-        status,
-        credits_used,
-        created_at
-    ) VALUES (
-        p_user_id,
-        p_contract_name,
-        p_file_url,
-        p_summary_json,
-        p_risk_level,
-        'pending',
-        1,
-        CURRENT_TIMESTAMP
-    ) RETURNING id INTO v_analysis_id;
-
-    RETURN v_analysis_id;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- Enable Realtime for the analyses table
-ALTER PUBLICATION supabase_realtime ADD TABLE analyses;
-
--- Confirmation message
-DO $$
-BEGIN
-    RAISE NOTICE 'Clarify database initialized successfully!';
-    RAISE NOTICE 'Demo user created: demo@clarify.app with 10 credits';
-END $$;

@@ -153,26 +153,22 @@ const handleSubmit = async () => {
       const { data, error } = await supabase.auth.signUp({
         email: email.value,
         password: password.value,
+        options: {
+          emailRedirectTo: `${window.location.origin}/dashboard`,
+        }
       })
 
       if (error) throw error
 
-      // Create user profile in database
-      if (data.user) {
-        const { error: profileError } = await supabase
-          .from('users')
-          .insert({
-            id: data.user.id,
-            email: data.user.email,
-            credits: 3, // Give 3 free credits
-          })
-
-        if (profileError) {
-          console.error('Error creating profile:', profileError)
-        }
+      // Check if email confirmation is required
+      if (data.user?.identities?.length === 0) {
+        errorMessage.value = 'Este email ya está registrado. Por favor inicia sesión.'
+        return
       }
 
-      successMessage.value = 'Cuenta creada! Por favor verifica tu email.'
+      successMessage.value = '¡Cuenta creada! Por favor verifica tu email antes de iniciar sesión.'
+      email.value = ''
+      password.value = ''
     } else {
       // Sign In
       const { error } = await supabase.auth.signInWithPassword({
@@ -185,7 +181,13 @@ const handleSubmit = async () => {
       // Redirect handled by watchEffect
     }
   } catch (error: any) {
-    errorMessage.value = error.message || 'Ocurrió un error. Intenta nuevamente.'
+    // Handle email verification error
+    if (error.message?.includes('Email not confirmed') || 
+        error.message?.includes('verify')) {
+      errorMessage.value = 'Por favor verifica tu email antes de iniciar sesión. Revisa tu bandeja de entrada.'
+    } else {
+      errorMessage.value = error.message || 'Ocurrió un error. Intenta nuevamente.'
+    }
   } finally {
     loading.value = false
   }

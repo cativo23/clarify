@@ -183,12 +183,12 @@
 <script setup lang="ts">
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
-const runtimeConfig = useRuntimeConfig()
 const showUserMenu = ref(false)
 const userCredits = useCreditsState()
 
+const userState = useUserState()
 const isAdmin = computed(() => {
-    return user.value?.email === runtimeConfig.public.adminEmail
+    return userState.value?.is_admin === true
 })
 
 const userInitials = computed(() => {

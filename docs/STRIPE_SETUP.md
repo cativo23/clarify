@@ -1,41 +1,41 @@
-# Configuración de Stripe para Clarify
+# Stripe Setup Guide
 
-Para que el sistema de pagos funcione correctamente, necesitas configurar tu cuenta de Stripe y actualizar las variables de entorno de la aplicación.
+To enable payments and credit top-ups in Clarify, you must configure your Stripe account and update the environment variables.
 
-## 1. Obtener API Keys
+## 1. Obtain API Keys
 
-1. Ve al [Dashboard de Stripe](https://dashboard.stripe.com/).
-2. Asegúrate de estar en **Modo de prueba** (toggle "Test mode" en la esquina superior derecha).
-3. Ve a **Developers** > **API keys**.
-4. Copia la `Publishable key` y la `Secret key`.
-5. Pégalas en tu archivo `.env`:
+1.  Go to the [Stripe Dashboard](https://dashboard.stripe.com/).
+2.  Enable **Test Mode** (toggle in the top-right corner).
+3.  Navigate to **Developers** > **API keys**.
+4.  Copy the `Publishable key` and `Secret key`.
+5.  Add them to your `.env` file:
 
 ```env
 STRIPE_PUBLISHABLE_KEY=pk_test_...
 STRIPE_SECRET_KEY=sk_test_...
 ```
 
-## 2. Crear Productos (Paquetes de Créditos)
+## 2. Create Products (Credit Packages)
 
-Necesitas crear 3 productos en Stripe para corresponder con los paquetes de la aplicación.
+You need to create 3 products in Stripe to match the packages in the application.
 
-1. Ve a **Product catalog** > **Add product**.
-2. **Paquete Básico (5 Créditos)**:
-   - **Name**: 5 Créditos Clarify
-   - **Price**: 4.99 USD
-   - **Billing**: One-time
-3. **Paquete Popular (10 Créditos)**:
-   - **Name**: 10 Créditos Clarify
-   - **Price**: 8.99 USD
-   - **Billing**: One-time
-4. **Paquete Pro (25 Créditos)**:
-   - **Name**: 25 Créditos Clarify
-   - **Price**: 19.99 USD
-   - **Billing**: One-time
+1.  Go to **Product catalog** > **Add product**.
+2.  **Basic Pack (5 Credits)**:
+    - **Name**: 5 Clarify Credits
+    - **Price**: 4.99 USD
+    - **Billing**: One-time
+3.  **Popular Pack (10 Credits)**:
+    - **Name**: 10 Clarify Credits
+    - **Price**: 8.99 USD
+    - **Billing**: One-time
+4.  **Pro Pack (25 Credits)**:
+    - **Name**: 25 Clarify Credits
+    - **Price**: 19.99 USD
+    - **Billing**: One-time
 
-### Copiar Price IDs
+### Copy Price IDs
 
-Después de crear cada producto, busca el **API ID** del *precio* (comienza con `price_...`) y actualiza el archivo `server/utils/stripe-client.ts`:
+After creating each product, copy the **API ID** of the *Price* (starts with `price_...`) and update the `server/utils/stripe-client.ts` file:
 
 ```typescript
 // server/utils/stripe-client.ts
@@ -44,46 +44,44 @@ export const CREDIT_PACKAGES = [
     {
         id: 'pack_5',
         // ...
-        priceId: 'price_XXXXXX', // <-- Pega aquí el ID para 5 créditos
+        priceId: 'price_XXXXXX', // <-- Paste the 5-credit price ID here
     },
     {
         id: 'pack_10',
         // ...
-        priceId: 'price_XXXXXX', // <-- Pega aquí el ID para 10 créditos
+        priceId: 'price_XXXXXX', // <-- Paste the 10-credit price ID here
     },
     {
         id: 'pack_25',
         // ...
-        priceId: 'price_XXXXXX', // <-- Pega aquí el ID para 25 créditos
+        priceId: 'price_XXXXXX', // <-- Paste the 25-credit price ID here
     },
 ]
 ```
 
-## 3. Configurar Webhooks
+## 3. Configure Webhooks
 
-Para que la aplicación sepa cuándo se ha realizado un pago y sume los créditos automáticamente:
+The webhook ensures that credits are added to the user's account automatically after a successful payment.
 
-### Desarrollo Local (Stripe CLI)
+### Local Development (Stripe CLI)
 
-1. Instala Stripe CLI si no lo tienes.
-2. Loguéate: `stripe login`
-3. Inicia el listener redirigiendo a tu app local:
-   ```bash
-   stripe listen --forward-to localhost:3001/api/stripe/webhook
-   ```
-4. Copia el **Webhook Signing Secret** que te muestra el comando terminal (comienza con `whsec_...`).
-5. Pégalo en tu archivo `.env`:
+1.  [Install the Stripe CLI](https://stripe.com/docs/stripe-cli).
+2.  Login: `stripe login`
+3.  Start the listener:
+    ```bash
+    stripe listen --forward-to localhost:3001/api/stripe/webhook
+    ```
+4.  Copy the **Webhook Signing Secret** (starts with `whsec_...`).
+5.  Add it to your `.env` file:
 
 ```env
 STRIPE_WEBHOOK_SECRET=whsec_...
 ```
 
-### Producción (Vercel)
+### Production
 
-1. Ve a **Developers** > **Webhooks** en Stripe Dashboard.
-2. Click en **Add endpoint**.
-3. **Endpoint URL**: `https://tu-dominio.vercel.app/api/stripe/webhook`
-4. **Events to send**: Selecciona `checkout.session.completed`.
-5. Click **Add endpoint**.
-6. Copia el **Signing secret** de este endpoint.
-7. Agrégalo a las variables de entorno en Vercel.
+1.  Go to **Developers** > **Webhooks** in the Stripe Dashboard.
+2.  Click **Add endpoint**.
+3.  **Endpoint URL**: `https://your-domain.com/api/stripe/webhook`
+4.  **Events to send**: Select `checkout.session.completed`.
+5.  Copy the **Signing secret** and add it to your production environment variables.
