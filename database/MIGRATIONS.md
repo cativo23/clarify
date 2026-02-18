@@ -252,7 +252,7 @@ npm run db:refresh -- --force
 
 ## 📚 Related Documentation
 
-- [Security Report](./SECURITY_CONSOLIDATED_REPORT.md)
+- [Security Report](../docs/SECURITY.md)
 - [Architecture](./ARCHITECTURE.md)
 - [Supabase Setup](./SUPABASE_SETUP.md)
 

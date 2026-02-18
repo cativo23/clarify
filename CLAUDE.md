@@ -163,10 +163,28 @@ No formal test suite currently. Manual testing via:
 - Redis test: `scripts/test-redis.ts`
 - Health check: `GET /api/health`
 
+## Git Guidelines
+
+Follow [Conventional Commits](https://www.conventionalcommits.org/) with [Gitmoji](https://gitmoji.dev/).
+
+**Format:** `<type>(<scope>): <gitmoji> <description>` (scope is optional)
+
+**Common Types & Emojis:**
+- `feat`: ✨ New feature
+- `fix`: 🐛 Bug fix
+- `docs`: 📝 Documentation changes
+- `style`: 🎨 Code style (formatting, linting)
+- `refactor`: ♻️ Code refactoring
+- `test`: ✅ Adding or fixing tests
+- `chore`: 🔧 Maintenance or configuration
+- `perf`: ⚡ Performance improvements
+- `security`: 🔐 Security improvements/fixes
+- `cleanup`: 🔥 Removing code or files
+
 ## Documentation
 
 - `docs/DEV_WALKTHROUGH.md` - MVP overview, module guide
 - `docs/ARCHITECTURE.md` - Technical architecture, data flows
 - `docs/ANALYSIS_TIERS.md` - Model strategy, token optimization
-- `docs/SECURITY_MAINTENANCE.md` - Security tasks, incident response
+- `docs/SECURITY.md` - Security audit, maintenance, incident response
 - `docs/STRIPE_SETUP.md` - Stripe integration guide
