@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ middleware: ['admin'], layout: 'default' })
+definePageMeta({ middleware: ['admin'], layout: 'admin' })
 
 const route = useRoute()
 const router = useRouter()
@@ -65,17 +65,17 @@ const backToAnalytics = () => {
   <div class="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-500">
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Header -->
-      <div class="flex items-center gap-4 mb-8">
-        <button @click="backToAnalytics"
-          class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
-          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <div>
-          <h1 class="text-3xl font-black text-slate-900 dark:text-white">User Details</h1>
-          <p class="text-sm font-bold text-slate-500 dark:text-slate-400">Detailed view for {{ profile?.email }}</p>
+      <div class="mb-8">
+        <div class="flex items-center gap-2 mb-2">
+          <button @click="backToAnalytics"
+            class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
+            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <span class="text-sm font-bold text-slate-400">Detalles de Usuario</span>
         </div>
+        <h1 class="text-3xl font-black text-slate-900 dark:text-white">{{ profile?.email }}</h1>
       </div>
 
       <!-- Loading State -->
