@@ -15,6 +15,41 @@ export const createOpenAIClient = () => {
     return openai
 }
 
+/**
+ * Allowed OpenAI models whitelist
+ * [SECURITY FIX L4] Prevents unauthorized model usage via config tampering
+ */
+const ALLOWED_MODELS = [
+    'gpt-4o-mini',
+    'gpt-4o',
+    'gpt-5-mini',
+    'gpt-5',
+    'o1-mini',
+    'o1',
+    'o3-mini',
+] as const
+
+type AllowedModel = typeof ALLOWED_MODELS[number]
+
+/**
+ * Validates model name against whitelist
+ * [SECURITY FIX L4] Prevents injection of unauthorized model names
+ */
+function validateModel(model: string): { valid: boolean; model?: AllowedModel } {
+    if (!model || typeof model !== 'string') {
+        return { valid: false }
+    }
+
+    const trimmedModel = model.trim()
+
+    if (ALLOWED_MODELS.includes(trimmedModel as AllowedModel)) {
+        return { valid: true, model: trimmedModel as AllowedModel }
+    }
+
+    console.error('[SECURITY] Invalid model configured:', model)
+    return { valid: false }
+}
+
 export const analyzeContract = async (contractText: string, analysisType: 'basic' | 'premium' = 'premium') => {
     const openai = createOpenAIClient()
 
@@ -27,7 +62,15 @@ export const analyzeContract = async (contractText: string, analysisType: 'basic
 
     // 2. Resolve Parameters
     const tier = tiers[analysisType] || tiers.premium
-    const model = tier.model || 'gpt-4o-mini'
+    const rawModel = tier.model || 'gpt-4o-mini'
+
+    // [SECURITY FIX L4] Validate model against whitelist
+    const modelValidation = validateModel(rawModel)
+    if (!modelValidation.valid) {
+        throw new Error('Invalid AI model configuration. Please contact support.')
+    }
+    const model = modelValidation.model!
+
     const limits = tier.tokenLimits || { input: 8000, output: 800 }
 
     // 3. Load System Prompt -- Strict V2 Path
