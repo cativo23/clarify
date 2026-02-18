@@ -4,17 +4,17 @@ import { sanitizeAnalysesList, getRequestUserContext, isTokenDebugEnabled } from
 export default defineEventHandler(async (event) => {
     try {
         const user = await serverSupabaseUser(event)
-        
+
         if (!user) {
             throw createError({ statusCode: 401, message: 'Unauthorized' })
         }
 
         // Get user context including admin status
         const userContext = await getRequestUserContext(event)
-        
+
         // Check if tokenDebug is enabled (development/testing mode)
-        const tokenDebug = await isTokenDebugEnabled(event)
-        
+        const tokenDebug = await isTokenDebugEnabled()
+
         const client = await serverSupabaseClient(event)
 
         // Fetch user's analyses
@@ -39,9 +39,9 @@ export default defineEventHandler(async (event) => {
         }
     } catch (error: any) {
         console.error('Error in analyses list endpoint:', error)
-        throw createError({ 
-            statusCode: 500, 
-            message: 'Failed to fetch analyses' 
+        throw createError({
+            statusCode: 500,
+            message: 'Failed to fetch analyses'
         })
     }
 })
