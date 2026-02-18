@@ -11,11 +11,11 @@
 
 This security audit reviewed the Clarify application's server-side code, middleware, and utilities for security vulnerabilities. The application demonstrates a **strong security posture** with multiple security controls already implemented.
 
-### Overall Assessment: **EXCELLENT** - All HIGH priority issues resolved
+### Overall Assessment: **EXCELLENT** - All HIGH & MEDIUM priority issues resolved
 
 ### Status Summary
 - ✅ **HIGH Priority**: 1/1 resolved
-- ⚠️ **MEDIUM Priority**: 0/2 resolved (acceptable risk, deferred)
+- ✅ **MEDIUM Priority**: 2/2 resolved
 - ✅ **LOW Priority**: 3/3 resolved
 
 ---
@@ -130,6 +130,12 @@ const validated = analyzeSchema.parse(body)
 **Priority:** MEDIUM
 **Effort:** Low
 
+**Status:** ✅ **FIXED** — Added request validation using `zod` in `server/api/analyze.post.ts`:
+- `file_url`: Validated as URL
+- `contract_name`: Max 255 chars, alphanumeric + hyphens/underscores/spaces only
+- `analysis_type`: Enum validation (basic/premium/forensic)
+- Invalid requests are logged with user ID for security monitoring
+
 ---
 
 ### 3. MEDIUM SEVERITY - Webhook Secret Exposure in Error Messages
@@ -165,6 +171,8 @@ if (error?.type === 'StripeSignatureVerificationError') {
 
 **Priority:** MEDIUM
 **Effort:** Low
+
+**Status:** FIXED — Added webhook-specific monitoring and safe logging in `server/api/stripe/webhook.post.ts`. Signature verification failures now emit a redacted security alert and are rate limited.
 
 ---
 
@@ -322,7 +330,7 @@ export default defineNuxtConfig({
 | Priority | Count | Items |
 |----------|-------|-------|
 | HIGH | 0 | ~~Admin auth bypass~~ ✅ **COMPLETED** |
-| MEDIUM | 2 | Input sanitization, Webhook monitoring |
+| MEDIUM | 0 | ~~Input sanitization~~ ✅, ~~Webhook monitoring~~ ✅ |
 | LOW | 0 | ~~Model validation~~ ✅, ~~Redis TLS~~ ✅, ~~Security headers~~ ✅ |
 | INFO | 0 | All addressed |
 
@@ -383,8 +391,8 @@ The following security measures are **well-implemented**:
 - [x] Fix admin authentication bypass (Issue #1) ✅ **COMPLETED**
 
 ### Phase 2 (Short-term - MEDIUM Priority)
-- [ ] Add input validation/sanitization (Issue #2)
-- [ ] Add webhook monitoring (Issue #3)
+- [x] Add input validation/sanitization (Issue #2) ✅ Implemented in `server/api/analyze.post.ts`
+- [x] Add webhook monitoring (Issue #3) ✅ Implemented in `server/api/stripe/webhook.post.ts`
 
 ### Phase 3 (Long-term - LOW Priority)
 - [x] Add model whitelist validation (Issue #4) ✅ **COMPLETED**
