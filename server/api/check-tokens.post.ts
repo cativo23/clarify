@@ -6,8 +6,12 @@ import { validateSupabaseStorageUrl } from '~/server/utils/ssrf-protection'
 import { handleApiError } from '~/server/utils/error-handler'
 
 export default defineEventHandler(async (event) => {
+    let user
     try {
-        const user = await serverSupabaseUser(event)
+        // [SECURITY FIX M3] Rate limiting to prevent DoS
+        await applyRateLimit(event, RateLimitPresets.standard, 'user')
+
+        user = await serverSupabaseUser(event)
         if (!user) {
             throw createError({ statusCode: 401, message: 'Unauthorized' })
         }
