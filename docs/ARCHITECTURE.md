@@ -1,61 +1,248 @@
-# Technical Architecture — Clarify
+# Architecture Guide — Clarify
 
-This document describes the technical design, data flows, and architectural guidelines for Clarify.
+**Last Updated:** February 18, 2026
 
-## 🧱 Component Overview
-
-The platform is built on a modern Micro-SaaS stack using **Nuxt 3**.
-
-### 1. Frontend (Nuxt 3 / Vue 3)
-- **Framework:** Nuxt 3 with server-side rendering (SSR) capabilities.
-- **UI System:** Tailwind CSS with a modular component architecture.
-- **State Management:** Vue Composition API (`ref`, `computed`).
-- **Authentication:** Managed by Supabase Auth with client-side session awareness.
-
-### 2. Backend (Nitro Engine)
-- **API Server:** Lightweight Nitro endpoints located in `server/api/`.
-- **Worker Process:** Handles long-running AI analysis via **BullMQ** and **Redis**.
-- **Services Layer:** (Recommended) Business logic should be decoupled from route handlers into helper utilities or classes.
-- **AI Integration:** Secure server-side communication with OpenAI using `gpt-4o-mini`, `gpt-5-mini`, and `gpt-5`.
-
-### 3. Data & Storage (Supabase)
-- **Database:** PostgreSQL for structured data (Users, Analyses, Transactions).
-- **Storage:** Supabase Storage (S3-compatible) for encrypted contract PDFs.
-- **Realtime:** Supabase Realtime for pushing analysis updates to the dashboard without polling.
+This document describes the technical architecture, core modules, and development guidelines for Clarify.
 
 ---
 
-## 🔄 Core Data Flows
+## Table of Contents
 
-### A. Contract Analysis Flow
-1. **Upload**: Client sends PDF to `/api/upload`. The server streams it to Supabase Storage in a user-isolated folder.
-2. **Preprocessing**: The backend extracts text using `pdf-parse`, tokenizes it, and identifies the target model based on the selected **Analysis Tier**.
-3. **Queueing**: A job is enqueued in Redis.
-4. **Execution**: The worker process picks up the job, sends the payload to OpenAI, and parses the structured JSON response.
-5. **Persistence**: Results are saved to the `analyses` table.
-6. **Notification**: The client UI is updated via a Realtime subscription.
-
-### B. Payment & Credits
-1. **Checkout**: User initiates a Stripe Checkout session.
-2. **Success**: After successful payment, Stripe sends a secure Webhook to `/api/stripe/webhook`.
-3. **Fulfillment**: The server validates the signature and atomically increments the user's credits in the database.
+1. [Overview](#overview)
+2. [Tech Stack](#tech-stack)
+3. [Component Architecture](#component-architecture)
+4. [Core Data Flows](#core-data-flows)
+5. [Analysis Tiers](#analysis-tiers)
+6. [Security Architecture](#security-architecture)
+7. [Deployment](#deployment)
+8. [Development Guidelines](#development-guidelines)
 
 ---
 
-## 🛠️ Architectural Guidelines & Recommendations
+## Overview
 
-### Keep It Lean (Nitro vs NestJS)
-The current monolithic architecture (one Nuxt project) is optimal for the current scale (~15-20 endpoints). Moving to a separate backend (like NestJS) is deemed **overkill** until the API surface exceeds 50+ endpoints or multiple clients (Mobile, Public API) are introduced.
+Clarify is a contract analysis platform that translates complex legal documents into visual, easy-to-understand summaries. The platform uses a multi-tier AI strategy to balance speed, cost, and analysis depth.
 
-### Development Standards
-1. **Zod Validation**: (Recommended) Implement Zod for input schema validation in all `server/api` routes.
-2. **Atomic Operations**: All credit changes must be performed via atomic PostgreSQL functions (RPCs) to prevent race conditions.
-3. **Row Level Security (RLS)**: No data should be accessible without a matching RLS policy in Supabase.
-4. **Error Masking**: Raw database or AI errors must be masked. Log the full error server-side, but return generic messages to the client.
+**Status:** 🟢 Production Ready
 
 ---
 
-## ⚙️ Deployment & Infrastructure
-- **Containerization**: The app is dockerized with a non-root user for security.
-- **Routing**: Traefik handles SSL termination and routing.
-- **Scaling**: The worker process can be scaled independently of the web tier to handle analysis load spikes.
+## Tech Stack
+
+| Layer | Technology | Purpose |
+|-------|------------|---------|
+| **Frontend** | Nuxt 3 / Vue 3 | SSR, Composition API |
+| **UI** | Tailwind CSS | Styling, components |
+| **Backend** | Nitro Engine | API endpoints |
+| **Database** | Supabase (PostgreSQL) | Data storage, RLS |
+| **Storage** | Supabase Storage | Encrypted PDF storage |
+| **Queue** | BullMQ + Redis | Background job processing |
+| **AI** | OpenAI (gpt-4o-mini, gpt-5-mini, gpt-5) | Contract analysis |
+| **Payments** | Stripe | Checkout, webhooks |
+
+---
+
+## Component Architecture
+
+### Frontend (Nuxt 3)
+
+```
+app/
+├── pages/          # Route components
+├── components/     # Reusable UI components
+├── composables/    # Vue composables (state logic)
+└── middleware/     # Auth middleware
+```
+
+- **Authentication:** Supabase Auth with session management
+- **State:** Vue Composition API (`ref`, `computed`)
+- **Realtime:** Supabase Realtime for live analysis updates
+
+### Backend (Nitro)
+
+```
+server/
+├── api/            # API endpoints
+├── utils/          # Shared utilities
+│   ├── auth.ts
+│   ├── error-handler.ts
+│   ├── file-validation.ts
+│   ├── rate-limit.ts
+│   ├── ssrf-protection.ts
+│   └── stripe-client.ts
+├── plugins/        # Server plugins (worker)
+└── prompts/        # AI prompt templates
+```
+
+### Scoped Supabase Clients
+
+| Client | Purpose | Access Level |
+|--------|---------|--------------|
+| `serverSupabaseClient` | User requests | RLS-enforced |
+| `WorkerSupabaseClient` | Background jobs | Restricted |
+| `AdminSupabaseClient` | Admin operations | Audited, service role |
+
+---
+
+## Core Data Flows
+
+### Contract Analysis Flow
+
+```
+┌─────────┐     ┌─────────┐     ┌─────────┐     ┌─────────┐     ┌─────────┐
+│  Client │ ──► │ /upload │ ──► │ Storage │ ──► │  Queue  │ ──► │ Worker  │
+└─────────┘     └─────────┘     └─────────┘     └─────────┘     └─────────┘
+     ▲                                                      │
+     │                                                      ▼
+     │                                                ┌─────────┐
+     │                                                │ OpenAI  │
+     │                                                └─────────┘
+     │                                                      │
+     ▼                                                      ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     Realtime Update                              │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+1. **Upload:** Client sends PDF to `/api/upload`
+2. **Validation:** Magic byte verification, structural integrity check
+3. **Storage:** File uploaded to Supabase Storage `contracts` bucket
+4. **Queue:** Job enqueued in Redis via BullMQ
+5. **Processing:** Worker picks job, calls OpenAI, parses JSON response
+6. **Persistence:** Results saved to `analyses` table
+7. **Notification:** Realtime subscription updates client UI
+
+### Payment Flow
+
+1. **Checkout:** User selects credit package, redirected to Stripe
+2. **Payment:** User completes payment on Stripe
+3. **Webhook:** Stripe sends `checkout.session.completed` to `/api/stripe/webhook`
+4. **Fulfillment:** Signature verified, credits atomically incremented via RPC
+
+---
+
+## Analysis Tiers
+
+| Tier | Model | Credits | Input Limit | Output Limit | Use Case |
+|------|-------|---------|-------------|--------------|----------|
+| **Basic** | gpt-4o-mini | 1 | 8,000 | 2,500 | Simple leases, ToS, privacy policies |
+| **Premium** | gpt-5-mini | 3 | 35,000 | 10,000 | Business contracts (recommended) |
+| **Forensic** | gpt-5 | 10 | 120,000 | 30,000 | High-value audits, complex frameworks |
+
+### Configuration
+
+Managed in `server/utils/config.ts` with database overrides via `configurations` table.
+
+### Optimization Techniques
+
+- **Semantic Preprocessing:** `js-tiktoken` (cl100k_base) prioritizes critical clauses (Liability, Termination, Indemnification)
+- **Prompt Versioning:** v2 enforces strict JSON output with conciseness on low-risk items
+- **Prompt Caching:** Static prefixes achieve 55-70% cache hit rates
+- **Token Debug:** `features.tokenDebug = true` enables detailed logging
+
+---
+
+## Security Architecture
+
+### Implemented Controls
+
+| Control | Implementation |
+|---------|----------------|
+| **Authentication** | Supabase Auth with RLS |
+| **Admin Auth** | `normalizeEmail()` + `admin_emails` table |
+| **Rate Limiting** | Redis-based (Upstash with TLS) |
+| **Input Validation** | Zod schemas on all endpoints |
+| **File Security** | Magic byte validation (PDF only) |
+| **SSRF Protection** | URL allowlist for Supabase storage |
+| **Error Handling** | Sanitized messages, no info disclosure |
+| **Security Headers** | CSP, HSTS, COEP, COOP, CORP |
+
+### Security Files Reference
+
+| File | Purpose |
+|------|---------|
+| `server/utils/auth.ts` | Admin authentication |
+| `server/utils/rate-limit.ts` | Rate limiting |
+| `server/utils/file-validation.ts` | Magic byte validation |
+| `server/utils/ssrf-protection.ts` | SSRF prevention |
+| `server/utils/error-handler.ts` | Error sanitization |
+| `server/api/stripe/webhook.post.ts` | Webhook security |
+
+**See [SECURITY.md](./SECURITY.md) for complete audit findings and maintenance procedures.**
+
+---
+
+## Deployment
+
+### Environment Variables
+
+```env
+# Supabase
+SUPABASE_URL=https://xxxxx.supabase.co
+SUPABASE_ANON_KEY=eyxxx...
+SUPABASE_SERVICE_ROLE=eyxxx...
+
+# OpenAI
+OPENAI_API_KEY=sk-xxx...
+
+# Stripe
+STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+# Redis (Upstash)
+REDIS_HOST=xxx.upstash.io
+REDIS_PORT=6379
+REDIS_TOKEN=xxx  # Required in production
+
+# Admin
+ADMIN_EMAIL=admin@example.com
+```
+
+### Infrastructure
+
+- **Containerization:** Docker with non-root user
+- **Deployment:** Vercel preset (Nitro)
+- **Database:** Migrations via `scripts/migrate.ts`
+
+---
+
+## Development Guidelines
+
+### Security Principles
+
+1. **Zero Trust:** Never trust client input
+2. **SSR-Only Logic:** Sensitive calculations server-side only
+3. **Scoped Access:** Use most restrictive Supabase client
+4. **Atomic Operations:** Credit changes via RPC only
+
+### Code Standards
+
+1. **Error Handling:** Use `handleApiError()` for sanitized responses
+2. **Input Validation:** Zod schemas on all `server/api` routes
+3. **TypeScript:** Strict mode enabled
+4. **Testing:** Validate token limits, error paths
+
+### Key Commands
+
+```bash
+npm run dev          # Development server
+npm run build        # Production build
+npm run typecheck    # TypeScript validation
+npm run db:migrate   # Run database migrations
+npm audit            # Security audit dependencies
+```
+
+---
+
+## Related Documentation
+
+| Document | Purpose |
+|----------|---------|
+| [SECURITY.md](./SECURITY.md) | Security audit & maintenance |
+| [ANALYSIS_TIERS.md](./ANALYSIS_TIERS.md) | Detailed tier configuration |
+| [STRIPE_SETUP.md](./STRIPE_SETUP.md) | Stripe configuration guide |
+
+---
+
+*Last Reviewed: February 18, 2026*

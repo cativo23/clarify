@@ -30,14 +30,17 @@ export default defineNuxtConfig({
     stripeSecretKey: process.env.STRIPE_SECRET_KEY || '',
     stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
     supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY || '',
+    // [SECURITY FIX M3] Redis configuration with Upstash support (auth + TLS)
     redisHost: process.env.REDIS_HOST || 'localhost',
     redisPort: parseInt(process.env.REDIS_PORT || '6379'),
+    redisToken: process.env.REDIS_TOKEN || '', // Upstash authentication token
+    redisTlsEnabled: !!process.env.REDIS_TOKEN, // Enable TLS for Upstash
+    adminEmail: process.env.ADMIN_EMAIL || '',
 
     // Public keys (exposed to client)
     public: {
       baseUrl: process.env.BASE_URL || 'http://localhost:3000',
       stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY || '',
-      adminEmail: process.env.ADMIN_EMAIL || '',
     },
   },
 
@@ -52,7 +55,6 @@ export default defineNuxtConfig({
     port: 3001,
   },
 
-
   // App configuration
   app: {
     head: {
@@ -65,6 +67,13 @@ export default defineNuxtConfig({
           content: 'Traduce contratos complejos a un formato visual tipo semáforo. Entiende qué estás firmando en segundos.'
         },
         { name: 'theme-color', content: '#0f172a' },
+        // [SECURITY FIX M5] Security headers
+        { 'http-equiv': 'Content-Security-Policy', content: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' wss: https://*.supabase.co https://api.openai.com https://api.stripe.com;" },
+        { 'http-equiv': 'X-Content-Type-Options', content: 'nosniff' },
+        { 'http-equiv': 'X-Frame-Options', content: 'DENY' },
+        { 'http-equiv': 'X-XSS-Protection', content: '1; mode=block' },
+        { 'http-equiv': 'Referrer-Policy', content: 'strict-origin-when-cross-origin' },
+        { 'http-equiv': 'Permissions-Policy', content: 'geolocation=(), microphone=(), camera=()' },
       ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
@@ -79,6 +88,26 @@ export default defineNuxtConfig({
   // Nitro configuration for serverless functions
   nitro: {
     preset: 'vercel',
+    // [SECURITY FIX L7] Enhanced security headers at server level
+    routeRules: {
+      '/**': {
+        headers: {
+          'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
+          'X-Content-Type-Options': 'nosniff',
+          'X-Frame-Options': 'DENY',
+          'X-XSS-Protection': '1; mode=block',
+          'Referrer-Policy': 'strict-origin-when-cross-origin',
+          'Permissions-Policy': 'geolocation=(), microphone=(), camera=(), payment=()',
+          'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' wss://*.supabase.co https://*.supabase.co https://api.openai.com https://api.stripe.com; frame-ancestors 'none';",
+          // [SECURITY FIX L7] Additional cross-origin isolation headers
+          'Cross-Origin-Embedder-Policy': 'require-corp',
+          'Cross-Origin-Opener-Policy': 'same-origin',
+          'Cross-Origin-Resource-Policy': 'same-origin',
+          // [SECURITY FIX L7] Prevent speculative side-channel attacks
+          'Origin-Agent-Cluster': '?1',
+        }
+      }
+    }
   },
 
   // Vite configuration for Hot Module Replacement (HMR) in Docker
