@@ -88,7 +88,7 @@ export default defineNuxtConfig({
   // Nitro configuration for serverless functions
   nitro: {
     preset: 'vercel',
-    // [SECURITY FIX M5] Security headers at server level
+    // [SECURITY FIX L7] Enhanced security headers at server level
     routeRules: {
       '/**': {
         headers: {
@@ -97,8 +97,14 @@ export default defineNuxtConfig({
           'X-Frame-Options': 'DENY',
           'X-XSS-Protection': '1; mode=block',
           'Referrer-Policy': 'strict-origin-when-cross-origin',
-          'Permissions-Policy': 'geolocation=(), microphone=(), camera=()',
-          'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' wss://*.supabase.co https://*.supabase.co https://api.openai.com https://api.stripe.com;",
+          'Permissions-Policy': 'geolocation=(), microphone=(), camera=(), payment=()',
+          'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' wss://*.supabase.co https://*.supabase.co https://api.openai.com https://api.stripe.com; frame-ancestors 'none';",
+          // [SECURITY FIX L7] Additional cross-origin isolation headers
+          'Cross-Origin-Embedder-Policy': 'require-corp',
+          'Cross-Origin-Opener-Policy': 'same-origin',
+          'Cross-Origin-Resource-Policy': 'same-origin',
+          // [SECURITY FIX L7] Prevent speculative side-channel attacks
+          'Origin-Agent-Cluster': '?1',
         }
       }
     }

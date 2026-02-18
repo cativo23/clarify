@@ -79,6 +79,14 @@ function getRedisClient(): Redis | null {
       return null
     }
 
+    const isProduction = process.env.NODE_ENV === 'production'
+
+    // [SECURITY FIX L6] Enforce authentication and TLS in production
+    if (isProduction && !config.redisToken) {
+      console.error('[SECURITY] Redis authentication not configured in production')
+      throw new Error('Redis authentication required in production environment')
+    }
+
     // [SECURITY FIX M3] Upstash Redis with authentication and TLS
     const redisConfig: any = {
       host: config.redisHost,
@@ -86,11 +94,16 @@ function getRedisClient(): Redis | null {
       maxRetriesPerRequest: 1,
       lazyConnect: true
     }
-    
+
     // Add authentication and TLS for Upstash (production)
     if (config.redisToken) {
       redisConfig.password = config.redisToken
       redisConfig.tls = {} // Enable TLS
+    } else if (isProduction) {
+      // [SECURITY FIX L6] Force TLS in production even without token
+      // This catches misconfiguration where TLS might be disabled
+      console.warn('[SECURITY] Redis TLS enabled but no token configured')
+      redisConfig.tls = {}
     }
 
     return new Redis(redisConfig)
