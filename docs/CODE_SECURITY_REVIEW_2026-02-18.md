@@ -718,13 +718,13 @@ No high severity vulnerabilities found.
 - **admin_emails RLS policies:** ✅ Already implemented correctly with self-referential admin verification
 - **Frontend admin check:** ✅ Downgraded to LOW - backend is authoritative, frontend check is UX optimization
 
-### Medium (4)
+### Medium (3)
 
 | ID | Finding | Location |
 |----|---------|----------|
 | M1 | ✅ **FIXED** - Rate limiting applied to all endpoints | `server/api/user/profile.get.ts`, `server/api/analyses/[id]/status.get.ts` |
 | M2 | CSP allows 'unsafe-inline' and 'unsafe-eval' | `nuxt.config.ts` |
-| M3 | BullMQ missing default job options | `server/utils/queue.ts` |
+| M3 | ✅ **FIXED** - BullMQ default job options added | `server/utils/queue.ts` |
 | M4 | State synchronization risk in composables | `composables/useSupabase.ts` |
 | M5 | Missing content-type validation | `server/api/analyze.post.ts` |
 
@@ -747,7 +747,7 @@ No high severity vulnerabilities found.
 ### Immediate Actions (This Sprint)
 
 1. ✅ **M1 FIXED** - Rate limiting applied to `/api/user/profile` and `/api/analyses/[id]/status`
-2. **Add BullMQ default job options** (M3) - Prevent memory growth from completed/failed jobs
+2. ✅ **M3 FIXED** - BullMQ default job options added (timeout, cleanup)
 3. **Standardize error handling pattern** (L4) - Prefer `createError()` over returning error objects
 
 ### Short-Term (Next Month)
