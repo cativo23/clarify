@@ -1,4 +1,4 @@
-import { useSupabaseUser, useUserState, isUserProfileStale, fetchUserProfile } from '~/composables/useSupabase'
+import { useUserState, isUserProfileStale, fetchUserProfile } from '~/composables/useSupabase'
 
 export default defineNuxtRouteMiddleware(async (_to, _from) => {
     const user = useSupabaseUser()
