@@ -49,22 +49,38 @@
                 <SkeletonAnalysisCard v-for="i in 8" :key="i" />
             </div>
 
+            <!-- Empty State: No Results -->
             <div v-else-if="filteredAnalyses.length === 0"
-                class="text-center py-32 bg-slate-50 dark:bg-slate-900/50 rounded-[3rem] border border-dashed border-slate-200 dark:border-slate-800">
+                class="text-center py-20 bg-slate-50 dark:bg-slate-900/50 rounded-[3rem] border border-dashed border-slate-200 dark:border-slate-800">
                 <div
                     class="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-6 text-slate-300 dark:text-slate-700">
                     <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
-                <h3 class="text-xl font-black text-slate-900 dark:text-white mb-2">No se encontraron resultados</h3>
-                <p class="text-slate-500 dark:text-slate-400 font-medium mb-8">Intenta ajustar tus filtros o búsqueda.
+                <h3 class="text-xl font-black text-slate-900 dark:text-white mb-2">
+                    {{ searchQuery ? `No encontramos "${searchQuery}"` : 'Tu historial está vacío' }}
+                </h3>
+                <p class="text-slate-500 dark:text-slate-400 font-medium mb-8 max-w-md mx-auto">
+                    {{ searchQuery
+                        ? 'No hay contratos que coincidan con tu búsqueda. Intenta con otros términos.'
+                        : 'Comienza analizando tu primer contrato para ver tu historial aquí.'
+                    }}
                 </p>
-                <button v-if="searchQuery || activeFilter !== 'all'" @click="resetFilters"
-                    class="px-8 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-bold text-sm hover:scale-105 transition-all">
-                    Limpiar Filtros
-                </button>
+                <div class="flex items-center justify-center gap-4">
+                    <button v-if="searchQuery || activeFilter !== 'all'" @click="resetFilters"
+                        class="px-6 py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-bold text-sm hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
+                        Limpiar filtros
+                    </button>
+                    <NuxtLink to="/dashboard"
+                        class="px-6 py-3 bg-secondary text-white rounded-xl font-bold text-sm hover:scale-105 transition-all inline-flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Analizar contrato
+                    </NuxtLink>
+                </div>
             </div>
 
             <div v-else class="grid md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
