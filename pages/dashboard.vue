@@ -7,90 +7,81 @@
         <!-- Sidebar: User & Quick Stats -->
         <div class="lg:col-span-1">
           <div :class="[
-            'space-y-6',
+            'flex flex-col gap-6',
             'lg:sticky lg:top-24 lg:z-20',
-            'max-lg:border-b max-lg:pb-6 max-lg:mb-6 max-lg:border-slate-100 dark:max-lg:border-slate-800'
+            'max-lg:border-b max-lg:pb-10 max-lg:mb-10 max-lg:border-slate-100 dark:max-lg:border-slate-800'
           ]">
-          <div
-            class="bg-white dark:bg-slate-900 rounded-[2rem] p-6 border border-slate-100 dark:border-slate-800 shadow-soft relative overflow-hidden group">
-            <div
-              class="absolute w-24 h-24 transition-colors rounded-full -top-4 -right-4 bg-secondary/5 blur-2xl group-hover:bg-secondary/10">
-            </div>
-            <div class="relative z-10 text-center">
-              <div
-                class="flex items-center justify-center w-20 h-20 mx-auto mb-4 text-3xl font-black text-white shadow-lg bg-gradient-to-br from-secondary to-accent-indigo rounded-3xl shadow-secondary/20">
-                {{ user?.email?.charAt(0).toUpperCase() }}
+
+            <!-- ── User Profile Card ── -->
+            <div class="bg-white dark:bg-slate-900 rounded-[2rem] p-6 border border-slate-100 dark:border-slate-800 shadow-lg relative overflow-hidden">
+              <!-- decorative blob -->
+              <div class="absolute w-24 h-24 -top-4 -right-4 rounded-full bg-secondary/5 blur-2xl pointer-events-none"></div>
+              <div class="relative z-10 text-center">
+                <!-- ONE avatar only -->
+                <div class="w-20 h-20 mx-auto mb-4 flex items-center justify-center text-3xl font-black text-white bg-gradient-to-br from-secondary to-accent-indigo rounded-3xl shadow-lg shadow-secondary/20">
+                  {{ user?.email?.charAt(0).toUpperCase() }}
+                </div>
+                <h2 class="mb-1 text-xl font-black truncate text-slate-900 dark:text-white">
+                  {{ user?.email?.split('@')[0] }}
+                </h2>
+                <p class="mb-5 text-[10px] font-bold tracking-widest uppercase text-slate-500 dark:text-slate-400">Plan Estándar</p>
+
+                <!-- Credits badge -->
+                <div class="flex items-center justify-center gap-2 px-4 py-2 mb-4 bg-secondary/10 border border-secondary/20 rounded-xl">
+                  <svg class="w-4 h-4 shrink-0 text-secondary" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" />
+                  </svg>
+                  <span class="text-lg font-black text-secondary">{{ userProfile?.credits || 0 }}</span>
+                  <span class="text-[10px] font-black uppercase tracking-tighter text-slate-500 dark:text-slate-400">Créditos</span>
+                </div>
+
+                <NuxtLink to="/credits"
+                  class="block w-full py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-black text-xs uppercase tracking-widest hover:scale-[1.02] transition-transform active:scale-[0.98]">
+                  Comprar Más
+                </NuxtLink>
               </div>
-              <h2 class="mb-1 text-xl font-black truncate text-slate-900 dark:text-white">{{ user?.email?.split('@')[0]
-                }}
-              </h2>
-
-              <p class="mb-6 text-xs font-bold tracking-widest uppercase text-slate-500 dark:text-slate-400">Plan Estándar</p>
-
-              <div
-                class="flex items-center justify-center gap-2 px-4 py-2 mb-4 border bg-secondary/10 rounded-xl border-secondary/20">
-                <svg class="w-4 h-4 text-secondary" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" />
-                </svg>
-                <span class="text-lg font-black text-secondary">{{ userProfile?.credits || 0 }}</span>
-                <span class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-tighter">Créditos</span>
-              </div>
-
-              <NuxtLink to="/credits"
-                class="block w-full py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-black text-xs uppercase tracking-widest hover:scale-[1.02] transition-all active:scale-[0.98]">
-                Comprar Más
-              </NuxtLink>
             </div>
-          </div>
 
-          <!-- Quick Metrics -->
-          <div
-            class="bg-slate-900 rounded-[2rem] p-6 text-white border border-slate-800 shadow-xl relative overflow-hidden group">
-            <div
-              class="absolute top-0 right-0 w-32 h-32 -mt-16 -mr-16 transition-colors rounded-full bg-secondary/20 blur-3xl group-hover:bg-secondary/30">
-            </div>
-            <div class="relative z-10">
-              <div class="flex items-center justify-between mb-6">
-                <h3 class="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">Resumen de Seguridad</h3>
-                <span
-                  class="px-2 py-0.5 bg-secondary/20 text-secondary text-[8px] font-black uppercase rounded-full border border-secondary/30">
-                  En Vivo
-                </span>
-              </div>
+            <!-- ── Security Summary Card ── -->
+            <div class="bg-white dark:bg-slate-900 rounded-[2rem] p-6 border border-slate-100 dark:border-slate-800 shadow-lg relative overflow-hidden">
+              <!-- decorative blob -->
+              <div class="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-secondary/10 blur-3xl pointer-events-none"></div>
+              <div class="relative z-10">
+                <div class="flex items-center justify-between mb-5">
+                  <h3 class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">Resumen de Seguridad</h3>
+                  <span class="px-2 py-0.5 bg-secondary/10 text-secondary text-[8px] font-black uppercase rounded-full border border-secondary/20">
+                    En Vivo
+                  </span>
+                </div>
 
-              <div class="space-y-6">
-                <!-- Safety Score -->
-                <div class="flex items-center gap-4">
-                  <div class="relative flex items-center justify-center">
-                    <svg class="w-16 h-16 transform -rotate-90">
+                <!-- Safety Score donut -->
+                <div class="flex items-center gap-4 mb-5">
+                  <div class="relative flex items-center justify-center shrink-0">
+                    <svg class="w-16 h-16 -rotate-90">
                       <circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="6" fill="transparent"
-                        class="text-slate-800" />
+                        class="text-slate-100 dark:text-slate-800" />
                       <circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="6" fill="transparent"
                         :stroke-dasharray="2 * Math.PI * 28"
                         :stroke-dashoffset="(1 - safetyScore / 100) * (2 * Math.PI * 28)"
-                        class="transition-all duration-1000 ease-out text-secondary" />
+                        class="text-secondary transition-all duration-1000 ease-out" />
                     </svg>
-                    <span class="absolute text-sm font-black">{{ safetyScore }}%</span>
+                    <span class="absolute text-sm font-black text-slate-900 dark:text-white">{{ safetyScore }}%</span>
                   </div>
                   <div>
-                    <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tighter">Índice de Protección</p>
-                    <p class="text-xs font-black text-white">{{ safetyScore > 80 ? 'Seguridad Alta' : safetyScore > 50 ?
-                      'Seguridad Media' : 'Atención Requerida' }}</p>
+                    <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tighter mb-0.5">Índice de Protección</p>
+                    <p class="text-xs font-black text-slate-900 dark:text-white">
+                      {{ safetyScore > 80 ? 'Seguridad Alta' : safetyScore > 50 ? 'Seguridad Media' : 'Atención Requerida' }}
+                    </p>
                   </div>
                 </div>
 
+                <!-- Divider label -->
+                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Indicadores Mensuales</p>
 
-
-                <!-- Monthly Stats Label -->
-                <div class="pt-2">
-                  <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Indicadores Mensuales</p>
-                </div>
-
-                <!-- Stats Grid -->
-                <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-800">
+                <!-- Stats -->
+                <div class="grid grid-cols-2 gap-3 pt-3 border-t border-slate-100 dark:border-slate-800 mb-4">
                   <div>
-                    <p class="text-xl font-black text-white">{{ totalCriticalFindings }}</p>
+                    <p class="text-xl font-black text-slate-900 dark:text-white">{{ totalCriticalFindings }}</p>
                     <p class="text-[9px] font-bold text-slate-500 uppercase">Puntos Críticos</p>
                   </div>
                   <div class="text-right">
@@ -100,18 +91,18 @@
                 </div>
 
                 <!-- Last Audit -->
-                <div class="flex items-center justify-between p-3 border bg-white/5 rounded-2xl border-white/5">
+                <div class="flex items-center justify-between px-3 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 rounded-2xl">
                   <div class="flex items-center gap-2">
-                    <div class="w-2 h-2 rounded-full bg-secondary animate-pulse"></div>
+                    <span class="w-2 h-2 rounded-full bg-secondary animate-pulse shrink-0"></span>
                     <span class="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase">Última Auditoría</span>
                   </div>
-                  <span class="text-[10px] font-black text-white">{{ lastAnalysisDate }}</span>
+                  <span class="text-[10px] font-black text-slate-900 dark:text-white">{{ lastAnalysisDate }}</span>
                 </div>
               </div>
             </div>
+
           </div>
         </div>
-      </div>
 
       <!-- Center: Distribution & New Analysis -->
         <div class="space-y-8 lg:col-span-3">
