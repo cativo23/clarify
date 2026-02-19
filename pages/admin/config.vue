@@ -4,6 +4,8 @@ definePageMeta({
     layout: 'admin'
 })
 
+import { vClickOutside } from '~/composables/useClickOutside'
+
 const config = ref<any>({
     promptVersion: 'v2',
     tiers: {
@@ -134,21 +136,6 @@ const selectModel = (plan: 'basic' | 'premium' | 'forensic', modelId: string) =>
         showDropdownForensic.value = false
         searchForensic.value = ''
     }
-}
-
-// Click outside directive
-const vClickOutside = {
-  mounted(el: any, binding: any) {
-    el.clickOutsideEvent = (event: Event) => {
-      if (!(el === event.target || el.contains(event.target))) {
-        binding.value()
-      }
-    }
-    document.addEventListener('click', el.clickOutsideEvent)
-  },
-  unmounted(el: any) {
-    document.removeEventListener('click', el.clickOutsideEvent)
-  },
 }
 </script>
 

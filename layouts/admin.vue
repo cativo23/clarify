@@ -155,6 +155,8 @@
 </template>
 
 <script setup lang="ts">
+import { vClickOutside } from '~/composables/useClickOutside'
+
 const user = useSupabaseUser()
 const sidebarOpen = ref(false)
 const showUserMenu = ref(false)
@@ -171,20 +173,5 @@ const userEmail = computed(() => user.value?.email || '')
 
 const handleSignOut = async () => {
   await signOut()
-}
-
-// Click outside directive implementation
-const vClickOutside = {
-  mounted(el: any, binding: any) {
-    el.clickOutsideEvent = (event: Event) => {
-      if (!(el === event.target || el.contains(event.target))) {
-        binding.value()
-      }
-    }
-    document.addEventListener('click', el.clickOutsideEvent)
-  },
-  unmounted(el: any) {
-    document.removeEventListener('click', el.clickOutsideEvent)
-  },
 }
 </script>
