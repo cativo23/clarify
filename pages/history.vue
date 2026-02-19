@@ -45,10 +45,8 @@
             </div>
 
             <!-- Content -->
-            <div v-if="loading" class="flex flex-col items-center justify-center py-24">
-                <LoadingSpinner size="xl" />
-                <p class="mt-6 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-[10px] animate-pulse">
-                    Sincronizando con la nube...</p>
+            <div v-if="loading" class="grid md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
+                <SkeletonAnalysisCard v-for="i in 8" :key="i" />
             </div>
 
             <div v-else-if="filteredAnalyses.length === 0"

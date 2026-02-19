@@ -267,10 +267,15 @@
                 class="text-xs font-black tracking-widest uppercase text-secondary hover:underline">Ver Todo</NuxtLink>
             </div>
 
-            <div v-if="loading" class="py-12 text-center">
-              <LoadingSpinner size="lg" />
-              <p class="mt-4 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-[10px]">Sincronizando contrato...</p>
+            <div v-if="loading" class="grid gap-8 lg:grid-cols-4">
+            <!-- Sidebar Skeleton -->
+            <SkeletonSidebar />
+            <!-- Main Content Skeleton -->
+            <div class="lg:col-span-3 space-y-8">
+              <SkeletonCard />
+              <SkeletonCard />
             </div>
+          </div>
 
             <div v-else-if="analyses.length === 0"
               class="text-center py-20 bg-slate-50 dark:bg-slate-900/50 rounded-[2.5rem] border border-dashed border-slate-200 dark:border-slate-800">
