@@ -6,7 +6,11 @@
       <div class="grid gap-8 mb-12 lg:grid-cols-4">
         <!-- Sidebar: User & Quick Stats -->
         <div class="lg:col-span-1">
-          <div class="lg:sticky lg:top-24 space-y-6 z-20">
+          <div :class="[
+            'space-y-6',
+            'lg:sticky lg:top-24 lg:z-20',
+            'max-lg:border-b max-lg:pb-6 max-lg:mb-6 max-lg:border-slate-100 dark:max-lg:border-slate-800'
+          ]">
           <div
             class="bg-white dark:bg-slate-900 rounded-[2rem] p-6 border border-slate-100 dark:border-slate-800 shadow-soft relative overflow-hidden group">
             <div
