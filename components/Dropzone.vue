@@ -61,27 +61,46 @@
     </div>
 
     <!-- Selected File Preview -->
-    <div v-if="selectedFile" class="mt-6 p-6 bg-slate-50 dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 flex items-center justify-between animate-slide-up shadow-premium">
-      <div class="flex items-center gap-4">
-        <div class="w-12 h-12 bg-risk-high/10 rounded-xl flex items-center justify-center text-risk-high shadow-inner">
-          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd" />
-          </svg>
+    <div v-if="selectedFile" class="mt-6 p-6 bg-slate-50 dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 animate-slide-up shadow-premium">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-risk-high/10 rounded-xl flex items-center justify-center text-risk-high shadow-inner">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div>
+            <p class="font-bold text-slate-900 dark:text-white leading-tight">{{ selectedFile.name }}</p>
+            <p class="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mt-1">{{ formatFileSize(selectedFile.size) }}</p>
+          </div>
         </div>
-        <div>
-          <p class="font-bold text-slate-900 dark:text-white leading-tight">{{ selectedFile.name }}</p>
-          <p class="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mt-1">{{ formatFileSize(selectedFile.size) }}</p>
+        <button
+          v-if="!isUploading"
+          @click.stop="clearFile"
+          class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-risk-high hover:text-white transition-all flex items-center justify-center"
+          title="Eliminar archivo"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Upload Progress Bar -->
+      <div v-if="isUploading || uploadProgress !== undefined" class="space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+            {{ isUploading ? 'Subiendo...' : uploadProgress === 100 ? 'Completado' : `Progreso: ${uploadProgress}%` }}
+          </span>
+          <span class="text-xs font-black text-secondary">{{ uploadProgress ?? 0 }}%</span>
+        </div>
+        <div class="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+          <div
+            class="h-full bg-gradient-to-r from-secondary to-accent-indigo transition-all duration-300 ease-out rounded-full"
+            :style="{ width: `${uploadProgress ?? 0}%` }"
+          ></div>
         </div>
       </div>
-      <button
-        @click.stop="clearFile"
-        class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-risk-high hover:text-white transition-all flex items-center justify-center"
-        title="Eliminar archivo"
-      >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
     </div>
 
     <!-- Error Message -->
@@ -94,6 +113,8 @@
 <script setup lang="ts">
 const props = defineProps<{
   modelValue?: File | null
+  uploadProgress?: number
+  isUploading?: boolean
 }>()
 
 const emit = defineEmits<{
