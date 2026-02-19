@@ -1,7 +1,7 @@
 <template>
   <footer
     class="bg-white dark:bg-slate-950 py-20 border-t border-slate-100 dark:border-slate-900 transition-colors duration-500">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl 2xl:max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid md:grid-cols-4 gap-12">
         <div class="col-span-2">
           <h3 class="text-2xl font-black text-slate-900 dark:text-white mb-6">Clarify</h3>

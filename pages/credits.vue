@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-white dark:bg-slate-950 transition-colors duration-500">
 
     <!-- Main Content -->
-    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <main class="max-w-5xl 2xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div class="text-center mb-12 animate-fade-in">
         <h1 class="text-4xl lg:text-5xl font-black text-slate-900 dark:text-white mb-4">Compra Créditos</h1>
         <p class="text-xl text-slate-500 dark:text-slate-400">

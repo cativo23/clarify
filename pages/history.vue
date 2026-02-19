@@ -1,6 +1,6 @@
 <template>
     <div class="min-h-screen bg-white dark:bg-slate-950 transition-colors duration-500">
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main class="max-w-7xl 2xl:max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
             <!-- Header Section -->
             <div class="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -69,7 +69,7 @@
                 </button>
             </div>
 
-            <div v-else class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div v-else class="grid md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
                 <NuxtLink v-for="analysis in filteredAnalyses" :key="analysis.id" :to="`/analyze/${analysis.id}`"
                     class="group bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2.5rem] p-6 hover:border-secondary/50 hover:shadow-premium transition-all relative overflow-hidden">
                     <!-- Background Decoration -->
