@@ -21,7 +21,7 @@
                 }}
               </h2>
 
-              <p class="mb-6 text-xs font-bold tracking-widest uppercase text-slate-400">Plan Estándar</p>
+              <p class="mb-6 text-xs font-bold tracking-widest uppercase text-slate-500 dark:text-slate-400">Plan Estándar</p>
 
               <div
                 class="flex items-center justify-center gap-2 px-4 py-2 mb-4 border bg-secondary/10 rounded-xl border-secondary/20">
@@ -30,7 +30,7 @@
                     d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" />
                 </svg>
                 <span class="text-lg font-black text-secondary">{{ userProfile?.credits || 0 }}</span>
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Créditos</span>
+                <span class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-tighter">Créditos</span>
               </div>
 
               <NuxtLink to="/credits"
@@ -48,7 +48,7 @@
             </div>
             <div class="relative z-10">
               <div class="flex items-center justify-between mb-6">
-                <h3 class="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Resumen de Seguridad</h3>
+                <h3 class="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">Resumen de Seguridad</h3>
                 <span
                   class="px-2 py-0.5 bg-secondary/20 text-secondary text-[8px] font-black uppercase rounded-full border border-secondary/30">
                   En Vivo
@@ -70,7 +70,7 @@
                     <span class="absolute text-sm font-black">{{ safetyScore }}%</span>
                   </div>
                   <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Índice de Protección</p>
+                    <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tighter">Índice de Protección</p>
                     <p class="text-xs font-black text-white">{{ safetyScore > 80 ? 'Seguridad Alta' : safetyScore > 50 ?
                       'Seguridad Media' : 'Atención Requerida' }}</p>
                   </div>
@@ -99,7 +99,7 @@
                 <div class="flex items-center justify-between p-3 border bg-white/5 rounded-2xl border-white/5">
                   <div class="flex items-center gap-2">
                     <div class="w-2 h-2 rounded-full bg-secondary animate-pulse"></div>
-                    <span class="text-[9px] font-bold text-slate-400 uppercase">Última Auditoría</span>
+                    <span class="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase">Última Auditoría</span>
                   </div>
                   <span class="text-[10px] font-black text-white">{{ lastAnalysisDate }}</span>
                 </div>
@@ -139,7 +139,7 @@
               <div class="absolute inset-0 flex flex-col items-center justify-center">
                 <span class="text-3xl font-black text-slate-900 dark:text-white">{{ analyses.length }}</span>
                 <span
-                  class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center leading-3">Contratos<br />Auditados</span>
+                  class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest text-center leading-3">Contratos<br />Auditados</span>
               </div>
             </div>
           </div>
@@ -164,7 +164,7 @@
             <div v-if="selectedFile" class="space-y-8 animate-slide-up">
               <!-- Analysis Type Selector -->
               <div>
-                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4">
+                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-4">
                   Elige el nivel de protección
                 </label>
                 <AnalysisSelector v-model="analysisType" :user-credits="userProfile?.credits || 0" />
@@ -187,7 +187,7 @@
                  <div :class="['p-3 rounded-xl border flex items-center justify-between text-xs font-bold', 
                     tokenCheckResult.suggestion === analysisType || tokenCheckResult.fitsInBasic ? 'bg-green-50 text-green-700 border-green-200' : 'bg-amber-50 text-amber-700 border-amber-200']">
                     <div>
-                        <span class="block text-[10px] uppercase tracking-widest text-slate-400 mb-0.5">Tamaño Documento</span>
+                        <span class="block text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-0.5">Tamaño Documento</span>
                         <span>{{ tokenCheckResult.originalTokens.toLocaleString() }} tokens estimados</span>
                     </div>
                     <div class="text-right">
@@ -242,7 +242,7 @@
                 </div>
                 <div class="flex items-center gap-4">
                   <button @click="analysisType = 'basic'"
-                    class="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+                    class="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
                     Usar Rápido (1)
                   </button>
                   <NuxtLink to="/credits"
@@ -269,7 +269,7 @@
 
             <div v-if="loading" class="py-12 text-center">
               <LoadingSpinner size="lg" />
-              <p class="mt-4 text-slate-400 font-bold uppercase tracking-widest text-[10px]">Sincronizando contrato...</p>
+              <p class="mt-4 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-[10px]">Sincronizando contrato...</p>
             </div>
 
             <div v-else-if="analyses.length === 0"
@@ -307,7 +307,7 @@
                     <div>
                       <h3 class="font-black text-slate-900 dark:text-white group-hover:text-secondary line-clamp-1 truncate">{{ analysis.contract_name }}</h3>
                       <div class="flex items-center gap-2">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ formatDate(analysis.created_at) }}</span>
+                        <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">{{ formatDate(analysis.created_at) }}</span>
                         <span class="w-1 h-1 rounded-full bg-slate-200 dark:bg-slate-800"></span>
                         <span class="text-[9px] font-black uppercase tracking-tighter">{{ analysis.status === 'completed' ? (analysis.risk_level === 'high' ? 'Alto Riesgo' : analysis.risk_level === 'medium' ? 'Cautela' : 'Seguro') : 'Fallido' }}</span>
                       </div>
@@ -317,15 +317,15 @@
 
                 <div v-else class="group p-5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2rem] transition-all flex items-center justify-between opacity-70 cursor-wait">
                   <div class="flex items-center gap-4">
-                    <div class="flex items-center justify-center w-14 h-14 rounded-2xl bg-slate-100 text-slate-400">
+                    <div class="flex items-center justify-center w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
                       <span v-if="analysis.status === 'processing'" class="w-6 h-6 border-2 rounded-full border-secondary/30 border-t-secondary animate-spin"></span>
                       <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </div>
                     <div>
                       <h3 class="font-black text-slate-900 dark:text-white line-clamp-1">{{ analysis.contract_name }}</h3>
                       <div class="flex items-center gap-2">
-                        <span class="text-[10px] font-bold text-slate-400">{{ formatDate(analysis.created_at) }}</span>
-                        <span class="text-[9px] font-black uppercase text-slate-400">{{ analysis.status === 'processing' ? 'Analizando...' : 'Pendiente' }}</span>
+                        <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400">{{ formatDate(analysis.created_at) }}</span>
+                        <span class="text-[9px] font-black uppercase text-slate-500 dark:text-slate-400">{{ analysis.status === 'processing' ? 'Analizando...' : 'Pendiente' }}</span>
                       </div>
                     </div>
                   </div>

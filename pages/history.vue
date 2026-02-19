@@ -6,7 +6,7 @@
             <div class="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
                     <NuxtLink to="/dashboard"
-                        class="group flex items-center gap-2 text-slate-400 hover:text-secondary mb-4 transition-colors">
+                        class="group flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-secondary mb-4 transition-colors">
                         <svg class="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
@@ -23,7 +23,7 @@
                     <div class="relative w-full sm:w-64">
                         <input v-model="searchQuery" type="text" placeholder="Buscar contrato..."
                             class="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-secondary/50 focus:border-secondary text-slate-900 dark:text-white transition-all outline-none font-bold" />
-                        <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none"
+                        <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 dark:text-slate-400" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -36,7 +36,7 @@
                             'px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all',
                             activeFilter === filter.id
                                 ? 'bg-white dark:bg-slate-800 text-secondary shadow-sm'
-                                : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
+                                : 'text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
                         ]">
                             {{ filter.label }}
                         </button>
@@ -47,7 +47,7 @@
             <!-- Content -->
             <div v-if="loading" class="flex flex-col items-center justify-center py-24">
                 <LoadingSpinner size="xl" />
-                <p class="mt-6 text-slate-400 font-bold uppercase tracking-widest text-[10px] animate-pulse">
+                <p class="mt-6 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-[10px] animate-pulse">
                     Sincronizando con la nube...</p>
             </div>
 
@@ -101,7 +101,7 @@
                                 <div v-else-if="analysis.status === 'processing'">
                                     <LoadingSpinner size="sm" color="white" />
                                 </div>
-                                <svg v-else class="w-7 h-7 text-slate-400" fill="none" stroke="currentColor"
+                                <svg v-else class="w-7 h-7 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
@@ -124,10 +124,10 @@
                         </h3>
 
                         <div class="flex items-center gap-2 mb-6">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{
+                            <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">{{
                                 formatDate(analysis.created_at) }}</span>
                             <span class="w-1 h-1 bg-slate-200 dark:bg-slate-800 rounded-full"></span>
-                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{
+                            <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">{{
                                 analysis.status === 'completed' ? 'Finalizado' : 'En Cola' }}</span>
                         </div>
 
@@ -135,7 +135,7 @@
                             class="flex items-center justify-between pt-6 border-t border-slate-50 dark:border-slate-800">
                             <span class="text-xs font-bold text-slate-500">Ver reporte completo</span>
                             <div
-                                class="w-8 h-8 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:bg-secondary group-hover:text-white transition-all">
+                                class="w-8 h-8 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 group-hover:bg-secondary group-hover:text-white transition-all">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
                                         d="M9 5l7 7-7 7" />
