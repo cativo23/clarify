@@ -11,8 +11,8 @@ async function globalSetup(config: FullConfig) {
     try {
         await page.goto(baseURL + '/login');
         await page.getByLabel('Email').fill('admin@clarify.com');
-        await page.getByLabel('Password').fill('password123');
-        await page.getByRole('button', { name: 'Iniciar Sesión' }).click();
+        await page.getByLabel('Contraseña').fill('password123');
+        await page.getByRole('button', { name: 'Ingresar' }).click();
 
         // Wait for redirect to dashboard to ensure cookie is set
         await page.waitForURL('**/dashboard');
