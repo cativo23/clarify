@@ -1,7 +1,7 @@
 <template>
   <header
     class="sticky top-0 z-50 border-b bg-white/80 dark:bg-slate-900/80 border-primary-100 dark:border-slate-800 backdrop-blur-xl">
-    <div class="px-4 py-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+    <div class="px-4 py-4 mx-auto max-w-7xl 2xl:max-w-screen-2xl sm:px-6 lg:px-8">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-8">
           <NuxtLink :to="user ? '/dashboard' : '/'"

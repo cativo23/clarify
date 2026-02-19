@@ -1,11 +1,12 @@
 <template>
   <div class="min-h-screen transition-colors duration-500 bg-white dark:bg-slate-950">
 
-    <main class="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
+    <main class="px-4 py-8 mx-auto max-w-7xl 2xl:max-w-screen-2xl sm:px-6 lg:px-8">
       <!-- New Dashboard Layout -->
       <div class="grid gap-8 mb-12 lg:grid-cols-4">
         <!-- Sidebar: User & Quick Stats -->
-        <div class="space-y-6 lg:col-span-1">
+        <div class="lg:col-span-1">
+          <div class="lg:sticky lg:top-24 space-y-6 z-20">
           <div
             class="bg-white dark:bg-slate-900 rounded-[2rem] p-6 border border-slate-100 dark:border-slate-800 shadow-soft relative overflow-hidden group">
             <div
@@ -75,8 +76,15 @@
                   </div>
                 </div>
 
+
+
+                <!-- Monthly Stats Label -->
+                <div class="pt-2">
+                  <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Indicadores Mensuales</p>
+                </div>
+
                 <!-- Stats Grid -->
-                <div class="grid grid-cols-2 gap-4 pt-6 border-t border-slate-800">
+                <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-800">
                   <div>
                     <p class="text-xl font-black text-white">{{ totalCriticalFindings }}</p>
                     <p class="text-[9px] font-bold text-slate-500 uppercase">Puntos Críticos</p>
@@ -99,8 +107,9 @@
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- Center: Distribution & New Analysis -->
+      <!-- Center: Distribution & New Analysis -->
         <div class="space-y-8 lg:col-span-3">
           <!-- Distribution Chart Area -->
           <div
@@ -242,115 +251,88 @@
                   </NuxtLink>
                 </div>
               </div>
-            </div>
 
-            <div v-if="analyzeError" class="p-4 mt-4 border bg-risk-high/10 border-risk-high rounded-2xl animate-shake">
-              <p class="text-xs font-bold text-risk-high">{{ analyzeError }}</p>
+              <!-- Error Message -->
+              <div v-if="analyzeError" class="p-4 mt-4 border bg-risk-high/10 border-risk-high rounded-2xl animate-shake">
+                <p class="text-xs font-bold text-risk-high">{{ analyzeError }}</p>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- Recent Analyses -->
-      <div class="mb-12">
-        <div class="flex items-center justify-between mb-8">
-          <h2 class="text-2xl font-black text-slate-900 dark:text-white">Análisis Recientes</h2>
-          <NuxtLink v-if="analyses.length > 5" to="/history"
-            class="text-xs font-black tracking-widest uppercase text-secondary hover:underline">Ver Todo</NuxtLink>
-        </div>
-
-        <div v-if="loading" class="py-12 text-center">
-          <LoadingSpinner size="lg" />
-          <p class="mt-4 text-slate-400 font-bold uppercase tracking-widest text-[10px]">Sincronizando contrato...</p>
-        </div>
-
-        <div v-else-if="analyses.length === 0"
-          class="text-center py-20 bg-slate-50 dark:bg-slate-900/50 rounded-[2.5rem] border border-dashed border-slate-200 dark:border-slate-800">
-          <svg class="w-16 h-16 mx-auto mb-4 text-slate-200 dark:text-slate-800" fill="none" stroke="currentColor"
-            viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          <p class="mb-1 font-black text-slate-900 dark:text-white">Aún no has analizado contratos</p>
-          <p class="text-sm font-medium text-slate-500 dark:text-slate-500">Sube tu primer documento para comenzar.</p>
-        </div>
-
-        <div v-else class="grid gap-4 md:grid-cols-2">
-          <template v-for="analysis in analyses.slice(0, 6)" :key="analysis.id">
-            <!-- Clickable Card (Completed/Failed) -->
-            <NuxtLink v-if="analysis.status === 'completed' || analysis.status === 'failed'" 
-              :to="`/analyze/${analysis.id}`"
-              class="group p-5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2rem] transition-all flex items-center justify-between hover:border-secondary/50 hover:shadow-premium cursor-pointer">
-              
-              <div class="flex items-center gap-4">
-                <div :class="[
-                  'w-14 h-14 rounded-2xl flex items-center justify-center transition-all group-hover:scale-110',
-                  analysis.risk_level === 'high' ? 'bg-risk-high/10 text-risk-high' :
-                    analysis.risk_level === 'medium' ? 'bg-risk-medium/10 text-risk-medium' :
-                      analysis.risk_level === 'low' ? 'bg-risk-low/10 text-risk-low' : 'bg-slate-100 text-slate-400'
-                ]">
-                  <svg v-if="analysis.status === 'completed'" class="w-7 h-7" fill="none" stroke="currentColor"
-                    viewBox="0 0 24 24">
-                    <path v-if="analysis.risk_level === 'high'" stroke-linecap="round" stroke-linejoin="round"
-                      stroke-width="2.5"
-                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    <path v-else-if="analysis.risk_level === 'medium'" stroke-linecap="round" stroke-linejoin="round"
-                      stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                  </svg>
-                  <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 class="font-black transition-colors text-slate-900 dark:text-white group-hover:text-secondary line-clamp-1">
-                    {{ analysis.contract_name }}
-                  </h3>
-                  <div class="flex items-center gap-2">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ formatDate(analysis.created_at) }}</span>
-                    <span class="w-1 h-1 rounded-full bg-slate-200 dark:bg-slate-800"></span>
-                    <span :class="[
-                      'text-[9px] font-black uppercase tracking-tighter',
-                      analysis.status === 'completed' ? (analysis.risk_level === 'high' ? 'text-risk-high' : analysis.risk_level === 'medium' ? 'text-risk-medium' : 'text-risk-low') : 'text-slate-400'
-                    ]">
-                      {{ analysis.status === 'completed' ? (analysis.risk_level === 'high' ? 'Alto Riesgo' : analysis.risk_level === 'medium' ? 'Cautela' : 'Seguro') : 'Fallido' }}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div class="flex items-center justify-center w-8 h-8 transition-all rounded-full text-slate-200 group-hover:text-secondary group-hover:bg-secondary/10">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </NuxtLink>
-
-            <!-- Non-clickable Card (Processing/Pending) -->
-            <div v-else 
-              class="group p-5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2rem] transition-all flex items-center justify-between opacity-70 cursor-wait">
-              
-              <div class="flex items-center gap-4">
-                <div class="flex items-center justify-center w-14 h-14 rounded-2xl bg-slate-100 text-slate-400">
-                   <span v-if="analysis.status === 'processing'" class="w-6 h-6 border-2 rounded-full border-secondary/30 border-t-secondary animate-spin"></span>
-                   <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 class="font-black text-slate-900 dark:text-white line-clamp-1">
-                    {{ analysis.contract_name }}
-                  </h3>
-                  <div class="flex items-center gap-2">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ formatDate(analysis.created_at) }}</span>
-                    <span class="w-1 h-1 rounded-full bg-slate-200 dark:bg-slate-800"></span>
-                    <span class="text-[9px] font-black uppercase tracking-tighter text-slate-400">
-                      {{ analysis.status === 'processing' ? 'Analizando...' : 'Pendiente' }}
-                    </span>
-                  </div>
-                </div>
-              </div>
+          <!-- Recent Analyses -->
+          <div class="mt-12 mb-12">
+            <div class="flex items-center justify-between mb-8">
+              <h2 class="text-2xl font-black text-slate-900 dark:text-white">Análisis Recientes</h2>
+              <NuxtLink v-if="analyses.length > 5" to="/history"
+                class="text-xs font-black tracking-widest uppercase text-secondary hover:underline">Ver Todo</NuxtLink>
             </div>
-          </template>
+
+            <div v-if="loading" class="py-12 text-center">
+              <LoadingSpinner size="lg" />
+              <p class="mt-4 text-slate-400 font-bold uppercase tracking-widest text-[10px]">Sincronizando contrato...</p>
+            </div>
+
+            <div v-else-if="analyses.length === 0"
+              class="text-center py-20 bg-slate-50 dark:bg-slate-900/50 rounded-[2.5rem] border border-dashed border-slate-200 dark:border-slate-800">
+              <svg class="w-16 h-16 mx-auto mb-4 text-slate-200 dark:text-slate-800" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <p class="mb-1 font-black text-slate-900 dark:text-white">Aún no has analizado contratos</p>
+              <p class="text-sm font-medium text-slate-500 dark:text-slate-500">Sube tu primer documento para comenzar.</p>
+            </div>
+
+            <div v-else class="grid gap-6 md:grid-cols-2 2xl:grid-cols-4">
+              <template v-for="analysis in analyses.slice(0, 6)" :key="analysis.id">
+                <NuxtLink v-if="analysis.status === 'completed' || analysis.status === 'failed'" 
+                  :to="`/analyze/${analysis.id}`"
+                  class="group p-5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2rem] transition-all flex items-center justify-between hover:border-secondary/50 hover:shadow-premium cursor-pointer">
+                  <div class="flex items-center gap-4">
+                    <div :class="[
+                      'w-14 h-14 rounded-2xl flex items-center justify-center transition-all group-hover:scale-110',
+                      analysis.risk_level === 'high' ? 'bg-risk-high/10 text-risk-high' :
+                        analysis.risk_level === 'medium' ? 'bg-risk-medium/10 text-risk-medium' :
+                          analysis.risk_level === 'low' ? 'bg-risk-low/10 text-risk-low' : 'bg-slate-100 text-slate-400'
+                    ]">
+                      <svg v-if="analysis.status === 'completed'" class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path v-if="analysis.risk_level === 'high'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        <path v-else-if="analysis.risk_level === 'medium'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                      </svg>
+                      <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 class="font-black text-slate-900 dark:text-white group-hover:text-secondary line-clamp-1 truncate">{{ analysis.contract_name }}</h3>
+                      <div class="flex items-center gap-2">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ formatDate(analysis.created_at) }}</span>
+                        <span class="w-1 h-1 rounded-full bg-slate-200 dark:bg-slate-800"></span>
+                        <span class="text-[9px] font-black uppercase tracking-tighter">{{ analysis.status === 'completed' ? (analysis.risk_level === 'high' ? 'Alto Riesgo' : analysis.risk_level === 'medium' ? 'Cautela' : 'Seguro') : 'Fallido' }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </NuxtLink>
+
+                <div v-else class="group p-5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2rem] transition-all flex items-center justify-between opacity-70 cursor-wait">
+                  <div class="flex items-center gap-4">
+                    <div class="flex items-center justify-center w-14 h-14 rounded-2xl bg-slate-100 text-slate-400">
+                      <span v-if="analysis.status === 'processing'" class="w-6 h-6 border-2 rounded-full border-secondary/30 border-t-secondary animate-spin"></span>
+                      <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </div>
+                    <div>
+                      <h3 class="font-black text-slate-900 dark:text-white line-clamp-1">{{ analysis.contract_name }}</h3>
+                      <div class="flex items-center gap-2">
+                        <span class="text-[10px] font-bold text-slate-400">{{ formatDate(analysis.created_at) }}</span>
+                        <span class="text-[9px] font-black uppercase text-slate-400">{{ analysis.status === 'processing' ? 'Analizando...' : 'Pendiente' }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </div>
         </div>
       </div>
     </main>
@@ -483,7 +465,7 @@ const setupRealtimeSubscription = () => {
         event: 'UPDATE',
         schema: 'public',
         table: 'analyses',
-        filter: `user_id=eq.${user.value.id}`
+        filter: `user_id=eq.${user.value?.id}`
       },
       async (payload) => {
         const updatedAnalysis = payload.new as Analysis
@@ -506,7 +488,7 @@ const setupRealtimeSubscription = () => {
              const { data: profile, error } = await supabase
                .from('users')
                .select('*')
-               .eq('id', user.value.id)
+               .eq('id', user.value?.id)
                .single()
 
              if (error) {
@@ -517,7 +499,7 @@ const setupRealtimeSubscription = () => {
                  const { data: refreshedProfile, error: refreshError } = await supabase
                    .from('users')
                    .select('*')
-                   .eq('id', user.value.id)
+                   .eq('id', user.value?.id)
                    .single()
 
                  if (refreshError) {
