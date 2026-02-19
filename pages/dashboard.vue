@@ -329,9 +329,16 @@
                     <div>
                       <h3 class="font-black text-slate-900 dark:text-white group-hover:text-secondary line-clamp-1 truncate">{{ analysis.contract_name }}</h3>
                       <div class="flex items-center gap-2">
-                        <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">{{ formatDate(analysis.created_at) }}</span>
-                        <span class="w-1 h-1 rounded-full bg-slate-200 dark:bg-slate-800"></span>
-                        <span class="text-[9px] font-black uppercase tracking-tighter">{{ analysis.status === 'completed' ? (analysis.risk_level === 'high' ? 'Alto Riesgo' : analysis.risk_level === 'medium' ? 'Cautela' : 'Seguro') : 'Fallido' }}</span>
+                        <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400">{{ timeAgo(analysis.created_at) }}</span>
+                        <span class="w-1.5 h-1.5 rounded-full" :class="[
+                          analysis.status === 'processing' ? 'bg-secondary animate-pulse' :
+                          analysis.risk_level === 'high' ? 'bg-risk-high' :
+                          analysis.risk_level === 'medium' ? 'bg-risk-medium' :
+                          analysis.risk_level === 'low' ? 'bg-risk-low' : 'bg-slate-400'
+                        ]"></span>
+                        <span class="text-[9px] font-black uppercase tracking-tighter" :class="[
+                          analysis.status === 'completed' ? (analysis.risk_level === 'high' ? 'text-risk-high' : analysis.risk_level === 'medium' ? 'text-risk-medium' : 'text-risk-low') : 'text-slate-400'
+                        ]">{{ analysis.status === 'completed' ? (analysis.risk_level === 'high' ? 'Alto Riesgo' : analysis.risk_level === 'medium' ? 'Cautela' : 'Seguro') : 'Fallido' }}</span>
                       </div>
                     </div>
                   </div>
@@ -346,7 +353,8 @@
                     <div>
                       <h3 class="font-black text-slate-900 dark:text-white line-clamp-1">{{ analysis.contract_name }}</h3>
                       <div class="flex items-center gap-2">
-                        <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400">{{ formatDate(analysis.created_at) }}</span>
+                        <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400">{{ timeAgo(analysis.created_at) }}</span>
+                        <span v-if="analysis.status === 'processing'" class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
                         <span class="text-[9px] font-black uppercase text-slate-500 dark:text-slate-400">{{ analysis.status === 'processing' ? 'Analizando...' : 'Pendiente' }}</span>
                       </div>
                     </div>
@@ -363,6 +371,7 @@
 
 <script setup lang="ts">
 import type { Analysis } from '~/types'
+import { timeAgo } from '~/composables/useTimeAgo'
 
 definePageMeta({
   middleware: 'auth',
