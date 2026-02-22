@@ -1,5 +1,5 @@
 import type { UploadResponse } from "../../types";
-import { serverSupabaseUser, serverSupabaseClient } from "#supabase/server";
+import { serverSupabaseClient } from "#supabase/server";
 import {
   validateFileUpload,
   logFileValidation,
@@ -11,7 +11,8 @@ export default defineEventHandler(async (event): Promise<UploadResponse> => {
 
   try {
     // Get user from session
-    const user = await serverSupabaseUser(event);
+    const _client = await serverSupabaseClient(event);
+    const user = (await _client.auth.getUser()).data.user;
 
     if (!user) {
       throw createError({

@@ -209,7 +209,6 @@ definePageMeta({
 
 const config = useRuntimeConfig();
 const supabase = useSupabaseClient();
-const user = useSupabaseUser();
 
 const userCredits = ref(0);
 const purchasing = ref(false);
@@ -237,12 +236,13 @@ const creditPackages = [
 ];
 
 const fetchUserCredits = async () => {
-  if (!user.value) return;
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user?.id) return;
 
   const { data } = await supabase
     .from("users")
     .select("credits")
-    .eq("id", user.value.id)
+    .eq("id", session.user.id)
     .single();
 
   if (data) {

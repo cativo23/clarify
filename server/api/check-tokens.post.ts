@@ -1,4 +1,4 @@
-import { serverSupabaseUser, serverSupabaseClient } from "#supabase/server";
+import { serverSupabaseClient } from "#supabase/server";
 import { extractTextFromPDF } from "~/server/utils/pdf-parser";
 import { preprocessDocument } from "~/server/utils/preprocessing";
 import { getPromptConfig } from "~/server/utils/config";
@@ -11,7 +11,8 @@ export default defineEventHandler(async (event) => {
     // [SECURITY FIX M3] Rate limiting to prevent DoS
     await applyRateLimit(event, RateLimitPresets.standard, "user");
 
-    user = await serverSupabaseUser(event);
+    const _client = await serverSupabaseClient(event);
+    user = (await _client.auth.getUser()).data.user;
     if (!user) {
       throw createError({ statusCode: 401, message: "Unauthorized" });
     }
