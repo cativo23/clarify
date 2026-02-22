@@ -1,6 +1,6 @@
 {
   "name": "clarify",
-  "version": "1.0.0-alpha.9",
+  "version": "1.0.0-alpha.10.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -71,5 +71,8 @@
     "minimatch": "^10.2.1",
     "glob": "^11.0.1",
     "archiver": "^7.0.1"
+  },
+  "engines": {
+    "node": ">=24"
   }
 }
