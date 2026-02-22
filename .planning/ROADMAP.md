@@ -31,12 +31,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Forensic tier uses gpt-5 model with dedicated exhaustive analysis prompt
   3. Long-running analyses (2-5 min) complete without timeout via BullMQ queue
   4. Uploaded files are validated via magic bytes (not just extension)
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: Create Forensic analysis prompt (deeper than Premium, 100% coverage)
-- [ ] 01-02: Configure gpt-5 model for Forensic tier in config
-- [ ] 01-03: Ensure async queue processes all 3 tiers correctly
+- [ ] 01-01-PLAN.md — Create Forensic analysis prompt (100% coverage, cross-clause analysis, exhaustive omissions)
+- [ ] 01-02-PLAN.md — Update OpenAI client to support Forensic tier (prompt loading, gpt-5 model, token limits)
+- [ ] 01-03-PLAN.md — Add database support and config-driven credit costs for Forensic tier
 
 ### Phase 2: Tier Selection & UX
 **Goal**: Users can choose analysis tier and understand what they're paying for
