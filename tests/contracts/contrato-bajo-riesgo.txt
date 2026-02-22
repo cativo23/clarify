@@ -1,0 +1,225 @@
+# CONTRATO DE SERVICIOS DIGITALES - BAJO RIESGO
+
+## SECCIÓN 1: IDENTIFICACIÓN DE LAS PARTES
+
+Entre CLEVERAPP TECHNOLOGIES S.A., sociedad constituida bajo las leyes de Argentina, con domicilio en Avenida Corrientes 1234, Buenos Aires, Argentina (en adelante, "LA EMPRESA"); y [NOMBRE DEL USUARIO], con domicilio en [DIRECCIÓN] (en adelante, "EL USUARIO").
+
+## SECCIÓN 2: DESCRIPCIÓN DEL SERVICIO
+
+LA EMPRESA proporciona una plataforma digital que permite a los USUARIOS gestionar sus proyectos y colaborar con equipos de trabajo. El servicio incluye:
+- Gestión de tareas y proyectos
+- Almacenamiento de archivos en la nube
+- Herramientas de colaboración en tiempo real
+- Reportes y análisis de productividad
+
+## SECCIÓN 3: DURACIÓN Y CANCELACIÓN
+
+### 3.1 Sin Período Mínimo
+Este contrato no tiene período mínimo de permanencia. EL USUARIO puede utilizar el servicio mes a mes.
+
+### 3.2 Cancelación en Cualquier Momento
+EL USUARIO podrá cancelar su suscripción en cualquier momento, sin penalizaciones ni cargos adicionales. La cancelación será efectiva al final del período de facturación actual.
+
+### 3.3 Proceso de Cancelación Sencillo
+La cancelación podrá realizarse:
+- Desde la configuración de la cuenta del USUARIO
+- Mediante solicitud por correo electrónico a soporte@cleverapp.example.com
+- A través del chat de soporte en vivo
+
+### 3.4 Sin Renovación Automática Obligatoria
+El servicio no se renueva automáticamente de forma obligatoria. EL USUARIO decide cada mes si continúa con el servicio.
+
+## SECCIÓN 4: PRECIOS Y PAGOS
+
+### 4.1 Planes Disponibles
+- Plan Básico: USD $9.99 mensuales
+- Plan Profesional: USD $19.99 mensuales
+- Plan Empresarial: USD $49.99 mensuales
+
+### 4.2 Transparencia de Precios
+Todos los precios incluyen impuestos. No hay cargos ocultos, tarifas de activación ni costos adicionales no declarados.
+
+### 4.3 Modificación de Precios
+Cualquier aumento de precio será notificado a EL USUARIO con SESENTA (60) DÍAS DE ANTICIPACIÓN mínima. Los aumentos no aplicarán a USUARIOS existentes hasta la próxima renovación de su suscripción.
+
+### 4.4 Garantía de Devolución
+EL USUARIO dispone de TREINTA (30) DÍAS NATURALES desde la contratación para solicitar un reembolso completo si no está satisfecho con el servicio. No se requieren explicaciones ni justificaciones.
+
+## SECCIÓN 5: PRIVACIDAD Y DATOS PERSONALES
+
+### 5.1 Minimización de Datos
+LA EMPRESA solo recopila los datos estrictamente necesarios para prestar el servicio:
+- Nombre y apellido
+- Correo electrónico
+- Contraseña (encriptada)
+- Información de facturación
+
+### 5.2 Propiedad de los Datos
+Todos los datos, archivos y contenido creado por EL USUARIO permanecen siendo de su exclusiva propiedad. LA EMPRESA no reclama ningún derecho sobre el contenido del USUARIO.
+
+### 5.3 Uso de Datos
+Los datos personales solo se utilizan para:
+- Prestar el servicio contratado
+- Comunicaciones relacionadas con la cuenta
+- Facturación
+- Soporte técnico
+
+### 5.4 Sin Venta de Datos
+LA EMPRESA NUNCA vende, alquila o cede datos personales a terceros con fines comerciales o de marketing.
+
+### 5.5 Compartición Limitada
+Los datos solo se comparten con:
+- Procesadores de pago (para facturación)
+- Proveedores de infraestructura cloud (para hosting)
+- Autoridades, únicamente cuando sea requerido por orden judicial
+
+### 5.6 Derechos del Usuario
+EL USUARIO puede en cualquier momento:
+- Acceder a todos sus datos almacenados
+- Rectificar información incorrecta
+- Solicitar la eliminación completa de su cuenta y datos
+- Exportar todos sus datos en formato estándar (CSV, JSON)
+
+### 5.7 Portabilidad de Datos
+EL USUARIO puede exportar todos sus datos en formatos abiertos (CSV, JSON) en cualquier momento, sin costo adicional ni limitaciones.
+
+### 5.8 Eliminación de Datos
+Al cancelar la cuenta, todos los datos del USUARIO serán eliminados de los servidores de LA EMPRESA en un plazo máximo de TREINTA (30) DÍAS, salvo obligación legal de retención.
+
+## SECCIÓN 6: PROPIEDAD INTELECTUAL
+
+### 6.1 Licencia de Uso
+LA EMPRESA otorga a EL USUARIO una licencia personal, no exclusiva, intransferible y revocable para usar el software.
+
+### 6.2 Respeto a Propiedad de Terceros
+LA EMPRESA garantiza que el software no infringe derechos de propiedad intelectual de terceros.
+
+## SECCIÓN 7: GARANTÍAS Y CALIDAD DEL SERVICIO
+
+### 7.1 Garantía de Satisfacción
+LA EMPRESA garantiza que el USUARIO estará satisfecho con el servicio. En caso contrario, se aplicará la garantía de devolución de 30 días de la cláusula 4.4.
+
+### 7.2 Nivel de Servicio (SLA)
+LA EMPRESA se compromete a mantener una disponibilidad del 99.5% mensual. Si la disponibilidad es menor, EL USUARIO recibirá un crédito proporcional en su próxima facturación.
+
+### 7.3 Soporte Técnico
+El soporte técnico está disponible:
+- 24/7 a través de chat en vivo
+- Por email con tiempo de respuesta máximo de 24 horas
+- Base de conocimientos y tutoriales gratuitos
+
+### 7.4 Copias de Seguridad
+LA EMPRESA realiza copias de seguridad diarias de todos los datos del USUARIO. En caso de pérdida de datos por falla del servicio, LA EMPRESA restaurará la información sin costo.
+
+## SECCIÓN 8: RESPONSABILIDAD
+
+### 8.1 Responsabilidad Equilibrada
+LA EMPRESA será responsable por daños directos causados por:
+- Negligencia en la prestación del servicio
+- Violación de datos por falla de seguridad
+- Incumplimiento de las obligaciones contractuales
+
+### 8.2 Límite de Responsabilidad
+El límite máximo de responsabilidad será EL MONTO PAGADO POR EL USUARIO EN LOS ÚLTIMOS DOCE (12) MESES o USD $10,000, lo que sea mayor.
+
+### 8.3 Excepciones al Límite
+El límite de responsabilidad NO aplica en casos de:
+- Violación de datos personales
+- Negligencia grave o dolo
+- Violación de propiedad intelectual
+
+## SECCIÓN 9: MODIFICACIONES AL CONTRATO
+
+### 9.1 Notificación Amplia
+Cualquier modificación a este contrato será notificada a EL USUARIO con TREINTA (30) DÍAS DE ANTICIPACIÓN mínima, mediante:
+- Correo electrónico a la dirección registrada
+- Notificación dentro de la aplicación
+- Publicación en el sitio web
+
+### 9.2 Derecho a Rechazar
+Si EL USUARIO no acepta las modificaciones, podrá:
+- Cancelar el servicio antes de que los cambios entren en vigor
+- Solicitar un reembolso proporcional del período no utilizado
+
+### 9.3 Sin Cambios Retroactivos
+Las modificaciones nunca aplicarán de forma retroactiva.
+
+## SECCIÓN 10: SUSPENSIÓN Y TERMINACIÓN
+
+### 10.1 Causas de Suspensión
+El servicio solo podrá suspenderse por:
+- Falta de pago (con notificación previa de 15 días)
+- Violación grave de los términos de uso
+- Mantenimiento programado (con 48 horas de notificación)
+
+### 10.2 Proceso de Terminación por la Empresa
+Antes de terminar el contrato, LA EMPRESA:
+- Notificará por escrito la violación específica
+- Otorgará QUINCE (15) DÍAS para remediar la situación
+- Solo terminará si la violación persiste
+
+### 10.3 Efectos de la Terminación
+Al terminar el contrato:
+- EL USUARIO conservará acceso de solo lectura por 60 días
+- Podrá exportar todos sus datos gratuitamente
+- Recibirá asistencia para la migración si lo solicita
+
+## SECCIÓN 11: RESOLUCIÓN DE DISPUTAS
+
+### 11.1 Resolución Amistosa
+Las partes intentarán resolver cualquier disputa de buena fe dentro de los QUINCE (15) DÍAS siguientes a la notificación de la controversia.
+
+### 11.2 Mediación Opcional
+Si la resolución amistosa falla, las partes podrán optar por mediación antes de iniciar acciones legales.
+
+### 11.3 Jurisdicción del Usuario
+Cualquier acción legal podrá iniciarse en:
+- El domicilio de EL USUARIO
+- La Ciudad de Buenos Aires, Argentina
+A elección de EL USUARIO.
+
+### 11.4 Ley Aplicable
+Este contrato se rige por las leyes de la Nación Argentina.
+
+## SECCIÓN 12: DERECHOS DEL CONSUMIDOR
+
+### 12.1 Reconocimiento de Derechos
+LA EMPRESA reconoce que EL USUARIO, en su carácter de consumidor, tiene derechos que no pueden ser limitados por contrato, incluyendo:
+- Derecho a información clara y veraz
+- Derecho a la protección de datos personales
+- Derecho a la seguridad y calidad del servicio
+- Derecho a la reparación de daños
+
+### 12.2 Cláusulas Abusivas
+Cualquier cláusula que pueda considerarse abusiva o nula se tendrá por no escrita, sin afectar la validez del resto del contrato.
+
+## SECCIÓN 13: DISPOSICIONES GENERALES
+
+### 13.1 Idioma
+Este contrato está disponible en español e inglés. En caso de discrepancia, prevalecerá la versión en español.
+
+### 13.2 Comunicaciones
+Las notificaciones se enviarán por:
+- Correo electrónico
+- Notificaciones push en la aplicación
+- Mensajes dentro de la plataforma
+
+### 13.3 Cesión
+LA EMPRESA solo podrá ceder el contrato a un sucesor que mantenga las mismas obligaciones. EL USUARIO puede transferir su cuenta a otro usuario con aprobación previa.
+
+### 13.4 Acuerdo Completo
+Este documento, junto con la Política de Privacidad, constituye el acuerdo completo entre las partes.
+
+---
+
+**ACEPTADO POR:**
+
+___________________________
+LA EMPRESA
+CLEVERAPP TECHNOLOGIES S.A.
+
+___________________________
+EL USUARIO
+[NOMBRE Y FIRMA]
+
+FECHA: _______________
