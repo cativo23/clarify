@@ -136,7 +136,7 @@ async function getCurrentBatch(): Promise<number> {
       return 0
     }
 
-    return data[0].batch_number
+    return data[0]?.batch_number ?? 0
   } catch (error) {
     return 0
   }
@@ -324,15 +324,16 @@ async function fresh() {
     return
   }
   
-  logWarning('⚠  Dropping all migration records...', 'red')
-  
+  logWarning('⚠  Dropping all migration records...')
+
   // Ensure table exists first
   await ensureMigrationsTable()
-  
+
+  // Delete all rows using neq with non-existent UUID
   const { error } = await supabase
     .from('_migrations')
     .delete()
-    .neq('id', 0) // Delete all
+    .neq('id', '00000000-0000-0000-0000-000000000000') // Delete all
   
   if (error) {
     logError(`Failed to reset migrations: ${error.message}`)
@@ -386,16 +387,17 @@ async function wipe() {
     return
   }
   
-  logWarning('⚠  Wiping all data (except migrations table)...', 'red')
-  
+  logWarning('⚠  Wiping all data (except migrations table)...')
+
   const tables = ['analyses', 'transactions', 'users']
-  
+
   for (const table of tables) {
+    // Delete all rows using neq with non-existent UUID
     const { error } = await supabase
       .from(table)
       .delete()
       .neq('id', '00000000-0000-0000-0000-000000000000') // Delete all
-    
+
     if (error) {
       logError(`Failed to wipe ${table}: ${error.message}`)
     } else {

@@ -40,16 +40,16 @@ export const useToast = () => {
   }
 
   const success = (message: string, duration?: number) =>
-    addToast({ type: 'success', message, duration })
+    addToast({ type: 'success', message, duration: duration ?? 5000 })
 
   const error = (message: string, duration?: number) =>
-    addToast({ type: 'error', message, duration })
+    addToast({ type: 'error', message, duration: duration ?? 5000 })
 
   const info = (message: string, duration?: number) =>
-    addToast({ type: 'info', message, duration })
+    addToast({ type: 'info', message, duration: duration ?? 5000 })
 
   const warning = (message: string, duration?: number) =>
-    addToast({ type: 'warning', message, duration })
+    addToast({ type: 'warning', message, duration: duration ?? 5000 })
 
   return {
     toasts,

@@ -33,7 +33,7 @@ async function testRedisConnection() {
     host: host,
     port: port,
     maxRetriesPerRequest: 1,
-    retryStrategy: (times) => {
+    retryStrategy: (times: number) => {
       if (times > 3) {
         console.error('❌ Max retries reached')
         return null

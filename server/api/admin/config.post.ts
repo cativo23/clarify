@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
     if (!result.success) {
         throw createError({
             statusCode: 500,
-            message: result.error,
+            message: result.error || 'Failed to update configuration',
         })
     }
 

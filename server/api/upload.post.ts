@@ -4,6 +4,8 @@ import { validateFileUpload, logFileValidation } from '../utils/file-validation'
 import { handleApiError } from '~/server/utils/error-handler'
 
 export default defineEventHandler(async (event): Promise<UploadResponse> => {
+    let userId: string | undefined
+
     try {
         // Get user from session
         const user = await serverSupabaseUser(event)
@@ -14,6 +16,8 @@ export default defineEventHandler(async (event): Promise<UploadResponse> => {
                 message: 'Unauthorized',
             })
         }
+
+        userId = user.id
 
         // Parse multipart form data
         const formData = await readMultipartFormData(event)
@@ -47,7 +51,7 @@ export default defineEventHandler(async (event): Promise<UploadResponse> => {
         if (!validation.isValid) {
             throw createError({
                 statusCode: 400,
-                message: validation.error,
+                message: validation.error || 'File validation failed',
             })
         }
 
@@ -93,7 +97,7 @@ export default defineEventHandler(async (event): Promise<UploadResponse> => {
     } catch (error: any) {
         console.error('Error in upload endpoint:', error)
         handleApiError(error, {
-            userId: user?.id,
+            userId,
             endpoint: '/api/upload',
             operation: 'upload_file'
         })

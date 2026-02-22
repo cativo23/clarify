@@ -304,15 +304,19 @@
                   <div class="flex items-center gap-4">
                     <div :class="[
                       'w-14 h-14 rounded-2xl flex items-center justify-center transition-all group-hover:scale-110',
-                      analysis.risk_level === 'high' ? 'bg-risk-high/10 text-risk-high' :
-                        analysis.risk_level === 'medium' ? 'bg-risk-medium/10 text-risk-medium' :
-                          analysis.risk_level === 'low' ? 'bg-risk-low/10 text-risk-low' : 'bg-slate-100 text-slate-400'
+                      getRiskColor(analysis.risk_level)
                     ]">
-                      <svg v-if="analysis.status === 'completed'" class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path v-if="analysis.risk_level === 'high'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        <path v-else-if="analysis.risk_level === 'medium'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                      <!-- Completed status icons -->
+                      <svg v-if="analysis.status === 'completed' && analysis.risk_level === 'high'" class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                       </svg>
+                      <svg v-else-if="analysis.status === 'completed' && analysis.risk_level === 'medium'" class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <svg v-else-if="analysis.status === 'completed' && analysis.risk_level === 'low'" class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                      </svg>
+                      <!-- Processing/pending/failed icons -->
                       <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
@@ -322,14 +326,11 @@
                       <div class="flex items-center gap-2">
                         <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400">{{ timeAgo(analysis.created_at) }}</span>
                         <span class="w-1.5 h-1.5 rounded-full" :class="[
-                          analysis.status === 'processing' ? 'bg-secondary animate-pulse' :
-                          analysis.risk_level === 'high' ? 'bg-risk-high' :
-                          analysis.risk_level === 'medium' ? 'bg-risk-medium' :
-                          analysis.risk_level === 'low' ? 'bg-risk-low' : 'bg-slate-400'
+                          getStatusDotClass(analysis)
                         ]"></span>
                         <span class="text-[9px] font-black uppercase tracking-tighter" :class="[
-                          analysis.status === 'completed' ? (analysis.risk_level === 'high' ? 'text-risk-high' : analysis.risk_level === 'medium' ? 'text-risk-medium' : 'text-risk-low') : 'text-slate-400'
-                        ]">{{ analysis.status === 'completed' ? (analysis.risk_level === 'high' ? 'Alto Riesgo' : analysis.risk_level === 'medium' ? 'Cautela' : 'Seguro') : 'Fallido' }}</span>
+                          getStatusTextClass(analysis)
+                        ]">{{ getStatusLabel(analysis) }}</span>
                       </div>
                     </div>
                   </div>
@@ -565,6 +566,46 @@ watch(() => user.value, async (newUser) => {
     setupRealtimeSubscription()
   }
 }, { immediate: true })
+
+// Helper functions for status display (extracted to avoid TypeScript type narrowing issues)
+const getRiskColor = (riskLevel: string | null) => {
+  switch (riskLevel) {
+    case 'high': return 'bg-risk-high/10 text-risk-high'
+    case 'medium': return 'bg-risk-medium/10 text-risk-medium'
+    case 'low': return 'bg-risk-low/10 text-risk-low'
+    default: return 'bg-slate-100 text-slate-400'
+  }
+}
+
+const getStatusDotClass = (analysis: Analysis) => {
+  if (analysis.status === 'processing') return 'bg-secondary animate-pulse'
+  if (analysis.status === 'completed') {
+    if (analysis.risk_level === 'high') return 'bg-risk-high'
+    if (analysis.risk_level === 'medium') return 'bg-risk-medium'
+    if (analysis.risk_level === 'low') return 'bg-risk-low'
+  }
+  return 'bg-slate-400'
+}
+
+const getStatusTextClass = (analysis: Analysis) => {
+  if (analysis.status === 'completed') {
+    if (analysis.risk_level === 'high') return 'text-risk-high'
+    if (analysis.risk_level === 'medium') return 'text-risk-medium'
+    if (analysis.risk_level === 'low') return 'text-risk-low'
+  }
+  return 'text-slate-400'
+}
+
+const getStatusLabel = (analysis: Analysis) => {
+  if (analysis.status === 'completed') {
+    if (analysis.risk_level === 'high') return 'Alto Riesgo'
+    if (analysis.risk_level === 'medium') return 'Cautela'
+    if (analysis.risk_level === 'low') return 'Seguro'
+  }
+  if (analysis.status === 'processing') return 'Procesando...'
+  if (analysis.status === 'failed') return 'Fallido'
+  return 'Pendiente'
+}
 
 // Removed onMounted since watcher handles immediate check
 

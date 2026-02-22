@@ -30,14 +30,13 @@ export const getRedisConnection = () => {
 export const getAnalysisQueue = () => {
     if (!analysisQueue) {
         analysisQueue = new Queue('analysis-queue', {
-            connection: getRedisConnection(),
+            connection: getRedisConnection() as any, // Cast to any to resolve ioredis version mismatch
             defaultJobOptions: {
                 attempts: 3,
                 backoff: {
                     type: 'exponential',
                     delay: 5000
                 },
-                timeout: 300000, // 5 minute timeout
                 removeOnComplete: { count: 100 }, // Keep last 100 completed
                 removeOnFail: { count: 1000 } // Keep last 1000 failed for debugging
             }
