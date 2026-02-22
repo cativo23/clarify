@@ -43,6 +43,7 @@ export default defineEventHandler(async (event) => {
       success: true,
       data: {
         sessionId: session.id,
+        sessionUrl: session.url,
       },
     };
   } catch (error: any) {

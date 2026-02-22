@@ -276,18 +276,12 @@ const handlePurchase = async (pack: any) => {
       },
     });
 
-    if (!data?.sessionId) {
+    if (!data?.sessionUrl) {
       throw new Error("Error al crear sesión de pago");
     }
 
     // Redirect to Stripe Checkout
-    const { error: stripeError } = await stripe.redirectToCheckout({
-      sessionId: data.sessionId,
-    });
-
-    if (stripeError) {
-      throw stripeError;
-    }
+    window.location.href = data.sessionUrl;
   } catch (err: any) {
     error.value =
       err.message || "Error al procesar el pago. Intenta nuevamente.";
