@@ -12,7 +12,7 @@ Clarify is an AI-powered contract auditing platform that analyzes legal document
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Core Analysis Foundation** - Complete 3-tier analysis backend with secure upload and async processing
+- [x] **Phase 1: Core Analysis Foundation** - Complete 3-tier analysis backend with secure upload and async processing
 - [ ] **Phase 2: Tier Selection & UX** - Users can select analysis tier and see progress during upload/analysis
 - [ ] **Phase 3: PDF Export & History** - Export results as branded PDF, searchable analysis history
 - [ ] **Phase 4: Stripe & Monetization** - Enable credit purchases with real payments
@@ -34,9 +34,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Create Forensic analysis prompt (100% coverage, cross-clause analysis, exhaustive omissions)
+- [x] 01-01-PLAN.md — Create Forensic analysis prompt (100% coverage, cross-clause analysis, exhaustive omissions)
 - [x] 01-02-PLAN.md — Update OpenAI client to support Forensic tier (prompt loading, gpt-5 model, token limits)
-- [ ] 01-03-PLAN.md — Add database support and config-driven credit costs for Forensic tier
+- [x] 01-03-PLAN.md — Add database support and config-driven credit costs for Forensic tier
 
 ### Phase 2: Tier Selection & UX
 **Goal**: Users can choose analysis tier and understand what they're paying for
@@ -136,7 +136,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Core Analysis Foundation | 1/3 | In progress | 01-02 |
+| 1. Core Analysis Foundation | 3/3 | Complete   | 2026-02-22 |
 | 2. Tier Selection & UX | 0/2 | Not started | - |
 | 3. PDF Export & History | 0/2 | Not started | - |
 | 4. Stripe & Monetization | 0/3 | Not started | - |
