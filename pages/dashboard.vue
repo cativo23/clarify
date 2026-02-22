@@ -500,9 +500,7 @@
           <!-- Recent Analyses -->
           <div class="mt-12 mb-12">
             <div class="flex items-center justify-between mb-8">
-              <h2 class="text-2xl font-black text-slate-900 dark:text-white">
-                Análisis Recientes
-              </h2>
+              <h2 class="text-2xl font-black text-slate-900 dark:text-white">Análisis Recientes</h2>
               <NuxtLink
                 v-if="analyses.length > 5"
                 to="/history"
@@ -743,6 +741,7 @@
 
 <script setup lang="ts">
 import type { Analysis } from "~/types";
+import type { RealtimeChannel } from "@supabase/supabase-js";
 import { timeAgo } from "~/composables/useTimeAgo";
 
 definePageMeta({
@@ -767,6 +766,9 @@ const analyzeError = ref("");
 const uploadedFileUrl = ref("");
 const tokenCheckResult = ref<any>(null);
 const checkingTokens = ref(false);
+
+// Realtime subscription
+let realtimeChannel: RealtimeChannel | null = null;
 
 const analyzeButtonText = computed(() => {
   if (analyzing.value) return "Procesando...";
@@ -881,9 +883,6 @@ const fetchUserData = async () => {
     loading.value = false;
   }
 };
-
-// Realtime subscription
-let realtimeChannel: any = null;
 
 const setupRealtimeSubscription = () => {
   if (realtimeChannel || !user.value?.id) return;

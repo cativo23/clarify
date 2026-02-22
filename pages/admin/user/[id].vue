@@ -1,11 +1,13 @@
 <script setup lang="ts">
+import type { User, Analysis } from "~/types";
+
 definePageMeta({ middleware: ["admin"], layout: "admin" });
 
 const route = useRoute();
 const router = useRouter();
 const id = computed(() => route.params.id as string);
-const profile = ref<any>(null);
-const analyses = ref<any[]>([]);
+const profile = ref<User | null>(null);
+const analyses = ref<Analysis[]>([]);
 const loading = ref(true);
 const error = ref("");
 
@@ -26,14 +28,14 @@ const lowRiskCount = computed(
 
 onMounted(async () => {
   try {
-    const res = await $fetch<{ profile: any; analyses: any[] }>(
+    const res = await $fetch<{ profile: User; analyses: Analysis[] }>(
       `/api/admin/user/${id.value}`,
     );
     profile.value = res.profile;
     analyses.value = res.analyses || [];
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error(e);
-    error.value = e.message || "Failed to load user data";
+    error.value = e instanceof Error ? e.message : "Failed to load user data";
   } finally {
     loading.value = false;
   }
@@ -47,7 +49,7 @@ const formatDate = (dateString: string) => {
   });
 };
 
-const getRiskColor = (level: string) => {
+const getRiskColor = (level: string | null) => {
   switch (level) {
     case "high":
       return "text-risk-high bg-risk-high/10";
@@ -60,7 +62,7 @@ const getRiskColor = (level: string) => {
   }
 };
 
-const getStatusColor = (status: string) => {
+const getStatusColor = (status: string | null) => {
   switch (status) {
     case "completed":
       return "text-risk-low bg-risk-low/10";
