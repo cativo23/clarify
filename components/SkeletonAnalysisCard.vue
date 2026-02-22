@@ -1,5 +1,7 @@
 <template>
-  <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-6 border border-slate-100 dark:border-slate-800 animate-pulse">
+  <div
+    class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-6 border border-slate-100 dark:border-slate-800 animate-pulse"
+  >
     <!-- Risk indicator -->
     <div class="flex items-start justify-between mb-6">
       <div class="w-14 h-14 rounded-2xl bg-slate-200 dark:bg-slate-700"></div>
@@ -23,5 +25,4 @@
   </div>
 </template>
 
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
