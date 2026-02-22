@@ -6,7 +6,7 @@ import { applyRateLimit, RateLimitPresets } from "~/server/utils/rate-limit";
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   const stripe = new Stripe(config.stripeSecretKey, {
-    apiVersion: "2025-02-24.acacia",
+    apiVersion: "2026-01-28.clover",
   });
 
   // Get raw body
