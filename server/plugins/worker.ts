@@ -21,8 +21,9 @@ export default defineNitroPlugin((_nitroApp) => {
     "analysis-queue",
     async (job) => {
       const { analysisId, userId, storagePath, analysisType } = job.data;
+      const tier = analysisType || "premium";
       console.log(
-        `[Worker] Started processing ${analysisType || "premium"} analysis ${analysisId} for user ${userId}`,
+        `[Worker] Started processing ${tier} analysis ${analysisId} for user ${userId}`,
       );
 
       // [SECURITY FIX C5] Use scoped worker client instead of raw service_role
@@ -64,6 +65,9 @@ export default defineNitroPlugin((_nitroApp) => {
         }
 
         // 4. Analyze with OpenAI
+        console.log(
+          `[Worker] Processing ${tier} analysis for job ${analysisId}`,
+        );
         let analysisSummary = await analyzeContract(
           contractText,
           analysisType || "premium",
