@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import vue from "@vitejs/plugin-vue";
 
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [vue()] as any,
   test: {
     environment: "happy-dom",
     include: ["tests/**/*.test.ts"],
