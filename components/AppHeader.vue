@@ -327,17 +327,27 @@ const handleSignOut = async () => {
 };
 
 // Click outside directive implementation
+interface HTMLElementWithClickOutside extends HTMLElement {
+  clickOutsideEvent?: EventListener;
+}
+
 const vClickOutside = {
-  mounted(el: any, binding: any) {
-    el.clickOutsideEvent = (event: Event) => {
-      if (!(el === event.target || el.contains(event.target))) {
+  mounted(
+    el: HTMLElementWithClickOutside,
+    binding: DirectiveBinding<() => void>,
+  ) {
+    const handler: EventListener = (event: Event) => {
+      if (!(el === event.target || el.contains(event.target as Node))) {
         binding.value();
       }
     };
-    document.addEventListener("click", el.clickOutsideEvent);
+    el.clickOutsideEvent = handler;
+    document.addEventListener("click", handler);
   },
-  unmounted(el: any) {
-    document.removeEventListener("click", el.clickOutsideEvent);
+  unmounted(el: HTMLElementWithClickOutside) {
+    if (el.clickOutsideEvent) {
+      document.removeEventListener("click", el.clickOutsideEvent);
+    }
   },
 };
 
