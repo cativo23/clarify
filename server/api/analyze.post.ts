@@ -45,7 +45,7 @@ export default defineEventHandler(async (event) => {
     const parseResult = analyzeRequestSchema.safeParse(body);
 
     if (!parseResult.success) {
-      const errors = parseResult.error.errors.map((e: any) => ({
+      const errors = parseResult.error.issues.map((e) => ({
         field: e.path.join("."),
         message: e.message,
       }));
