@@ -1,6 +1,7 @@
 # Requirements: Clarify
 
 **Defined:** 2026-02-21
+**Updated:** 2026-02-22 — Added Stripe and Forensic Prompt requirements
 **Core Value:** Democratizing legal advice by making contract analysis accessible and affordable for non-lawyers.
 
 ## v1 Requirements
@@ -13,6 +14,10 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **TIER-02**: Tier Selection UI — Users can select Basic/Premium/Forensic before analysis
 - [ ] **TIER-03**: 3-tier analysis strategy with clear credit costs (1/3/10 credits)
 
+### Prompt Management
+
+- [ ] **PROMPT-01**: Forensic Analysis Prompt — Dedicated prompt for exhaustive 100% coverage analysis (different from Premium)
+
 ### Upload & Queue
 
 - [ ] **UPLOAD-01**: Secure file upload with magic byte validation (not just extension)
@@ -24,6 +29,12 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **PDF-01**: PDF Export — Export analysis results as formatted PDF report
 - [ ] **HISTORY-01**: Searchable analysis history with full-text search
 - [ ] **HISTORY-02**: Analysis history with filters (date range, tier, risk level)
+
+### Stripe & Payments
+
+- [ ] **STRIPE-01**: Stripe Configuration — Price IDs, webhook secret, checkout flow working
+- [ ] **STRIPE-02**: Credit Purchase Flow — Users can buy credit packages (5/$4.99, 10/$8.99, 25/$19.99)
+- [ ] **STRIPE-03**: Webhook Handling — Atomic credit increment on successful payment via PostgreSQL RPC
 
 ### Credits & Onboarding
 
@@ -81,26 +92,30 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TIER-01 | Phase 1 | Pending |
 | TIER-02 | Phase 2 | Pending |
 | TIER-03 | Phase 1 | Pending |
+| PROMPT-01 | Phase 1 | Pending |
 | UPLOAD-01 | Phase 1 | Pending |
 | UPLOAD-02 | Phase 2 | Pending |
 | QUEUE-01 | Phase 1 | Pending |
 | PDF-01 | Phase 3 | Pending |
 | HISTORY-01 | Phase 3 | Pending |
 | HISTORY-02 | Phase 3 | Pending |
-| CREDIT-01 | Phase 4 | Pending |
-| CREDIT-02 | Phase 4 | Pending |
-| DEMO-01 | Phase 4 | Pending |
-| ADMIN-01 | Phase 5 | Pending |
-| ADMIN-02 | Phase 5 | Pending |
-| ADMIN-03 | Phase 5 | Pending |
-| ADMIN-04 | Phase 5 | Pending |
-| DEPLOY-01 | Phase 6 | Pending |
+| STRIPE-01 | Phase 4 | Pending |
+| STRIPE-02 | Phase 4 | Pending |
+| STRIPE-03 | Phase 4 | Pending |
+| CREDIT-01 | Phase 5 | Pending |
+| CREDIT-02 | Phase 5 | Pending |
+| DEMO-01 | Phase 5 | Pending |
+| ADMIN-01 | Phase 6 | Pending |
+| ADMIN-02 | Phase 6 | Pending |
+| ADMIN-03 | Phase 6 | Pending |
+| ADMIN-04 | Phase 6 | Pending |
+| DEPLOY-01 | Phase 7 | Pending |
 
 **Coverage:**
-- v1 requirements: 17 total
-- Mapped to phases: 17
+- v1 requirements: 20 total
+- Mapped to phases: 20
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-02-21*
-*Last updated: 2026-02-21 after roadmap creation*
+*Last updated: 2026-02-22 after roadmap adjustment*
