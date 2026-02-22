@@ -89,9 +89,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TIER-01 | Phase 1 | Pending |
+| TIER-01 | Phase 1 | In Progress |
 | TIER-02 | Phase 2 | Pending |
-| TIER-03 | Phase 1 | Pending |
+| TIER-03 | Phase 1 | In Progress |
 | PROMPT-01 | Phase 1 | Pending |
 | UPLOAD-01 | Phase 1 | Pending |
 | UPLOAD-02 | Phase 2 | Pending |

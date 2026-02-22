@@ -35,7 +35,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 - [ ] 01-01-PLAN.md — Create Forensic analysis prompt (100% coverage, cross-clause analysis, exhaustive omissions)
-- [ ] 01-02-PLAN.md — Update OpenAI client to support Forensic tier (prompt loading, gpt-5 model, token limits)
+- [x] 01-02-PLAN.md — Update OpenAI client to support Forensic tier (prompt loading, gpt-5 model, token limits)
 - [ ] 01-03-PLAN.md — Add database support and config-driven credit costs for Forensic tier
 
 ### Phase 2: Tier Selection & UX
@@ -136,7 +136,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Core Analysis Foundation | 0/3 | Not started | - |
+| 1. Core Analysis Foundation | 1/3 | In progress | 01-02 |
 | 2. Tier Selection & UX | 0/2 | Not started | - |
 | 3. PDF Export & History | 0/2 | Not started | - |
 | 4. Stripe & Monetization | 0/3 | Not started | - |
