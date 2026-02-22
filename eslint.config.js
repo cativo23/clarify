@@ -94,7 +94,7 @@ export default [
       "vue/multi-word-component-names": "off",
       "vue/require-default-prop": "off",
       "vue/attribute-hyphenation": ["error", "always"],
-      "vue/no-undef-components": "warn", // Nuxt auto-imports components
+      "vue/no-undef-components": "off", // Nuxt auto-imports components globally
       "vue/define-macros-order": [
         "error",
         {
