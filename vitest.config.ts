@@ -1,25 +1,25 @@
-import { defineConfig } from 'vitest/config'
-import { resolve } from 'node:path'
-import vue from '@vitejs/plugin-vue'
+import { defineConfig } from "vitest/config";
+import { resolve } from "node:path";
+import vue from "@vitejs/plugin-vue";
 
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [vue()] as any,
   test: {
-    environment: 'happy-dom',
-    include: ['tests/**/*.test.ts'],
+    environment: "happy-dom",
+    include: ["tests/**/*.test.ts"],
     globals: true,
-    setupFiles: ['./tests/setup.ts'],
+    setupFiles: ["./tests/setup.ts"],
     server: {
       deps: {
-        inline: ['@nuxt/test-utils'],
+        inline: ["@nuxt/test-utils"],
       },
     },
   },
   resolve: {
     alias: {
-      '~': resolve(__dirname, '.'),
-      '@': resolve(__dirname, '.'),
-      '#supabase/server': resolve(__dirname, './tests/mocks/supabase.ts'),
+      "~": resolve(__dirname, "."),
+      "@": resolve(__dirname, "."),
+      "#supabase/server": resolve(__dirname, "./tests/mocks/supabase.ts"),
     },
   },
-})
+});

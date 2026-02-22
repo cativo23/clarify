@@ -18,5 +18,12 @@
     "exactOptionalPropertyTypes": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
-  }
+  },
+  "exclude": [
+    "node_modules",
+    ".output",
+    "dist",
+    "tests",
+    "test"
+  ]
 }
