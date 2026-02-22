@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ middleware: ['admin'], layout: 'default' })
+definePageMeta({ middleware: ['admin'], layout: 'admin' })
 
 const users = ref<any[]>([])
 const loading = ref(true)
@@ -135,24 +135,17 @@ const formatDate = (dateString: string | null) => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-500">
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <!-- Header -->
-      <div class="flex items-center justify-between mb-8">
-        <div>
-          <h1 class="text-3xl font-black text-slate-900 dark:text-white mb-2">Admin Analytics</h1>
-          <p class="text-sm font-bold text-slate-500 dark:text-slate-400">Platform overview and user metrics</p>
-        </div>
-        <NuxtLink to="/admin/config"
-          class="px-6 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-black text-xs uppercase tracking-widest hover:scale-[1.02] transition-all active:scale-[0.98]">
-          Config
-        </NuxtLink>
-      </div>
+  <div class="w-full animate-slide-up">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-black text-slate-900 dark:text-white mb-2">Admin Analytics</h1>
+      <p class="text-sm font-bold text-slate-500 dark:text-slate-400">Platform overview and user metrics</p>
+    </div>
 
       <!-- Loading State -->
       <div v-if="loading" class="py-20 text-center">
-        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-secondary"></div>
-        <p class="mt-4 text-slate-400 font-bold uppercase tracking-widest text-[10px]">Loading...</p>
+        <LoadingSpinner size="lg" />
+        <p class="mt-4 text-slate-400 font-bold uppercase tracking-widest text-[10px]">Cargando analíticas...</p>
       </div>
 
       <!-- Error State -->
@@ -324,8 +317,7 @@ const formatDate = (dateString: string | null) => {
             </div>
           </div>
         </div>
-      </div>
-    </main>
+    </div>
   </div>
 </template>
 
