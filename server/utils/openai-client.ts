@@ -55,7 +55,7 @@ function validateModel(model: string): {
 
 export const analyzeContract = async (
   contractText: string,
-  analysisType: "basic" | "premium" = "premium",
+  analysisType: "basic" | "premium" | "forensic" = "premium",
 ) => {
   const openai = createOpenAIClient();
 
@@ -80,10 +80,13 @@ export const analyzeContract = async (
   const limits = tier.tokenLimits || { input: 8000, output: 800 };
 
   // 3. Load System Prompt -- Strict V2 Path
+  // Explicitly handle all three tiers: basic, premium, forensic
   const promptFile =
     analysisType === "basic"
       ? "basic-analysis-prompt.txt"
-      : "analysis-prompt.txt";
+      : analysisType === "forensic"
+        ? "forensic-analysis-prompt.txt"
+        : "analysis-prompt.txt";
   const promptPath = path.resolve(
     process.cwd(),
     `server/prompts/${versionToUse}/${promptFile}`,
@@ -103,8 +106,11 @@ export const analyzeContract = async (
   let metadata: any = {};
 
   if (features.preprocessing) {
-    // Reserve buffer for system prompt (~2k tokens) + safety
-    const availableContext = limits.input - 2000;
+    // Reserve buffer for system prompt + safety
+    // Forensic tier gets larger buffer (5k) to maximize 120k context window
+    // for its target 15k-40k output. Basic/Premium use 2k buffer.
+    const buffer = analysisType === "forensic" ? 5000 : 2000;
+    const availableContext = limits.input - buffer;
     const result = preprocessDocument(contractText, availableContext);
 
     processedText = result.processedText;
@@ -141,6 +147,11 @@ ${processedText}
 
   let rawContent = "";
   try {
+    // Debug logging for Forensic tier
+    if (analysisType === "forensic") {
+      console.log("[Forensic] Forensic tier selected - using gpt-5 with 120k input / 30k output tokens");
+      console.log("[Forensic] Preprocessing buffer: 5k tokens reserved for system prompt");
+    }
     console.log("Using model:", model);
     console.log("Using limits:", limits);
     const isReasoningOrGpt5 =
@@ -170,6 +181,16 @@ ${processedText}
     }
 
     const response = await openai.chat.completions.create(completionParams);
+
+    // Log token usage for Forensic tier
+    if (analysisType === "forensic" && response.usage) {
+      console.log("[Forensic] Token usage:", {
+        prompt_tokens: response.usage.prompt_tokens,
+        completion_tokens: response.usage.completion_tokens,
+        total_tokens: response.usage.total_tokens,
+      });
+    }
+
     console.log("OpenAI Choice Details:", {
       finish_reason: response.choices[0]?.finish_reason,
       has_message: !!response.choices[0]?.message,
