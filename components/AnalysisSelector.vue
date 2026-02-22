@@ -92,10 +92,44 @@
       </div>
     </div>
   </div>
+
+  <!-- Tier Comparison Table -->
+  <div class="mt-8 p-6 bg-slate-50 dark:bg-slate-900/50 rounded-3xl border border-slate-100 dark:border-slate-800">
+    <h4 class="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-6 text-center">Comparativa de Niveles</h4>
+    <div class="grid grid-cols-3 gap-4 text-center">
+      <!-- Basic Column -->
+      <div class="space-y-2">
+        <div class="w-10 h-10 mx-auto rounded-xl bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+          <ZapIcon class="w-5 h-5" />
+        </div>
+        <p class="text-xs font-bold text-slate-700 dark:text-slate-300">Básico</p>
+        <p class="text-[10px] text-slate-400">~8K tokens</p>
+        <p class="text-[9px] font-black text-slate-500 uppercase">1 crédito</p>
+      </div>
+      <!-- Premium Column -->
+      <div class="border-x border-slate-200 dark:border-slate-700 px-4 space-y-2">
+        <div class="w-10 h-10 mx-auto rounded-xl bg-secondary/10 flex items-center justify-center text-secondary">
+          <SearchIcon class="w-5 h-5" />
+        </div>
+        <p class="text-xs font-bold text-secondary">Premium</p>
+        <p class="text-[10px] text-slate-400">~35K tokens</p>
+        <p class="text-[9px] font-black text-secondary uppercase">3 créditos</p>
+      </div>
+      <!-- Forensic Column -->
+      <div class="space-y-2">
+        <div class="w-10 h-10 mx-auto rounded-xl bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+          <ShieldCheckIcon class="w-5 h-5" />
+        </div>
+        <p class="text-xs font-bold text-slate-700 dark:text-slate-300">Forensic</p>
+        <p class="text-[10px] text-slate-400">~120K tokens</p>
+        <p class="text-[9px] font-black text-slate-500 uppercase">10 créditos</p>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ZapIcon, SearchIcon, CheckIcon } from 'lucide-vue-next'
+import { ZapIcon, SearchIcon, CheckIcon, ShieldCheckIcon } from 'lucide-vue-next'
 
 const props = defineProps<{
   modelValue: 'basic' | 'premium'

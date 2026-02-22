@@ -10,7 +10,47 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     '@nuxtjs/supabase',
     '@nuxtjs/color-mode',
+    'nuxt-security'
   ],
+
+  // [SECURITY FIX #6] Tighten CSP using nuxt-security with environment awareness
+  security: {
+    // Nonce is great for prod but can break HMR in some dev environments
+    nonce: process.env.NODE_ENV === 'production',
+    headers: {
+      contentSecurityPolicy: {
+        'default-src': ["'self'"],
+        'script-src': [
+          "'self'",
+          "'blob:'",
+          "https://js.stripe.com",
+          "https://challenges.cloudflare.com",
+          // Allow unsafe scripts ONLY in development for HMR and hydration
+          ...(process.env.NODE_ENV !== 'production' ? ["'unsafe-inline'", "'unsafe-eval'"] : [])
+        ],
+        'style-src': [
+          "'self'",
+          "'unsafe-inline'", // Required for Nuxt/Tailwind runtime styles
+          "https://fonts.googleapis.com"
+        ],
+        'font-src': ["'self'", "https://fonts.gstatic.com"],
+        'img-src': ["'self'", "data:", "https:"],
+        'connect-src': [
+          "'self'",
+          "'blob:'",
+          "wss://*.supabase.co",
+          "https://*.supabase.co",
+          "https://api.openai.com",
+          "https://api.stripe.com"
+        ],
+        'frame-ancestors': ["'none'"],
+        'object-src': ["'none'"],
+        'base-uri': ["'self'"]
+      },
+      // Relax COEP in dev to prevent loading issues with some local assets
+      crossOriginEmbedderPolicy: process.env.NODE_ENV === 'production' ? 'require-corp' : 'unsafe-none'
+    }
+  },
 
   colorMode: {
     classSuffix: '',
@@ -57,6 +97,8 @@ export default defineNuxtConfig({
 
   // App configuration
   app: {
+    pageTransition: { name: 'page', mode: 'out-in' },
+    layoutTransition: { name: 'layout', mode: 'out-in' },
     head: {
       title: 'Clarify - Análisis Inteligente de Contratos',
       meta: [
@@ -66,14 +108,7 @@ export default defineNuxtConfig({
           name: 'description',
           content: 'Traduce contratos complejos a un formato visual tipo semáforo. Entiende qué estás firmando en segundos.'
         },
-        { name: 'theme-color', content: '#0f172a' },
-        // [SECURITY FIX M5] Security headers
-        { 'http-equiv': 'Content-Security-Policy', content: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' wss: https://*.supabase.co https://api.openai.com https://api.stripe.com;" },
-        { 'http-equiv': 'X-Content-Type-Options', content: 'nosniff' },
-        { 'http-equiv': 'X-Frame-Options', content: 'DENY' },
-        { 'http-equiv': 'X-XSS-Protection', content: '1; mode=block' },
-        { 'http-equiv': 'Referrer-Policy', content: 'strict-origin-when-cross-origin' },
-        { 'http-equiv': 'Permissions-Policy', content: 'geolocation=(), microphone=(), camera=()' },
+        { name: 'theme-color', content: '#0f172a' }
       ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
@@ -93,18 +128,7 @@ export default defineNuxtConfig({
       '/**': {
         headers: {
           'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
-          'X-Content-Type-Options': 'nosniff',
-          'X-Frame-Options': 'DENY',
-          'X-XSS-Protection': '1; mode=block',
-          'Referrer-Policy': 'strict-origin-when-cross-origin',
-          'Permissions-Policy': 'geolocation=(), microphone=(), camera=(), payment=()',
-          'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' wss://*.supabase.co https://*.supabase.co https://api.openai.com https://api.stripe.com; frame-ancestors 'none';",
-          // [SECURITY FIX L7] Additional cross-origin isolation headers
-          'Cross-Origin-Embedder-Policy': 'require-corp',
-          'Cross-Origin-Opener-Policy': 'same-origin',
-          'Cross-Origin-Resource-Policy': 'same-origin',
-          // [SECURITY FIX L7] Prevent speculative side-channel attacks
-          'Origin-Agent-Cluster': '?1',
+          // Note: Standard security headers (CSP, XSS, Frame, etc) are now managed by nuxt-security
         }
       }
     }

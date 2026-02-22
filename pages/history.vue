@@ -1,12 +1,12 @@
 <template>
     <div class="min-h-screen bg-white dark:bg-slate-950 transition-colors duration-500">
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main class="max-w-7xl 2xl:max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
             <!-- Header Section -->
             <div class="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
                     <NuxtLink to="/dashboard"
-                        class="group flex items-center gap-2 text-slate-400 hover:text-secondary mb-4 transition-colors">
+                        class="group flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-secondary mb-4 transition-colors">
                         <svg class="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
@@ -23,7 +23,7 @@
                     <div class="relative w-full sm:w-64">
                         <input v-model="searchQuery" type="text" placeholder="Buscar contrato..."
                             class="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-secondary/50 focus:border-secondary text-slate-900 dark:text-white transition-all outline-none font-bold" />
-                        <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none"
+                        <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 dark:text-slate-400" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -36,7 +36,7 @@
                             'px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all',
                             activeFilter === filter.id
                                 ? 'bg-white dark:bg-slate-800 text-secondary shadow-sm'
-                                : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
+                                : 'text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
                         ]">
                             {{ filter.label }}
                         </button>
@@ -45,36 +45,45 @@
             </div>
 
             <!-- Content -->
-            <div v-if="loading" class="flex flex-col items-center justify-center py-24">
-                <div class="relative w-16 h-16">
-                    <div class="absolute inset-0 border-4 border-secondary/20 rounded-full"></div>
-                    <div
-                        class="absolute inset-0 border-4 border-secondary border-t-transparent rounded-full animate-spin">
-                    </div>
-                </div>
-                <p class="mt-6 text-slate-400 font-bold uppercase tracking-widest text-[10px] animate-pulse">
-                    Sincronizando con la nube...</p>
+            <div v-if="loading" class="grid md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
+                <SkeletonAnalysisCard v-for="i in 8" :key="i" />
             </div>
 
+            <!-- Empty State: No Results -->
             <div v-else-if="filteredAnalyses.length === 0"
-                class="text-center py-32 bg-slate-50 dark:bg-slate-900/50 rounded-[3rem] border border-dashed border-slate-200 dark:border-slate-800">
+                class="text-center py-20 bg-slate-50 dark:bg-slate-900/50 rounded-[3rem] border border-dashed border-slate-200 dark:border-slate-800">
                 <div
                     class="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-6 text-slate-300 dark:text-slate-700">
                     <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
-                <h3 class="text-xl font-black text-slate-900 dark:text-white mb-2">No se encontraron resultados</h3>
-                <p class="text-slate-500 dark:text-slate-400 font-medium mb-8">Intenta ajustar tus filtros o búsqueda.
+                <h3 class="text-xl font-black text-slate-900 dark:text-white mb-2">
+                    {{ searchQuery ? `No encontramos "${searchQuery}"` : 'Tu historial está vacío' }}
+                </h3>
+                <p class="text-slate-500 dark:text-slate-400 font-medium mb-8 max-w-md mx-auto">
+                    {{ searchQuery
+                        ? 'No hay contratos que coincidan con tu búsqueda. Intenta con otros términos.'
+                        : 'Comienza analizando tu primer contrato para ver tu historial aquí.'
+                    }}
                 </p>
-                <button v-if="searchQuery || activeFilter !== 'all'" @click="resetFilters"
-                    class="px-8 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-bold text-sm hover:scale-105 transition-all">
-                    Limpiar Filtros
-                </button>
+                <div class="flex items-center justify-center gap-4">
+                    <button v-if="searchQuery || activeFilter !== 'all'" @click="resetFilters"
+                        class="px-6 py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-bold text-sm hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
+                        Limpiar filtros
+                    </button>
+                    <NuxtLink to="/dashboard"
+                        class="px-6 py-3 bg-secondary text-white rounded-xl font-bold text-sm hover:scale-105 transition-all inline-flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Analizar contrato
+                    </NuxtLink>
+                </div>
             </div>
 
-            <div v-else class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div v-else class="grid md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
                 <NuxtLink v-for="analysis in filteredAnalyses" :key="analysis.id" :to="`/analyze/${analysis.id}`"
                     class="group bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2.5rem] p-6 hover:border-secondary/50 hover:shadow-premium transition-all relative overflow-hidden">
                     <!-- Background Decoration -->
@@ -103,10 +112,10 @@
                                     <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                         d="M5 13l4 4L19 7" />
                                 </svg>
-                                <div v-else-if="analysis.status === 'processing'"
-                                    class="w-6 h-6 border-2 border-secondary/30 border-t-secondary rounded-full animate-spin">
+                                <div v-else-if="analysis.status === 'processing'">
+                                    <LoadingSpinner size="sm" color="white" />
                                 </div>
-                                <svg v-else class="w-7 h-7 text-slate-400" fill="none" stroke="currentColor"
+                                <svg v-else class="w-7 h-7 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
@@ -129,10 +138,10 @@
                         </h3>
 
                         <div class="flex items-center gap-2 mb-6">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{
+                            <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">{{
                                 formatDate(analysis.created_at) }}</span>
                             <span class="w-1 h-1 bg-slate-200 dark:bg-slate-800 rounded-full"></span>
-                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{
+                            <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">{{
                                 analysis.status === 'completed' ? 'Finalizado' : 'En Cola' }}</span>
                         </div>
 
@@ -140,7 +149,7 @@
                             class="flex items-center justify-between pt-6 border-t border-slate-50 dark:border-slate-800">
                             <span class="text-xs font-bold text-slate-500">Ver reporte completo</span>
                             <div
-                                class="w-8 h-8 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:bg-secondary group-hover:text-white transition-all">
+                                class="w-8 h-8 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 group-hover:bg-secondary group-hover:text-white transition-all">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
                                         d="M9 5l7 7-7 7" />
@@ -162,7 +171,6 @@ definePageMeta({
     middleware: 'auth'
 })
 
-const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 
 const analyses = ref<Analysis[]>([])
