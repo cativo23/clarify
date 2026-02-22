@@ -1,8 +1,6 @@
 <script setup lang="ts">
 definePageMeta({ middleware: ['admin'], layout: 'admin' })
 
-import { vClickOutside } from '~/composables/useClickOutside'
-
 const route = useRoute()
 const router = useRouter()
 const id = computed(() => route.params.id as string)
@@ -20,7 +18,7 @@ const lowRiskCount = computed(() => analyses.value.filter(a => a.risk_level === 
 
 onMounted(async () => {
   try {
-    const res = await $fetch(`/api/admin/user/${id.value}`)
+    const res = await $fetch<{ profile: any; analyses: any[] }>(`/api/admin/user/${id.value}`)
     profile.value = res.profile
     analyses.value = res.analyses || []
   } catch (e: any) {

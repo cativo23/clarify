@@ -68,8 +68,8 @@ export function validateSupabaseStorageUrl(
   // - Internal URL: /storage/v1/object/{bucket}/{path}
   const pathSegments = parsedUrl.pathname.split('/').filter(Boolean)
 
-  let storagePath: string
-  let bucket: string
+  let storagePath: string = ''
+  let bucket: string = ''
 
   // Check for public/auth URL format: /storage/v1/object/public/{bucket}/{path}
   if (pathSegments[0] === 'storage' && pathSegments[1] === 'v1' && pathSegments[2] === 'object') {
@@ -84,7 +84,7 @@ export function validateSupabaseStorageUrl(
           error: 'Invalid storage URL structure'
         }
       }
-      bucket = pathSegments[4]
+      bucket = pathSegments[4] ?? ''
       storagePath = pathSegments.slice(5).join('/')
     } else {
       // Internal format: /storage/v1/object/{bucket}/{path}
@@ -94,7 +94,7 @@ export function validateSupabaseStorageUrl(
           error: 'Invalid storage URL structure'
         }
       }
-      bucket = pathSegments[3]
+      bucket = pathSegments[3] ?? ''
       storagePath = pathSegments.slice(4).join('/')
     }
   }

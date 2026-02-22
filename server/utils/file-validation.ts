@@ -33,45 +33,6 @@ const PDF_SIGNATURE: FileSignature = {
 }
 
 /**
- * PNG file signature
- * Magic: 89 50 4E 47 0D 0A 1A 0A
- */
-const PNG_SIGNATURE: FileSignature = {
-  extension: 'png',
-  mimeType: 'image/png',
-  magicBytes: [
-    [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]
-  ],
-  maxOffset: 8
-}
-
-/**
- * JPEG file signature
- * Magic: FF D8 FF
- */
-const JPEG_SIGNATURE: FileSignature = {
-  extension: 'jpg',
-  mimeType: 'image/jpeg',
-  magicBytes: [
-    [0xFF, 0xD8, 0xFF]
-  ],
-  maxOffset: 3
-}
-
-/**
- * ZIP file signature (also used for .docx, .xlsx)
- * Magic: 50 4B 03 04
- */
-const ZIP_SIGNATURE: FileSignature = {
-  extension: 'zip',
-  mimeType: 'application/zip',
-  magicBytes: [
-    [0x50, 0x4B, 0x03, 0x04]
-  ],
-  maxOffset: 4
-}
-
-/**
  * Allowed file types for contract uploads
  * Only PDF is allowed for this application
  */

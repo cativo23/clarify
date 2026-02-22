@@ -4,6 +4,8 @@ import { applyRateLimit, RateLimitPresets } from '~/server/utils/rate-limit'
 import { handleApiError } from '~/server/utils/error-handler'
 
 export default defineEventHandler(async (event) => {
+    let userId: string | undefined
+
     try {
         // [SECURITY FIX M1] Rate limiting to prevent information disclosure and DoS
         await applyRateLimit(event, RateLimitPresets.standard, 'user')
@@ -14,6 +16,8 @@ export default defineEventHandler(async (event) => {
         if (!user) {
             throw createError({ statusCode: 401, message: 'Unauthorized' })
         }
+
+        userId = user.id
 
         if (!analysisId) {
             throw createError({ statusCode: 400, message: 'Missing analysis ID' })
@@ -50,7 +54,7 @@ export default defineEventHandler(async (event) => {
         }
     } catch (error: any) {
         handleApiError(error, {
-            userId: user?.id,
+            userId,
             endpoint: '/api/analyses/[id]/status',
             operation: 'get_analysis_status'
         })

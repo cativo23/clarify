@@ -103,7 +103,7 @@ export default defineNitroPlugin((_nitroApp) => {
             })
         }
     }, {
-        connection: getRedisConnection(),
+        connection: getRedisConnection() as any, // Cast to any to resolve ioredis version mismatch
         concurrency: 2, // Process up to 2 jobs at the same time
     })
 
