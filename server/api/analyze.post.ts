@@ -4,6 +4,7 @@ import { validateSupabaseStorageUrl } from "../utils/ssrf-protection";
 import { handleApiError } from "../utils/error-handler";
 import { z } from "zod";
 import { getHeader } from "h3";
+import { getPromptConfig } from "../utils/config";
 
 /**
  * Request validation schema
@@ -76,7 +77,12 @@ export default defineEventHandler(async (event) => {
     }
 
     const storagePath = validation.storagePath!;
-    const creditCost = analysis_type === "premium" ? 3 : 1;
+
+    // Get credit cost from configuration (basic=1, premium=3, forensic=10)
+    const config = await getPromptConfig();
+    const creditCost = config.tiers[analysis_type]?.credits || 3;
+    console.log(`[Analyze] Tier: ${analysis_type}, Credits: ${creditCost}`);
+
     const client = await serverSupabaseClient(event);
 
     // Create analysis record using RPC - credit check and deduction are now atomic
