@@ -500,7 +500,9 @@
           <!-- Recent Analyses -->
           <div class="mt-12 mb-12">
             <div class="flex items-center justify-between mb-8">
-              <h2 class="text-2xl font-black text-slate-900 dark:text-white">Análisis Recientes</h2>
+              <h2 class="text-2xl font-black text-slate-900 dark:text-white">
+                Análisis Recientes
+              </h2>
               <NuxtLink
                 v-if="analyses.length > 5"
                 to="/history"
