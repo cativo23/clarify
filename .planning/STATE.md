@@ -48,6 +48,7 @@ Recent decisions affecting current work:
 - **PDF export for results**: Users want portable, shareable reports
 - **Forensic tier buffer allocation** (2026-02-22): 5k token buffer for Forensic (vs 2k for Basic/Premium) to maximize 120k context window
 - **Explicit three-tier prompt resolution** (2026-02-22): No fallback defaults; each tier maps to specific prompt file
+- [Phase 01-core-analysis-foundation]: Config-driven credit costs: Use getPromptConfig().tiers[analysis_type]?.credits instead of hardcoded values for maintainability
 
 ### Pending Todos
 
