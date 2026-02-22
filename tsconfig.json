@@ -18,5 +18,13 @@
     "exactOptionalPropertyTypes": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
-  }
+  },
+  "exclude": [
+    "node_modules",
+    ".nuxt",
+    ".output",
+    "dist",
+    "tests",
+    "test"
+  ]
 }
