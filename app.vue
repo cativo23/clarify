@@ -7,11 +7,11 @@
 <script setup lang="ts">
 // Set up global meta tags
 useHead({
-  titleTemplate: '%s | Clarify',
+  titleTemplate: "%s | Clarify",
   htmlAttrs: {
-    lang: 'es',
+    lang: "es",
   },
-})
+});
 </script>
 
 <style>
@@ -21,7 +21,7 @@ useHead({
 }
 
 body {
-  font-family: 'Inter', sans-serif, system-ui;
+  font-family: "Inter", sans-serif, system-ui;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   @apply bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100;
@@ -49,13 +49,23 @@ body {
 }
 
 @keyframes slide-up {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .animate-slide-up {
