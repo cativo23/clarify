@@ -1,13 +1,24 @@
-export const vClickOutside = {
-  mounted(el: HTMLElement, binding: any) {
-    el.clickOutsideEvent = (event: Event) => {
-      if (!(el === event.target || el.contains(event.target))) {
-        binding.value()
-      }
-    }
-    document.addEventListener('click', el.clickOutsideEvent)
-  },
-  unmounted(el: HTMLElement) {
-    document.removeEventListener('click', el.clickOutsideEvent)
-  },
+import type { DirectiveBinding } from "vue";
+
+interface HTMLElementWithClickOutside extends HTMLElement {
+  clickOutsideEvent?: EventListener;
 }
+
+export const vClickOutside = {
+  mounted(
+    el: HTMLElementWithClickOutside,
+    binding: DirectiveBinding<() => void>,
+  ) {
+    el.clickOutsideEvent = (event: Event) => {
+      if (!(el === event.target || el.contains(event.target as Node))) {
+        binding.value();
+      }
+    };
+    document.addEventListener("click", el.clickOutsideEvent);
+  },
+  unmounted(el: HTMLElementWithClickOutside) {
+    if (el.clickOutsideEvent) {
+      document.removeEventListener("click", el.clickOutsideEvent);
+    }
+  },
+};
