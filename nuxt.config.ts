@@ -22,7 +22,6 @@ export default defineNuxtConfig({
         "default-src": ["'self'"],
         "script-src": [
           "'self'",
-          "'blob:'",
           "https://js.stripe.com",
           "https://challenges.cloudflare.com",
           // Allow unsafe scripts ONLY in development for HMR and hydration
@@ -39,7 +38,6 @@ export default defineNuxtConfig({
         "img-src": ["'self'", "data:", "https:"],
         "connect-src": [
           "'self'",
-          "'blob:'",
           "wss://*.supabase.co",
           "https://*.supabase.co",
           "https://api.openai.com",
