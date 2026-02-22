@@ -32,6 +32,7 @@ Progress: [██████████] 100%
 **Recent Trend:**
 - Last 5 plans: 01-03 (~5 min), 01-02 (~3 min), 01-01 (~4 min)
 - Trend: On track
+| Phase 01-core-analysis-foundation P01 | 293 | 1 tasks | 1 files |
 
 ## Accumulated Context
 

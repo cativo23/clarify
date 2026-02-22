@@ -148,13 +148,13 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | ID | Requirement | Phase | Status |
 |----|-------------|-------|--------|
-| TIER-01 | Forensic Tier Backend — gpt-5 model configured and working | Phase 1 | Pending |
+| TIER-01 | Forensic Tier Backend — gpt-5 model configured and working | Phase 1 | Complete |
 | TIER-02 | Tier Selection UI — Users can select Basic/Premium/Forensic before analysis | Phase 2 | Pending |
-| TIER-03 | 3-tier analysis strategy (Basic/Premium/Forensic) | Phase 1 | Pending |
+| TIER-03 | 3-tier analysis strategy (Basic/Premium/Forensic) | Phase 1 | Complete |
 | UPLOAD-01 | Secure file upload with magic byte validation | Phase 1 | Pending |
 | UPLOAD-02 | Upload progress indicator | Phase 2 | Pending |
-| QUEUE-01 | BullMQ/Upstash queue for async processing | Phase 1 | Pending |
-| PROMPT-01 | Forensic Analysis Prompt — Dedicated prompt for exhaustive 100% coverage analysis | Phase 1 | Pending |
+| QUEUE-01 | BullMQ/Upstash queue for async processing | Phase 1 | Complete |
+| PROMPT-01 | Forensic Analysis Prompt — Dedicated prompt for exhaustive 100% coverage analysis | Phase 1 | Complete |
 | PDF-01 | PDF Export — Export analysis results as formatted PDF | Phase 3 | Pending |
 | HISTORY-01 | Searchable analysis history | Phase 3 | Pending |
 | HISTORY-02 | Analysis history with filters | Phase 3 | Pending |

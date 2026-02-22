@@ -16,7 +16,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Prompt Management
 
-- [ ] **PROMPT-01**: Forensic Analysis Prompt — Dedicated prompt for exhaustive 100% coverage analysis (different from Premium)
+- [x] **PROMPT-01**: Forensic Analysis Prompt — Dedicated prompt for exhaustive 100% coverage analysis (different from Premium)
 
 ### Upload & Queue
 
@@ -92,7 +92,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TIER-01 | Phase 1 | In Progress |
 | TIER-02 | Phase 2 | Pending |
 | TIER-03 | Phase 1 | In Progress |
-| PROMPT-01 | Phase 1 | Pending |
+| PROMPT-01 | Phase 1 | Complete |
 | UPLOAD-01 | Phase 1 | Pending |
 | UPLOAD-02 | Phase 2 | Pending |
 | QUEUE-01 | Phase 1 | Pending |
