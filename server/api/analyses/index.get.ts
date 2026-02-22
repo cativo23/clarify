@@ -1,4 +1,4 @@
-import { serverSupabaseUser, serverSupabaseClient } from "#supabase/server";
+import { serverSupabaseClient } from "#supabase/server";
 import {
   sanitizeAnalysesList,
   getRequestUserContext,
@@ -7,7 +7,8 @@ import {
 
 export default defineEventHandler(async (event) => {
   try {
-    const user = await serverSupabaseUser(event);
+    const _client = await serverSupabaseClient(event);
+    const user = (await _client.auth.getUser()).data.user;
 
     if (!user) {
       throw createError({ statusCode: 401, message: "Unauthorized" });

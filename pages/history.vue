@@ -315,7 +315,7 @@ definePageMeta({
   middleware: "auth",
 });
 
-const user = useSupabaseUser();
+const supabase = useSupabaseClient();
 
 const analyses = ref<Analysis[]>([]);
 const loading = ref(true);
@@ -330,7 +330,8 @@ const filters = [
 ];
 
 const fetchAnalyses = async () => {
-  if (!user.value) return;
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user) return;
   loading.value = true;
 
   try {

@@ -1,4 +1,4 @@
-import { serverSupabaseUser, serverSupabaseClient } from "#supabase/server";
+import { serverSupabaseClient } from "#supabase/server";
 import {
   sanitizeAnalysisSummary,
   getRequestUserContext,
@@ -14,7 +14,8 @@ export default defineEventHandler(async (event) => {
     // [SECURITY FIX M1] Rate limiting to prevent information disclosure and DoS
     await applyRateLimit(event, RateLimitPresets.standard, "user");
 
-    const user = await serverSupabaseUser(event);
+    const _client = await serverSupabaseClient(event);
+    const user = (await _client.auth.getUser()).data.user;
     const analysisId = getRouterParam(event, "id");
 
     if (!user) {

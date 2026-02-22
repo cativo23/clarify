@@ -1,4 +1,4 @@
-import { serverSupabaseUser, serverSupabaseClient } from "#supabase/server";
+import { serverSupabaseClient } from "#supabase/server";
 import type { H3Event } from "h3";
 
 /**
@@ -25,7 +25,8 @@ function normalizeEmail(email: string): string {
  * @returns true if user is authenticated and is admin, false otherwise
  */
 export async function isAdminUser(event: H3Event): Promise<boolean> {
-  const user = await serverSupabaseUser(event);
+  const _client = await serverSupabaseClient(event);
+  const user = (await _client.auth.getUser()).data.user;
 
   if (!user || !user.email) {
     return false;

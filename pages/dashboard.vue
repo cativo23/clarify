@@ -29,12 +29,12 @@
                 <div
                   class="w-20 h-20 mx-auto mb-4 flex items-center justify-center text-3xl font-black text-white bg-gradient-to-br from-secondary to-accent-indigo rounded-3xl shadow-lg shadow-secondary/20"
                 >
-                  {{ user?.email?.charAt(0).toUpperCase() }}
+                  {{ userProfile?.email?.charAt(0).toUpperCase() || "" }}
                 </div>
                 <h2
                   class="mb-1 text-xl font-black truncate text-slate-900 dark:text-white"
                 >
-                  {{ user?.email?.split("@")[0] }}
+                  {{ userProfile?.email?.split("@")[0] || "" }}
                 </h2>
                 <p
                   class="mb-5 text-[10px] font-bold tracking-widest uppercase text-slate-500 dark:text-slate-400"
@@ -751,8 +751,15 @@ definePageMeta({
 });
 
 const supabase = useSupabaseClient();
-const user = useSupabaseUser();
 const userState = useUserState();
+
+// Reactive user id for watchers
+const currentUserId = ref<string | undefined>(undefined);
+
+onMounted(async () => {
+  const { data: { session } } = await supabase.auth.getSession();
+  currentUserId.value = session?.user?.id;
+});
 
 const userProfile = ref<any>(null);
 const sharedCredits = useCreditsState();
@@ -854,7 +861,7 @@ watch(
 
 // Fetch user data
 const fetchUserData = async () => {
-  if (!user.value?.id) return;
+  if (!currentUserId.value) return;
 
   loading.value = true;
 
@@ -887,7 +894,7 @@ const fetchUserData = async () => {
 };
 
 const setupRealtimeSubscription = () => {
-  if (realtimeChannel || !user.value?.id) return;
+  if (realtimeChannel || !currentUserId.value) return;
 
   realtimeChannel = supabase
     .channel("analyses-updates")
@@ -897,7 +904,7 @@ const setupRealtimeSubscription = () => {
         event: "UPDATE",
         schema: "public",
         table: "analyses",
-        filter: `user_id=eq.${user.value?.id}`,
+        filter: `user_id=eq.${currentUserId.value}`,
       },
       async (payload) => {
         const updatedAnalysis = payload.new as Analysis;
@@ -928,7 +935,7 @@ const setupRealtimeSubscription = () => {
             const { data: profile, error } = await supabase
               .from("users")
               .select("*")
-              .eq("id", user.value?.id)
+              .eq("id", currentUserId.value)
               .single();
 
             if (error) {
@@ -943,7 +950,7 @@ const setupRealtimeSubscription = () => {
                   await supabase
                     .from("users")
                     .select("*")
-                    .eq("id", user.value?.id)
+                    .eq("id", currentUserId.value)
                     .single();
 
                 if (refreshError) {
@@ -991,9 +998,9 @@ onUnmounted(() => {
 
 // Watch for user changes to fetch data and setup realtime
 watch(
-  () => user.value,
-  async (newUser) => {
-    if (newUser?.id) {
+  currentUserId,
+  async (newId) => {
+    if (newId) {
       await fetchUserData();
       setupRealtimeSubscription();
     }
