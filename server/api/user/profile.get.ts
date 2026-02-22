@@ -2,6 +2,7 @@ import { serverSupabaseUser, serverSupabaseClient, serverSupabaseServiceRole } f
 import type { User } from '~/types'
 import { handleApiError } from '../../utils/error-handler'
 import { applyRateLimit, RateLimitPresets } from '~/server/utils/rate-limit'
+import { isAdminUser } from '../../utils/auth'
 
 export default defineEventHandler(async (event) => {
     let user
@@ -48,9 +49,9 @@ export default defineEventHandler(async (event) => {
 
             if (insertError) {
                 console.error('Error creating user profile:', insertError)
-                
+
                 // Check if it's an email verification issue
-                if (insertError.message?.includes('email') || 
+                if (insertError.message?.includes('email') ||
                     insertError.code === '42501') {
                     throw createError({
                         statusCode: 403,
@@ -61,7 +62,7 @@ export default defineEventHandler(async (event) => {
                         }
                     })
                 }
-                
+
                 throw createError({
                     statusCode: 500,
                     message: 'Failed to create user profile',
@@ -72,7 +73,7 @@ export default defineEventHandler(async (event) => {
 
         const finalProfile = {
             ...profile,
-            is_admin: user.email ? (user.email === useRuntimeConfig().adminEmail) : false
+            is_admin: await isAdminUser(event)
         }
 
         return finalProfile as User

@@ -1,7 +1,7 @@
 <template>
   <header
     class="sticky top-0 z-50 border-b bg-white/80 dark:bg-slate-900/80 border-primary-100 dark:border-slate-800 backdrop-blur-xl">
-    <div class="px-4 py-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+    <div class="px-4 py-4 mx-auto max-w-7xl 2xl:max-w-screen-2xl sm:px-6 lg:px-8">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-8">
           <NuxtLink :to="user ? '/dashboard' : '/'"
@@ -20,12 +20,6 @@
               Dashboard
               <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full"></span>
             </NuxtLink>
-            <NuxtLink v-if="isAdmin" to="/admin/analytics"
-              class="relative font-medium transition-colors text-primary-600 dark:text-slate-400 hover:text-primary-900 dark:hover:text-white group"
-              active-class="!text-secondary !font-black">
-              Analíticas
-              <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full"></span>
-            </NuxtLink>
             <NuxtLink to="/credits"
               class="relative font-medium transition-colors text-primary-600 dark:text-slate-400 hover:text-primary-900 dark:hover:text-white group"
               active-class="!text-secondary">
@@ -38,9 +32,12 @@
               Historial
               <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full"></span>
             </NuxtLink>
-            <NuxtLink v-if="isAdmin" to="/admin/config"
-              class="flex items-center gap-1.5 px-3 py-1 bg-red-500/10 border border-red-500/20 text-red-500 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all ml-2"
-              active-class="!bg-red-500 !text-white">
+            <NuxtLink v-if="isAdmin" to="/admin/analytics"
+              class="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-secondary to-accent-indigo text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:shadow-lg hover:shadow-secondary/20 hover:scale-105 transition-all ml-2"
+              active-class="!shadow-xl">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+              </svg>
               Admin
             </NuxtLink>
           </nav>
@@ -140,23 +137,15 @@
                   Mi Historial
                 </NuxtLink>
 
-                <NuxtLink v-if="isAdmin" to="/admin/config"
-                  class="flex items-center w-full gap-3 px-3 py-2 text-sm font-bold text-red-500 transition-colors hover:bg-red-500/10 rounded-xl"
+                <NuxtLink v-if="isAdmin" to="/admin/analytics"
+                  class="flex items-center w-full gap-3 px-3 py-2 text-xs font-black text-secondary transition-colors hover:bg-secondary/5 rounded-xl uppercase tracking-widest"
                   @click="showUserMenu = false">
-                  <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-red-500/10">
+                  <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-secondary/10">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                     </svg>
                   </div>
-                  Panel de Control
-                </NuxtLink>
-                <NuxtLink v-if="isAdmin" to="/admin/analytics"
-                  class="flex items-center w-full gap-3 px-3 py-2 text-sm font-bold transition-colors text-primary-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl"
-                  @click="showUserMenu = false">
-                  <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 3v18h18"/></svg>
-                  </div>
-                  Analíticas
+                  Admin Panel
                 </NuxtLink>
               </div>
 
@@ -181,7 +170,6 @@
 </template>
 
 <script setup lang="ts">
-const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 const showUserMenu = ref(false)
 const userCredits = useCreditsState()
@@ -203,11 +191,7 @@ const refreshCredits = async () => {
 }
 
 const handleSignOut = async () => {
-  await supabase.auth.signOut()
-  userCredits.value = 0 // Reset credits state
-  showUserMenu.value = false // Close menu
-  // Redirect to login page
-  navigateTo('/login')
+  await signOut()
 }
 
 // Click outside directive implementation

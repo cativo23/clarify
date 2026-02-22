@@ -11,6 +11,11 @@
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
     "typecheck": "nuxt typecheck",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "security:audit": "npm audit --audit-level=high",
     "security:fix": "npm audit fix",
     "db:migrate": "NODE_OPTIONS='--import tsx' node scripts/migrate.ts migrate",
@@ -43,10 +48,16 @@
     "zod": "^3"
   },
   "devDependencies": {
+    "@nuxt/test-utils": "^3.15.1",
+    "@playwright/test": "^1.49.1",
     "@types/node": "^25.1.0",
     "@types/pdf-parse": "^1.1.4",
+    "@vitest/ui": "^2.1.9",
+    "@vue/test-utils": "^2.4.6",
+    "happy-dom": "^15.11.7",
     "supabase": "^2.76.9",
     "tsx": "^4.21.0",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
   }
 }
