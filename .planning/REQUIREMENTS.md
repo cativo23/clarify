@@ -12,7 +12,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **TIER-01**: Forensic Tier Backend — gpt-5 model configured and working
 - [ ] **TIER-02**: Tier Selection UI — Users can select Basic/Premium/Forensic before analysis
-- [ ] **TIER-03**: 3-tier analysis strategy with clear credit costs (1/3/10 credits)
+- [x] **TIER-03**: 3-tier analysis strategy with clear credit costs (1/3/10 credits)
 
 ### Prompt Management
 
@@ -22,7 +22,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **UPLOAD-01**: Secure file upload with magic byte validation (not just extension)
 - [ ] **UPLOAD-02**: Upload progress indicator showing percentage during file transfer
-- [ ] **QUEUE-01**: BullMQ/Upstash queue for async processing of long-running analyses
+- [x] **QUEUE-01**: BullMQ/Upstash queue for async processing of long-running analyses
 
 ### PDF & History
 
@@ -95,7 +95,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PROMPT-01 | Phase 1 | Complete |
 | UPLOAD-01 | Phase 1 | Pending |
 | UPLOAD-02 | Phase 2 | Pending |
-| QUEUE-01 | Phase 1 | Pending |
+| QUEUE-01 | Phase 1 | Complete |
 | PDF-01 | Phase 3 | Pending |
 | HISTORY-01 | Phase 3 | Pending |
 | HISTORY-02 | Phase 3 | Pending |
