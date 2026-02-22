@@ -29,8 +29,11 @@ describe('Server Auth Utils', () => {
             adminEmail: 'admin@clarify.com'
         })
 
-        // Default mock for DB client
+        // Default mock for DB client with auth.getUser support
         mockClient.mockResolvedValue({
+            auth: {
+                getUser: vi.fn().mockResolvedValue({ data: { user: null } })
+            },
             from: vi.fn().mockReturnThis(),
             select: vi.fn().mockReturnThis(),
             eq: vi.fn().mockReturnThis(),
@@ -41,18 +44,33 @@ describe('Server Auth Utils', () => {
     describe('isAdminUser', () => {
         it('should return false if no user is logged in', async () => {
             mockUser.mockResolvedValue(null)
+            mockClient.mockResolvedValue({
+                auth: {
+                    getUser: vi.fn().mockResolvedValue({ data: { user: null } })
+                }
+            })
             const result = await isAdminUser(mockEvent)
             expect(result).toBe(false)
         })
 
         it('should return false if user email does not match config or db', async () => {
             mockUser.mockResolvedValue({ email: 'user@clarify.com' })
+            mockClient.mockResolvedValue({
+                auth: {
+                    getUser: vi.fn().mockResolvedValue({ data: { user: { email: 'user@clarify.com' } } })
+                }
+            })
             const result = await isAdminUser(mockEvent)
             expect(result).toBe(false)
         })
 
         it('should return true if user email matches config.adminEmail', async () => {
             mockUser.mockResolvedValue({ email: 'admin@clarify.com' })
+            mockClient.mockResolvedValue({
+                auth: {
+                    getUser: vi.fn().mockResolvedValue({ data: { user: { email: 'admin@clarify.com' } } })
+                }
+            })
             const result = await isAdminUser(mockEvent)
             expect(result).toBe(true)
         })
@@ -60,11 +78,21 @@ describe('Server Auth Utils', () => {
         it('should normalize email before checking config', async () => {
             // Case insensitive check
             mockUser.mockResolvedValue({ email: 'ADMIN@CLARIFY.COM' })
+            mockClient.mockResolvedValue({
+                auth: {
+                    getUser: vi.fn().mockResolvedValue({ data: { user: { email: 'ADMIN@CLARIFY.COM' } } })
+                }
+            })
             const result = await isAdminUser(mockEvent)
             expect(result).toBe(true)
 
             // Whitespace check
             mockUser.mockResolvedValue({ email: ' admin@clarify.com ' })
+            mockClient.mockResolvedValue({
+                auth: {
+                    getUser: vi.fn().mockResolvedValue({ data: { user: { email: ' admin@clarify.com ' } } })
+                }
+            })
             const result2 = await isAdminUser(mockEvent)
             expect(result2).toBe(true)
         })
@@ -82,6 +110,9 @@ describe('Server Auth Utils', () => {
             })
 
             mockClient.mockResolvedValue({
+                auth: {
+                    getUser: vi.fn().mockResolvedValue({ data: { user: { email: 'secondary_admin@clarify.com' } } })
+                },
                 from: vi.fn().mockReturnValue({
                     select: mockSelect
                 })
@@ -110,6 +141,9 @@ describe('Server Auth Utils', () => {
             const mockMaybeSingle = vi.fn().mockResolvedValue({ data: null, error: null })
 
             mockClient.mockResolvedValue({
+                auth: {
+                    getUser: vi.fn().mockResolvedValue({ data: { user: { email: 'hacker@clarify.com' } } })
+                },
                 from: vi.fn().mockReturnValue({ select: mockSelect })
             })
             mockSelect.mockReturnValue({ eq: mockEq })
@@ -123,8 +157,15 @@ describe('Server Auth Utils', () => {
         it('should fallback to config check if DB throws error', async () => {
             mockUser.mockResolvedValue({ email: 'admin@clarify.com' })
 
-            // Mock DB throwing error
-            mockClient.mockRejectedValue(new Error('DB Connection Failed'))
+            // First call returns client with auth.getUser
+            // Second call (for DB) throws error
+            mockClient
+                .mockResolvedValueOnce({
+                    auth: {
+                        getUser: vi.fn().mockResolvedValue({ data: { user: { email: 'admin@clarify.com' } } })
+                    }
+                })
+                .mockRejectedValue(new Error('DB Connection Failed'))
 
             const result = await isAdminUser(mockEvent)
             expect(result).toBe(true) // Should still be true because it matches config
@@ -134,6 +175,11 @@ describe('Server Auth Utils', () => {
     describe('requireAdmin', () => {
         it('should throw 401 if user is not admin', async () => {
             mockUser.mockResolvedValue({ email: 'user@clarify.com' })
+            mockClient.mockResolvedValue({
+                auth: {
+                    getUser: vi.fn().mockResolvedValue({ data: { user: { email: 'user@clarify.com' } } })
+                }
+            })
 
             await expect(requireAdmin(mockEvent)).rejects.toMatchObject({
                 statusCode: 401,
@@ -143,6 +189,11 @@ describe('Server Auth Utils', () => {
 
         it('should not throw if user is admin', async () => {
             mockUser.mockResolvedValue({ email: 'admin@clarify.com' })
+            mockClient.mockResolvedValue({
+                auth: {
+                    getUser: vi.fn().mockResolvedValue({ data: { user: { email: 'admin@clarify.com' } } })
+                }
+            })
 
             await expect(requireAdmin(mockEvent)).resolves.not.toThrow()
         })

@@ -4,6 +4,7 @@ import adminMiddleware from '@/middleware/admin' // This will import the default
 // Mocks
 const mockNavigateTo = vi.fn()
 const mockUseSupabaseUser = vi.fn()
+const mockUseSupabaseClient = vi.fn()
 const mockUseUserState = vi.fn()
 const mockIsUserProfileStale = vi.fn()
 const mockFetchUserProfile = vi.fn()
@@ -11,6 +12,7 @@ const mockFetchUserProfile = vi.fn()
 // Stub globals
 vi.stubGlobal('navigateTo', mockNavigateTo)
 vi.stubGlobal('useSupabaseUser', mockUseSupabaseUser)
+vi.stubGlobal('useSupabaseClient', mockUseSupabaseClient)
 vi.stubGlobal('defineNuxtRouteMiddleware', (cb: any) => cb) // Pass through the callback
 
 // Mock Composables
@@ -28,10 +30,22 @@ describe('Admin Middleware', () => {
     mockUseSupabaseUser.mockReturnValue({ value: { email: 'test@example.com' } }) // Logged in
     mockUseUserState.mockReturnValue({ value: { is_admin: true, isAuthenticated: true } }) // Is Admin
     mockIsUserProfileStale.mockReturnValue(false)
+
+    // Mock Supabase client with getSession
+    mockUseSupabaseClient.mockReturnValue({
+      auth: {
+        getSession: vi.fn().mockResolvedValue({ data: { session: { user: { email: 'test@example.com' } } } })
+      }
+    })
   })
 
   it('should redirect to login if user is not authenticated', async () => {
     mockUseSupabaseUser.mockReturnValue({ value: null })
+    mockUseSupabaseClient.mockReturnValue({
+      auth: {
+        getSession: vi.fn().mockResolvedValue({ data: { session: null } })
+      }
+    })
 
     await adminMiddleware({} as any, {} as any)
 
