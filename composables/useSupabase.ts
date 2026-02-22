@@ -20,7 +20,6 @@ export const isUserProfileStale = (): boolean => {
 
 // Fetch user profile with credits and admin status
 export const fetchUserProfile = async (forceRefresh = false) => {
-  const user = useSupabaseUser();
   const creditsState = useCreditsState();
   const userState = useUserState();
   const lastFetch = useUserStateLastFetch();
@@ -28,7 +27,10 @@ export const fetchUserProfile = async (forceRefresh = false) => {
   const supabase = useSupabaseClient();
   const router = useRouter();
 
-  if (!user.value?.id) return null;
+  const { data: { session } } = await supabase.auth.getSession();
+  const userId = session?.user?.id;
+
+  if (!userId) return null;
 
   // Skip fetch if cache is still valid (unless force refresh)
   if (!forceRefresh && !isUserProfileStale() && userState.value) {
@@ -80,9 +82,9 @@ export const signOut = async () => {
 
 // Fetch user's analyses
 export const useUserAnalyses = async () => {
-  const user = useSupabaseUser();
-
-  if (!user.value?.id) return [];
+  const supabase = useSupabaseClient();
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user?.id) return [];
 
   try {
     // [SECURITY FIX M4] Use API endpoint instead of direct Supabase query
@@ -115,12 +117,12 @@ export const saveAnalysis = async (
 // Upload file to Supabase Storage
 export const uploadContractFile = async (file: File) => {
   const client = useSupabaseClient();
-  const user = useSupabaseUser();
+  const { data: { session } } = await client.auth.getSession();
 
-  if (!user.value?.id) throw new Error("User not authenticated");
+  if (!session?.user?.id) throw new Error("User not authenticated");
 
   const fileExt = file.name.split(".").pop();
-  const fileName = `${user.value.id}/${Date.now()}.${fileExt}`;
+  const fileName = `${session.user.id}/${Date.now()}.${fileExt}`;
 
   const { data: _uploadData, error } = await client.storage
     .from("contracts")
