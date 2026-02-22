@@ -35,7 +35,9 @@
         <div>
           <h4
             class="font-bold text-slate-900 dark:text-white mb-6 uppercase tracking-widest text-sm"
-          >Producto</h4>
+          >
+            Producto
+          </h4>
           <ul class="space-y-4 text-slate-500 dark:text-slate-400 text-sm">
             <li>
               <NuxtLink
@@ -59,7 +61,9 @@
         <div>
           <h4
             class="font-bold text-slate-900 dark:text-white mb-6 uppercase tracking-widest text-sm"
-          >Legal</h4>
+          >
+            Legal
+          </h4>
           <ul class="space-y-4 text-slate-500 dark:text-slate-400 text-sm">
             <li>
               <NuxtLink
@@ -94,7 +98,9 @@
           es de carácter informativo y debe ser revisada por un profesional
           cualificado antes de tomar decisiones.
         </p>
-        <p class="text-slate-400 text-xs mt-4 md:mt-0 whitespace-nowrap">Made with Nuxt 3 & AI</p>
+        <p class="text-slate-400 text-xs mt-4 md:mt-0 whitespace-nowrap">
+          Made with Nuxt 3 & AI
+        </p>
       </div>
     </div>
   </footer>
