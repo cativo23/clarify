@@ -1,0 +1,273 @@
+# CONTRATO DE SERVICIOS PROFESIONALES - SIN RIESGO
+
+## SECCIÓN 1: PARTES DEL CONTRATO
+
+Entre OPENCODE SERVICES S.COOP., cooperativa constituida bajo las leyes de España, con domicilio en Plaza del Pueblo 1, 48001 Bilbao, España (en adelante, "EL PROVEEDOR"); y [NOMBRE DEL CLIENTE], con domicilio en [DIRECCIÓN] (en adelante, "EL CLIENTE").
+
+## SECCIÓN 2: NATURALEZA DEL SERVICIO
+
+### 2.1 Descripción
+EL PROVEEDOR ofrece servicios de consultoría y desarrollo de software bajo metodología ágil y principios de código abierto.
+
+### 2.2 Filosofía de Servicio
+EL PROVEEDOR se compromete a trabajar de forma transparente, colaborativa y en el mejor interés del CLIENTE en todo momento.
+
+## SECCIÓN 3: DURACIÓN Y FLEXIBILIDAD
+
+### 3.1 Sin Compromiso de Permanencia
+Este contrato no tiene duración mínima obligatoria. EL CLIENTE puede contratar el servicio mes a mes según sus necesidades.
+
+### 3.2 Cancelación Sin Penalización
+EL CLIENTE puede cancelar el contrato en cualquier momento, sin penalizaciones, cargos adicionales ni trámites burocráticos. Basta con notificar por email con SIETE (7) DÍAS de antelación.
+
+### 3.3 Reembolso Proporcional
+Al cancelar, EL CLIENTE recibirá un reembolso proporcional de los días no utilizados del período facturado, procesado dentro de los 5 días hábiles siguientes.
+
+## SECCIÓN 4: PRECIOS, FACTURACIÓN Y PAGO
+
+### 4.1 Tarifas Claras
+- Consultoría: EUR €75/hora
+- Desarrollo: EUR €65/hora
+- Soporte premium: EUR €150/mes (opcional)
+
+### 4.2 Sin Cargos Ocultos
+Las tarifas publicadas son finales. No hay cargos por:
+- Configuración inicial
+- Reuniones de seguimiento
+- Documentación
+- Formación básica
+
+### 4.3 Congelación de Precios
+Una vez iniciado un proyecto, las tarifas se mantienen fijas durante TODA su duración, sin aumentos ni ajustes.
+
+### 4.4 Presupuestos Cerrados
+Para proyectos específicos, EL PROVEEDOR proporcionará un presupuesto cerrado por escrito que no podrá ser excedido sin autorización expresa del CLIENTE.
+
+### 4.5 Facturación y Términos de Pago
+- Las facturas se emitirán MENSUALMENTE, dentro de los primeros 5 días del mes siguiente
+- El plazo de pago es de TREINTA (30) DÍAS naturales desde la recepción de la factura
+- El pago se realizará mediante transferencia bancaria a la cuenta indicada en la factura
+- La moneda de facturación es el EURO (EUR)
+- Los precios NO incluyen IVA, que se aplicará según la normativa vigente
+- Para clientes fuera de la UE con certificado de empresa intracomunitaria, no se aplicará IVA
+- En caso de retraso en el pago, se aplicará un interés de mora del 5% anual sobre el importe vencido
+
+### 4.6 Impuestos y Responsabilidad Fiscal
+Cada parte será responsable de sus propias obligaciones fiscales. EL PROVEEDOR emitirá las facturas con el IVA desglosado según corresponda.
+
+## SECCIÓN 5: PROPIEDAD INTELECTUAL Y DATOS
+
+### 5.1 Propiedad del Cliente
+TODO el trabajo desarrollado, código, documentación, diseños y entregables serán propiedad EXCLUSIVA del CLIENTE desde el momento de su creación.
+
+### 5.2 Cesión Automática
+EL PROVEEDOR cede automáticamente al CLIENTE todos los derechos de propiedad intelectual sobre el trabajo realizado, sin necesidad de documentación adicional.
+
+### 5.3 Licencia de Herramientas Propias
+Si EL PROVEEDOR utiliza sus propias librerías o herramientas, concederá al CLIENTE una licencia perpetua, irrevocable, gratuita y no exclusiva para su uso.
+
+### 5.4 Código Abierto
+Cuando sea posible, EL PROVEEDOR utilizará y contribuirá a proyectos de código abierto, beneficiando al CLIENTE con software probado y sin costos de licencia.
+
+### 5.5 Datos del Cliente
+Todos los datos, información confidencial y materiales proporcionados por el CLIENTE son y serán siempre de su exclusiva propiedad.
+
+### 5.6 Sin Uso Comercial de Datos
+EL PROVEEDOR no utilizará la información del CLIENTE para fines comerciales, marketing o desarrollo de productos propios.
+
+### 5.7 Confidencialidad
+EL PROVEEDOR mantendrá estricta confidencialidad sobre toda la información del CLIENTE, incluso después de finalizado el contrato.
+
+## SECCIÓN 6: GARANTÍAS Y CALIDAD
+
+### 6.1 Garantía de Satisfacción Total
+EL PROVEEDOR garantiza que el CLIENTE estará completamente satisfecho con el trabajo. Si no es así, se realizarán las modificaciones necesarias sin costo adicional.
+
+### 6.2 Período de Garantía Extendida
+Todo el trabajo realizado tiene una garantía de UN (1) AÑO desde la entrega. Cualquier error o defecto será corregido gratuitamente sin límite de intervenciones. Esta garantía se extiende indefinidamente para bugs críticos de seguridad.
+
+### 6.3 Estándares de Calidad
+EL PROVEEDOR se compromete a:
+- Seguir las mejores prácticas de la industria
+- Escribir código limpio, documentado y testeado
+- Cumplir con los plazos acordados
+- Comunicar proactivamente cualquier incidencia
+
+### 6.4 Revisiones Ilimitadas
+EL CLIENTE puede solicitar revisiones y ajustes al trabajo sin límite, siempre que estén dentro del alcance acordado.
+
+### 6.5 Proceso de Aceptación de Entregables
+- EL PROVEEDOR entregará los hitos acordados por escrito
+- EL CLIENTE tendrá QUINCE (15) DÍAS HÁBILES para revisar y aceptar o solicitar cambios
+- La aceptación será siempre EXPRESA por escrito (email válido)
+- Los cambios fuera del alcance podrán presupuestarse adicionalmente
+- Si EL CLIENTE no responde en 15 días, el PROVEEDOR enviará un recordatorio
+- Si tras el recordatorio no hay respuesta en 5 días más, se considerará ACEPTADO TÁCITAMENTE
+
+## SECCIÓN 7: RESPONSABILIDAD
+
+### 7.1 Responsabilidad Completa
+EL PROVEEDOR asume responsabilidad completa por:
+- Errores o defectos en el trabajo realizado
+- Incumplimiento de plazos acordados
+- Violación de confidencialidad
+- Infracción de derechos de terceros
+
+### 7.2 Seguro de Responsabilidad
+EL PROVEEDOR cuenta con un seguro de responsabilidad profesional que cubre hasta EUR €2,000,000 por reclamación, con cobertura agregada anual de EUR €5,000,000. EL PROVEEDOR proporcionará certificado de seguro actualizado al CLIENTE dentro de los CINCO (5) DÍAS siguientes al inicio del contrato y anualmente durante su vigencia.
+
+### 7.3 Sin Límites Abusivos
+Este contrato no limita la responsabilidad del PROVEEDOR en casos de:
+- Negligencia
+- Dolo o mala fe
+- Violación de datos
+- Infracción de propiedad intelectual
+
+## SECCIÓN 8: METODOLOGÍA DE TRABAJO
+
+### 8.1 Transparencia Total
+EL CLIENTE tendrá acceso completo a:
+- Estado del proyecto en tiempo real
+- Repositorio de código
+- Documentación actualizada
+- Registro de horas trabajadas
+
+### 8.2 Comunicación Abierta
+EL PROVEEDOR proporcionará:
+- Reuniones semanales de seguimiento
+- Reportes de progreso detallados
+- Canal directo de comunicación (email, chat, video)
+
+### 8.3 Flexibilidad
+El alcance del proyecto puede ajustarse en cualquier momento según las necesidades del CLIENTE, sin penalizaciones.
+
+## SECCIÓN 9: PRIVACIDAD Y PROTECCIÓN DE DATOS
+
+### 9.1 Minimización de Datos
+EL PROVEEDOR solo solicita los datos estrictamente necesarios para la prestación del servicio.
+
+### 9.5 Notificación de Violación de Datos
+En caso de violación de seguridad que afecte datos del CLIENTE, EL PROVEEDOR notificará dentro de las VEINTICUATRO (24) HORAS siguientes al descubrimiento, detallando el alcance, medidas tomadas y pasos de remediación. EL PROVEEDOR cubrirá costos de notificación a afectados si corresponde.
+
+### 9.2 Sin Retención Innecesaria
+Los datos del CLIENTE se eliminan completamente al finalizar el contrato, salvo obligación legal expresa.
+
+### 9.3 Derechos del Cliente
+EL CLIENTE puede en cualquier momento:
+- Acceder a todos sus datos
+- Rectificar información
+- Solicitar eliminación completa
+- Obtener copia en formato estándar
+
+### 9.4 Sin Transferencias Internacionales
+Los datos se almacenan exclusivamente en servidores dentro de la Unión Europea.
+
+## SECCIÓN 10: MODIFICACIONES AL CONTRATO
+
+### 10.1 Consenso Requerido
+Este contrato solo puede modificarse con el consentimiento EXPRESO Y POR ESCRITO de AMBAS partes.
+
+### 10.2 Sin Cambios Unilaterales
+EL PROVEEDOR no se reserva ningún derecho de modificar el contrato unilateralmente.
+
+## SECCIÓN 11: RESOLUCIÓN DE DISPUTAS
+
+### 11.1 Diálogo Directo
+Cualquier cuestión se resolverá mediante conversación directa entre las partes en un plazo máximo de SIETE (7) DÍAS.
+
+### 11.2 Mediación Sin Costo
+Si el diálogo no funciona, las partes acudirán a mediación. Los costos se dividirán equitativamente.
+
+### 11.3 Jurisdicción del Cliente
+Si es necesario acudir a tribunales, EL CLIENTE puede elegir entre:
+- Su propio domicilio
+- El domicilio del PROVEEDOR
+- Bilbao, España
+
+### 11.4 Ley Aplicable
+Este contrato se rige por las leyes de España, con especial atención a la protección del consumidor.
+
+## SECCIÓN 12: COMPROMISOS ÉTICOS
+
+### 12.1 Código de Ética
+EL PROVEEDOR se adhiere a un código de ética que incluye:
+- Honestidad y transparencia absolutas
+- Respeto al medio ambiente
+- Compromiso con la accesibilidad digital
+- Rechazo a proyectos dañinos o poco éticos
+
+### 12.2 Derecho a Rechazar Proyectos
+EL PROVEEDOR se reserva el derecho de rechazar proyectos que considere poco éticos, con reembolso completo al CLIENTE si ya se inició el trabajo.
+
+## SECCIÓN 13: DERECHOS DEL CLIENTE
+
+### 13.1 Carta de Derechos
+EL CLIENTE tiene derecho a:
+- Ser tratado con respeto y profesionalidad
+- Recibir información clara y veraz
+- La máxima calidad posible
+- Reclamar y ser escuchado
+- La protección de sus datos y propiedad intelectual
+
+### 13.2 Sin Cláusulas Abusivas
+Cualquier cláusula que pueda limitar derechos fundamentales del CLIENTE se tendrá por no escrita.
+
+## SECCIÓN 14: DISPOSICIONES GENERALES
+
+### 14.1 Idioma
+Este contrato está redactado originalmente en español. Las traducciones a otros idiomas son solo para conveniencia y no tienen valor contractual.
+
+### 14.2 Validez Parcial
+Si alguna cláusula fuera declarada nula, el resto del contrato mantendrá su validez plena.
+
+### 14.3 Títulos
+Los títulos de las secciones son solo para conveniencia y no afectan la interpretación del contrato.
+
+### 14.4 Acuerdos Previos
+Este documento reemplaza cualquier acuerdo previo entre las partes.
+
+### 14.5 Cesión
+EL PROVEEDOR no podrá ceder este contrato sin consentimiento previo del CLIENTE. EL CLIENTE sí puede cederlo a un sucesor de su negocio con notificación escrita.
+
+---
+
+## ANEXO A: POLÍTICA DE SATISFACCIÓN
+
+### Nuestra Promesa
+Si EL CLIENTE no está 100% satisfecho con el trabajo:
+1. Lo comunicará por escrito detallando los problemas
+2. EL PROVEEDOR tendrá 5 días para corregirlos
+3. Si persiste la insatisfacción, se ofrecerá reembolso proporcional
+4. Sin preguntas incómodas, sin trámites burocráticos
+
+---
+
+## ANEXO B: CANALES DE COMUNICACIÓN Y SLA
+
+| Propósito | Canal | Tiempo de Respuesta |
+|-----------|-------|---------------------|
+| Consultas generales | info@opencode.example | 24 horas |
+| Soporte técnico | soporte@opencode.example | 4 horas |
+| Urgencias | +34 600 000 000 | 1 hora |
+| Reclamaciones | reclamaciones@opencode.example | 48 horas |
+
+### Compromiso de Disponibilidad
+EL PROVEEDOR mantiene un objetivo de disponibilidad del 99% para servicios en línea. Si la disponibilidad mensual es menor, EL CLIENTE recibirá un crédito del 5% en su próxima factura por cada punto porcentual por debajo del objetivo.
+
+---
+
+**FIRMADO Y ACEPTADO CONFORME:**
+
+___________________________
+EL PROVEEDOR
+OPENCODE SERVICES S.COOP.
+NIF: F12345678
+
+___________________________
+EL CLIENTE
+[NOMBRE Y FIRMA]
+NIF/NIE: _______________
+
+FECHA: _______________
+
+EN BILBAO, A ___ DE ___________ DE 20___

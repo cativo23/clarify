@@ -1,0 +1,175 @@
+# CONTRATO DE LICENCIA DE SOFTWARE - RIESGO MEDIO
+
+## SECCIÓN 1: PARTES CONTRATANTES
+
+Entre DATASOFT SOLUTIONS S.L., sociedad constituida bajo las leyes de España, con domicilio en Calle Mayor 45, 28013 Madrid, España (en adelante, "EL LICENCIANTE"); y [NOMBRE DEL CLIENTE], con domicilio en [DIRECCIÓN] (en adelante, "EL LICENCIATARIO").
+
+## SECCIÓN 2: OBJETO DEL CONTRATO
+
+EL LICENCIANTE otorga al LICENCIATARIO una licencia no exclusiva, intransferible y revocable para utilizar el software denominado "DataSoft Analytics Platform" conforme a los términos y condiciones establecidos en este contrato.
+
+## SECCIÓN 3: DURACIÓN Y RENOVACIÓN
+
+### 3.1 Duración Inicial
+El presente contrato tendrá una duración inicial de DOCE (12) MESES, contados a partir de la fecha de activación de la licencia.
+
+### 3.2 Renovación Automática
+El contrato se renovará automáticamente por períodos anuales adicionales, salvo que cualquiera de las partes notifique por escrito su intención de no renovar con TREINTA (30) DÍAS DE ANTICIPACIÓN a la fecha de vencimiento.
+
+### 3.3 Notificación de Renovación
+EL LICENCIANTE enviará un recordatorio por correo electrónico al LICENCIATARIO aproximadamente QUINCE (15) DÍAS antes del vencimiento del período actual.
+
+## SECCIÓN 4: PRECIO Y CONDICIONES DE PAGO
+
+### 4.1 Precio de la Licencia
+EL LICENCIATARIO pagará la cantidad de EUR €89.00 (OCHENTA Y NUEVE EUROS) mensuales.
+
+### 4.2 Forma de Pago
+Los pagos se realizarán mensualmente por adelantado mediante tarjeta de crédito, débito o transferencia bancaria.
+
+### 4.3 Ajuste de PreciosEL LICENCIANTE podrá ajustar el precio de la licencia anualmente, con un incremento máximo del QUINCE POR CIENTO (15%) o el índice de inflación oficial, lo que sea menor. El LICENCIANTE deberá notificar al LICENCIATARIO con QUINCE (15) DÍAS DE ANTICIPACIÓN.
+
+### 4.4 Reembolsos
+Los reembolsos solo estarán disponibles dentro de los primeros SIETE (7) DÍAS posteriores a la compra, siempre que el uso del software haya sido menor a 10 horas.
+
+## SECCIÓN 5: OBLIGACIONES DEL LICENCIATARIO
+
+### 5.1 Uso Permitido
+El LICENCIATARIO podrá utilizar el software únicamente para fines comerciales o personales legítimos.
+
+### 5.2 Restricciones
+Queda prohibido:
+- Reverse engineering, descompilación o desensamblaje del software
+- Compartir credenciales de acceso con terceros
+- Utilizar el software para actividades ilegales o fraudulentas
+- Exceder los límites de uso establecidos en el plan contratado
+
+## SECCIÓN 6: PROPIEDAD INTELECTUAL
+
+### 6.1 Titularidad
+Todo el software, documentación, marcas y propiedad intelectual relacionada permanece siendo propiedad exclusiva del LICENCIANTE.
+
+### 6.2 Feedback
+Cualquier sugerencia o feedback proporcionado por el LICENCIATARIO podrá ser utilizado por el LICENCIANTE sin compensación alguna.
+
+## SECCIÓN 7: PRIVACIDAD Y PROTECCIÓN DE DATOS
+
+### 7.1 Recolección de Datos
+EL LICENCIANTE recopilará los siguientes datos del LICENCIATARIO:
+- Nombre y apellidos
+- Dirección de correo electrónico
+- Datos de facturación
+- Datos de uso del software (analytics)
+
+### 7.2 Uso de DatosLos datos personales serán utilizados para:
+- Prestación del servicio
+- Facturación y cobro
+- Comunicaciones relacionadas con el servicio
+- Mejora del producto (datos anonimizados)
+
+### 7.3 Compartición de Datos
+EL LICENCIANTE podrá compartir datos con:
+- Procesadores de pago (Stripe, PayPal)
+- Proveedores de hosting y infraestructura
+- Autoridades cuando sea requerido por ley
+
+### 7.4 Derechos ARCO
+El LICENCIATARIO podrá ejercer sus derechos de acceso, rectificación, cancelación y oposición contactando a privacidad@datasoft.example.com.
+
+### 7.5 Retención de Datos
+Los datos serán retenidos durante la vigencia del contrato y hasta CINCO (5) AÑOS después de su terminación, conforme a obligaciones legales.
+
+## SECCIÓN 8: GARANTÍAS Y SOPORTE
+
+### 8.1 Garantía LimitadaEL LICENCIANTE garantiza que el software funcionará sustancialmente conforme a la documentación proporcionada durante un período de TREINTA (30) DÍAS desde la activación.
+
+### 8.2 Soporte Técnico
+El LICENCIANTE proporcionará soporte técnico por correo electrónico durante días laborables (lunes a viernes, 9:00-18:00 CET). El tiempo de respuesta objetivo es de 48 horas.
+
+### 8.3 Exclusiones de Garantía
+La garantía no cubre:
+- Problemas causados por mal uso del software
+- Incompatibilidades con hardware o software de terceros
+- Modificaciones no autorizadas al software
+
+## SECCIÓN 9: LIMITACIÓN DE RESPONSABILIDAD
+
+### 9.1 Exclusiones
+EL LICENCIANTE NO SERÁ RESPONSABLE POR DAÑOS INDIRECTOS, INCIDENTALES O CONSECUENTES, INCLUYENDO PÉRDIDA DE DATOS O BENEFICIOS.
+
+### 9.2 Límite MáximoLA RESPONSABILIDAD TOTAL DEL LICENCIANTE ESTARÁ LIMITADA AL MONTO PAGADO POR EL LICENCIATARIO EN LOS ÚLTIMOS SEIS (6) MESES ANTERIORES AL RECLAMO.
+
+## SECCIÓN 10: MODIFICACIONES AL CONTRATO
+
+### 10.1 Notificación de CambiosEL LICENCIANTE podrá modificar este contrato notificando al LICENCIATARIO por correo electrónico con QUINCE (15) DÍAS DE ANTICIPACIÓN.
+
+### 10.2 Derecho a Rechazar
+Si el LICENCIATARIO no acepta las modificaciones, podrá cancelar el contrato antes de que las modificaciones entren en vigor sin penalización alguna.
+
+### 10.3 Continuidad
+El uso continuado del servicio después de las modificaciones constituye aceptación de los nuevos términos.
+
+## SECCIÓN 11: SUSPENSIÓN Y TERMINACIÓN
+
+### 11.1 Suspensión del Servicio
+EL LICENCIANTE podrá suspender el acceso al software en caso de:
+- Falta de pago
+- Violación de los términos de uso
+- Mantenimiento programado (con 24 horas de notificación)
+
+### 11.2 Terminación por el Licenciatario
+EL LICENCIATARIO podrá cancelar el contrato en cualquier momento, sujeto a las condiciones de reembolso de la cláusula 4.4.
+
+### 11.3 Terminación por el Licenciante
+EL LICENCIANTE podrá terminar el contrato si el LICENCIATARIO viola los términos, con SIETE (7) DÍAS de notificación para remediar la violación.
+
+### 11.4 Efectos de la Terminación
+Al terminar el contrato:
+- Cesará el acceso al software
+- EL LICENCIATARIO deberá destruir todas las copias del software
+- Los datos del LICENCIATARIO serán exportables durante 30 días
+
+## SECCIÓN 12: DISPONIBILIDAD DEL SERVICIO
+
+### 12.1 Objetivo de DisponibilidadEL LICENCIANTE tiene como objetivo mantener una disponibilidad del 98% mensual, excluyendo mantenimiento programado.
+
+### 12.2 Mantenimiento Programado
+El mantenimiento se realizará preferentemente en horarios de menor actividad (fines de semana, noches CET).
+
+## SECCIÓN 13: RESOLUCIÓN DE DISPUTAS
+
+### 13.1 Negociación
+Las partes intentarán resolver cualquier disputa mediante negociación de buena fe durante TREINTA (30) DÍAS.
+
+### 13.2 JurisdicciónSi la negociación falla, las disputas se resolverán ante los tribunales de Madrid, España, con renuncia expresa a cualquier otro fuero.
+
+### 13.3 Ley Aplicable
+Este contrato se regirá por las leyes de España.
+
+## SECCIÓN 14: DISPOSICIONES GENERALES
+
+### 14.1 Cesión
+EL LICENCIANTE podrá ceder el contrato a un sucesor o adquiriente. EL LICENCIATARIO no podrá ceder el contrato sin consentimiento previo por escrito.
+
+### 14.2 Idioma
+Este contrato está redactado en español e inglés. En caso de discrepancia, prevalecerá la versión en español.
+
+### 14.3 Comunicaciones
+Las notificaciones se enviarán por correo electrónico a las direcciones registradas por las partes.
+
+### 14.4 Acuerdo Completo
+Este documento constituye el acuerdo completo entre las partes y reemplaza cualquier acuerdo previo.
+
+---
+
+**ACEPTADO Y CONFORME:**
+
+___________________________
+EL LICENCIANTE
+DATASOFT SOLUTIONS S.L.
+
+___________________________
+EL LICENCIATARIO
+[NOMBRE Y FIRMA]
+
+FECHA: _______________

@@ -52,6 +52,41 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/) with [Gitmoj
 Format: `<type>(<scope>): <gitmoji> <description>`
 Types: `feat` ✨, `fix` 🐛, `docs` 📝, `refactor` ♻️, `chore` 🔧, `security` 🔐, `cleanup` 🔥, `perf` ⚡, `style` 🎨, `test` ✅.
 
+### GitFlow Release Process
+For alpha releases, follow GitFlow workflow using GitHub CLI:
+
+```bash
+# 1. Create release branch from feature branch
+git checkout -b release/v1.0.0-alpha.X
+git push -u origin release/v1.0.0-alpha.X
+
+# 2. Create PRs to develop and main
+gh pr create --base develop --head release/v1.0.0-alpha.X --title "release: v1.0.0-alpha.X" --body "Release notes..."
+gh pr create --base main --head release/v1.0.0-alpha.X --title "release: v1.0.0-alpha.X" --body "Release notes..."
+
+# 3. Merge PRs (after any required reviews)
+gh pr merge <PR_NUMBER> --merge --admin
+
+# 4. Create and push tag
+git checkout main && git pull origin main
+git tag -a v1.0.0-alpha.X -m "Release v1.0.0-alpha.X - Description"
+git push origin v1.0.0-alpha.X
+
+# 5. Create GitHub release
+gh release create v1.0.0-alpha.X --title "v1.0.0-alpha.X" --notes "Changelog..." --prerelease
+
+# 6. Cleanup release branch
+git push origin --delete release/v1.0.0-alpha.X
+git branch -D release/v1.0.0-alpha.X
+```
+
+**Key Rules:**
+- All merges between branches MUST be done via GitHub PRs
+- PRs must be created and accepted via GitHub CLI (`gh pr create`, `gh pr merge`)
+- Tags and releases are created using GitHub CLI (`gh release create`)
+- Release branches follow naming convention: `release/v1.0.0-alpha.X`
+- All releases are pre-release (`--prerelease` flag) until stable
+
 ## 🛠️ Common Commands
 ```bash
 # Development
