@@ -1,5 +1,4 @@
 import {
-  serverSupabaseUser,
   serverSupabaseClient,
   serverSupabaseServiceRole,
 } from "#supabase/server";
@@ -14,7 +13,8 @@ export default defineEventHandler(async (event) => {
     // [SECURITY FIX M1] Rate limiting to prevent user enumeration and DoS
     await applyRateLimit(event, RateLimitPresets.standard, "user");
 
-    user = await serverSupabaseUser(event);
+    const _client = await serverSupabaseClient(event);
+    user = (await _client.auth.getUser()).data.user;
 
     if (!user) {
       throw createError({

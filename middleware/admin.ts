@@ -5,10 +5,11 @@ import {
 } from "~/composables/useSupabase";
 
 export default defineNuxtRouteMiddleware(async (_to, _from) => {
-  const user = useSupabaseUser();
+  const supabase = useSupabaseClient();
+  const { data: { session } } = await supabase.auth.getSession();
 
   // 1. Check Authentication
-  if (!user.value) {
+  if (!session?.user) {
     return navigateTo("/login");
   }
 
@@ -27,7 +28,7 @@ export default defineNuxtRouteMiddleware(async (_to, _from) => {
     // Redirect to dashboard or error page if not authorized
     console.warn(
       "Unauthorized access attempt to admin area by:",
-      user.value.email,
+      session?.user?.email,
     );
     return navigateTo("/");
   }

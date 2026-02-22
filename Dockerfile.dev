@@ -1,7 +1,7 @@
 # Development Dockerfile for Clarify
 # Optimized for hot reload with Nuxt 3
 
-FROM node:23-alpine
+FROM node:24-alpine
 
 # Install dependencies for file watching
 RUN apk add --no-cache libc6-compat

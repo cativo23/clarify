@@ -82,10 +82,11 @@ export function sanitizeAnalysesList(
  * @returns User context with admin flag
  */
 export async function getRequestUserContext(event: any) {
-  const { serverSupabaseUser } = await import("#supabase/server");
+  const { serverSupabaseClient } = await import("#supabase/server");
 
   try {
-    const user = await serverSupabaseUser(event);
+    const _client = await serverSupabaseClient(event);
+    const user = (await _client.auth.getUser()).data.user;
 
     if (!user) {
       return {
