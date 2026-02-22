@@ -83,6 +83,23 @@ npm run dev
 
 ---
 
+## 🧪 Testing
+
+```bash
+# Unit tests
+npm run test:run       # Run once
+npm run test           # Watch mode
+npm run test:ui        # Graphical UI
+
+# E2E tests (from host machine)
+npm run test:e2e       # Run all E2E tests
+npm run test:e2e:ui    # With UI
+```
+
+📖 See [Testing Guide](docs/TESTING.md) for detailed documentation.
+
+---
+
 ## 📂 Estructura del Proyecto
 
 ```text
@@ -109,6 +126,7 @@ Para una configuración más profunda, consulta nuestras guías para desarrollad
 4. 💳 [Stripe Setup](docs/STRIPE_SETUP.md)
 5. 🗄️ [Supabase Setup](docs/SUPABASE_SETUP.md)
 6. 📖 [Developer Walkthrough](docs/DEV_WALKTHROUGH.md)
+7. 🧪 [Testing Guide](docs/TESTING.md)
 
 ---
 

@@ -168,7 +168,9 @@ ${processedText}
             if (message?.refusal) {
                 console.error('OpenAI Refusal:', message.refusal)
                 // [SECURITY FIX H3] Don't expose OpenAI refusal details
-                throw new Error('Unable to analyze contract. Please try again or contact support.')
+                const err: any = new Error('Unable to analyze contract. Please try again or contact support.')
+                err.debugInfo = { type: 'REFUSAL', model }
+                throw err
             }
 
             if (choice?.finish_reason === 'length') {
@@ -237,7 +239,7 @@ ${processedText}
         if (error.message?.includes('token')) {
             throw new Error('Token limit exceeded. Please try with a shorter contract.')
         }
-        
+
         if (error.message?.includes('API') || error.message?.includes('connection')) {
             throw new Error('AI service temporarily unavailable. Please try again later.')
         }
