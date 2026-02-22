@@ -4,7 +4,7 @@
 # ============================================
 # Stage 1: Dependencies
 # ============================================
-FROM node:20-alpine AS deps
+FROM node:24-alpine AS deps
 
 RUN apk add --no-cache libc6-compat
 
@@ -19,7 +19,7 @@ RUN npm ci
 # ============================================
 # Stage 2: Builder
 # ============================================
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
@@ -35,7 +35,7 @@ RUN npm run build
 # ============================================
 # Stage 3: Production Runner
 # ============================================
-FROM node:20-alpine AS runner
+FROM node:24-alpine AS runner
 
 # Install security updates
 RUN apk update && apk upgrade --no-cache

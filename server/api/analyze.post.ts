@@ -1,4 +1,4 @@
-import { serverSupabaseUser, serverSupabaseClient } from "#supabase/server";
+import { serverSupabaseClient } from "#supabase/server";
 import { getAnalysisQueue } from "../utils/queue";
 import { validateSupabaseStorageUrl } from "../utils/ssrf-protection";
 import { handleApiError } from "../utils/error-handler";
@@ -23,7 +23,8 @@ const analyzeRequestSchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
-  const user = await serverSupabaseUser(event);
+  const _client = await serverSupabaseClient(event);
+  const user = (await _client.auth.getUser()).data.user;
   if (!user) {
     throw createError({ statusCode: 401, message: "Unauthorized" });
   }
