@@ -58,12 +58,19 @@ export function useUploadProgress() {
           }
         } else {
           // Handle HTTP errors
-          let errorMsg = `Error ${xhr.status}: ${xhr.statusText}`;
-          try {
-            const errorData = JSON.parse(xhr.responseText);
-            errorMsg = errorData.message || errorMsg;
-          } catch {
-            // Use status text if no JSON error
+          let errorMsg: string;
+
+          // Specific handling for 413 Payload Too Large
+          if (xhr.status === 413) {
+            errorMsg = "El archivo excede el tamaño máximo de 10MB. Por favor sube un documento más pequeño.";
+          } else {
+            errorMsg = `Error ${xhr.status}: ${xhr.statusText}`;
+            try {
+              const errorData = JSON.parse(xhr.responseText);
+              errorMsg = errorData.message || errorMsg;
+            } catch {
+              // Use status text if no JSON error
+            }
           }
           uploadError.value = errorMsg;
           isUploading.value = false;

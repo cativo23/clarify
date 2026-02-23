@@ -335,9 +335,10 @@ const validateFile = (file: File): boolean => {
   }
 
   // Check file size (10MB max)
-  const maxSize = 10 * 1024 * 1024;
+  const maxSizeMB = 10;
+  const maxSize = maxSizeMB * 1024 * 1024;
   if (file.size > maxSize) {
-    error.value = "El archivo no debe superar los 10MB";
+    error.value = `El archivo es demasiado grande (máx. ${maxSizeMB}MB). Por favor sube un documento más pequeño.`;
     emit("error", error.value);
     return false;
   }
