@@ -236,7 +236,9 @@ const creditPackages = [
 ];
 
 const fetchUserCredits = async () => {
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   if (!session?.user?.id) return;
 
   const { data } = await supabase

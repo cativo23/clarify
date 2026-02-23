@@ -42,10 +42,7 @@
       </div>
 
       <!-- Failed Analysis State -->
-      <div
-        v-else-if="analysis.status === 'failed'"
-        class="animate-fade-in"
-      >
+      <div v-else-if="analysis.status === 'failed'" class="animate-fade-in">
         <div
           class="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-premium p-10 mb-10 border border-slate-100 dark:border-slate-800 relative overflow-hidden"
         >
@@ -71,9 +68,7 @@
                 />
               </svg>
             </div>
-            <h2
-              class="text-3xl font-black text-slate-900 dark:text-white mb-3"
-            >
+            <h2 class="text-3xl font-black text-slate-900 dark:text-white mb-3">
               Análisis Fallido
             </h2>
             <p class="text-slate-600 dark:text-slate-400 text-lg">
@@ -112,7 +107,10 @@
                 <p
                   class="text-slate-700 dark:text-slate-300 font-medium leading-relaxed"
                 >
-                  {{ analysis.error_message || "Error desconocido durante el análisis" }}
+                  {{
+                    analysis.error_message ||
+                    "Error desconocido durante el análisis"
+                  }}
                 </p>
               </div>
             </div>
@@ -120,7 +118,10 @@
 
           <!-- Common Timeout Error Specific Guidance -->
           <div
-            v-if="analysis.error_message?.includes('timed out') || analysis.error_message?.includes('tiempo')"
+            v-if="
+              analysis.error_message?.includes('timed out') ||
+              analysis.error_message?.includes('tiempo')
+            "
             class="p-6 bg-amber-50 dark:bg-amber-950/20 rounded-2xl border border-amber-200 dark:border-amber-800/50 mb-8"
           >
             <h3
@@ -139,28 +140,22 @@
             >
               <li class="flex items-start gap-2">
                 <span class="text-amber-600 dark:text-amber-500 mt-1">•</span>
-                <span
-                  >Un contrato muy extenso (>100 páginas)</span
-                >
+                <span>Un contrato muy extenso (>100 páginas)</span>
               </li>
               <li class="flex items-start gap-2">
                 <span class="text-amber-600 dark:text-amber-500 mt-1">•</span>
-                <span
-                  >Complejidad excepcional en las cláusulas</span
-                >
+                <span>Complejidad excepcional en las cláusulas</span>
               </li>
               <li class="flex items-start gap-2">
                 <span class="text-amber-600 dark:text-amber-500 mt-1">•</span>
-                <span
-                  >Latencia temporal del servicio de IA</span
-                >
+                <span>Latencia temporal del servicio de IA</span>
               </li>
             </ul>
             <div class="flex flex-wrap gap-3">
               <button
-                @click="retryAnalysis"
                 :disabled="retrying"
                 class="px-6 py-3 bg-secondary text-white rounded-xl font-bold text-sm hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                @click="retryAnalysis"
               >
                 <svg
                   v-if="retrying"
@@ -190,9 +185,9 @@
           <!-- Generic Retry Actions -->
           <div v-else class="flex flex-wrap gap-3 justify-center">
             <button
-              @click="retryAnalysis"
               :disabled="retrying"
               class="px-8 py-4 bg-secondary text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              @click="retryAnalysis"
             >
               <svg
                 v-if="retrying"

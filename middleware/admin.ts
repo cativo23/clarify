@@ -6,7 +6,9 @@ import {
 
 export default defineNuxtRouteMiddleware(async (_to, _from) => {
   const supabase = useSupabaseClient();
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
 
   // 1. Check Authentication
   if (!session?.user) {

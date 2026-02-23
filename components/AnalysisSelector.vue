@@ -200,7 +200,8 @@
         <li
           class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
         >
-          <CheckIcon class="w-4 h-4 text-secondary" /> Análisis cruzado de cláusulas
+          <CheckIcon class="w-4 h-4 text-secondary" /> Análisis cruzado de
+          cláusulas
         </li>
         <li
           class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
