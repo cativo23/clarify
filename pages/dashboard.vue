@@ -260,7 +260,7 @@
               >
                 <span
                   class="text-3xl font-black text-slate-900 dark:text-white"
-                  >{{ analyses.length }}</span
+                  >{{ riskDistributionData?.total || 0 }}</span
                 >
                 <span
                   class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest text-center leading-3"
@@ -494,7 +494,6 @@
                   </NuxtLink>
                 </div>
               </div>
-
             </div>
           </div>
 
@@ -505,14 +504,17 @@
                 Análisis Recientes
               </h2>
               <NuxtLink
-                v-if="analyses.length > 5"
+                v-if="analyses.length > 8"
                 to="/history"
                 class="text-xs font-black tracking-widest uppercase text-secondary hover:underline"
                 >Ver Todo</NuxtLink
               >
             </div>
 
-            <div v-if="loading" class="grid gap-6 md:grid-cols-2 2xl:grid-cols-4">
+            <div
+              v-if="loading"
+              class="grid gap-6 md:grid-cols-2 2xl:grid-cols-4"
+            >
               <SkeletonRecentAnalysis v-for="i in 4" :key="i" />
             </div>
 
@@ -571,10 +573,7 @@
             </div>
 
             <div v-else class="grid gap-6 md:grid-cols-2 2xl:grid-cols-4">
-              <template
-                v-for="analysis in analyses.slice(0, 6)"
-                :key="analysis.id"
-              >
+              <template v-for="analysis in analyses" :key="analysis.id">
                 <NuxtLink
                   v-if="
                     analysis.status === 'completed' ||
@@ -670,9 +669,9 @@
                         <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
-                    <div>
+                    <div class="min-w-0 flex-1">
                       <h3
-                        class="font-black text-slate-900 dark:text-white group-hover:text-secondary line-clamp-1 truncate"
+                        class="font-black text-slate-900 dark:text-white group-hover:text-secondary truncate"
                       >
                         {{ analysis.contract_name }}
                       </h3>
@@ -717,9 +716,9 @@
                         <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
-                    <div>
+                    <div class="min-w-0 flex-1">
                       <h3
-                        class="font-black text-slate-900 dark:text-white line-clamp-1"
+                        class="font-black text-slate-900 dark:text-white truncate"
                       >
                         {{ analysis.contract_name }}
                       </h3>
@@ -769,7 +768,9 @@ const userState = useUserState();
 const currentUserId = ref<string | undefined>(undefined);
 
 onMounted(async () => {
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   currentUserId.value = session?.user?.id;
 });
 
@@ -777,6 +778,8 @@ const userProfile = ref<any>(null);
 const sharedCredits = useCreditsState();
 const analyses = ref<Analysis[]>([]);
 const loading = ref(true);
+const sidebarMetrics = ref<any>(null);
+const riskDistributionData = ref<any>(null);
 
 const selectedFile = ref<File | null>(null);
 const contractName = ref("");
@@ -807,33 +810,53 @@ const needsMoreForPremium = computed(
     (sharedCredits.value || 0) < 3,
 );
 
-// Chart Logic
+// Chart Logic (from dedicated endpoint)
 const riskDistribution = computed(() => {
-  const counts = { high: 0, medium: 0, low: 0 };
-  analyses.value.forEach((a) => {
-    if (a.status === "completed" && a.risk_level) {
-      counts[a.risk_level as keyof typeof counts]++;
-    }
-  });
+  if (!riskDistributionData.value) {
+    return [
+      {
+        level: "high",
+        label: "Riesgo Alto",
+        count: 0,
+        color: "bg-risk-high",
+        stroke: "#ef4444",
+      },
+      {
+        level: "medium",
+        label: "Precaución",
+        count: 0,
+        color: "bg-risk-medium",
+        stroke: "#f59e0b",
+      },
+      {
+        level: "low",
+        label: "Seguro",
+        count: 0,
+        color: "bg-risk-low",
+        stroke: "#10b981",
+      },
+    ];
+  }
+  const d = riskDistributionData.value;
   return [
     {
       level: "high",
       label: "Riesgo Alto",
-      count: counts.high,
+      count: d.high,
       color: "bg-risk-high",
       stroke: "#ef4444",
     },
     {
       level: "medium",
       label: "Precaución",
-      count: counts.medium,
+      count: d.medium,
       color: "bg-risk-medium",
       stroke: "#f59e0b",
     },
     {
       level: "low",
       label: "Seguro",
-      count: counts.low,
+      count: d.low,
       color: "bg-risk-low",
       stroke: "#10b981",
     },
@@ -887,13 +910,38 @@ const fetchUserData = async () => {
       userProfile.value = profile;
     }
 
-    // [SECURITY FIX M4] Fetch analyses via API endpoint (not direct Supabase query)
-    // This ensures debug info is stripped for non-admin users
+    // Fetch sidebar metrics
     try {
-      const response = await $fetch("/api/analyses", {
+      const metricsResponse = await $fetch("/api/dashboard/sidebar-metrics", {
         headers: headers as any,
       });
-      analyses.value = response.analyses?.slice(0, 10) || [];
+      sidebarMetrics.value = metricsResponse.metrics;
+    } catch (error) {
+      console.error("Error fetching sidebar metrics:", error);
+      sidebarMetrics.value = null;
+    }
+
+    // Fetch risk distribution
+    try {
+      const distributionResponse = await $fetch(
+        "/api/dashboard/risk-distribution",
+        {
+          headers: headers as any,
+        },
+      );
+      riskDistributionData.value = distributionResponse.distribution;
+    } catch (error) {
+      console.error("Error fetching risk distribution:", error);
+      riskDistributionData.value = null;
+    }
+
+    // Fetch limited analyses for recent cards (8 items, minimal fields)
+    try {
+      const response = await $fetch(
+        "/api/analyses?limit=8&projection=id,contract_name,status,risk_level,created_at,user_id",
+        { headers: headers as any },
+      );
+      analyses.value = response.analyses || [];
     } catch (error) {
       console.error("Error fetching analyses:", error);
       analyses.value = [];
@@ -1046,7 +1094,8 @@ const getStatusDotClass = (analysis: Analysis) => {
 };
 
 const getStatusTextClass = (analysis: Analysis) => {
-  if (analysis.status === "failed") return "text-red-500 dark:text-red-400 font-black";
+  if (analysis.status === "failed")
+    return "text-red-500 dark:text-red-400 font-black";
   if (analysis.status === "completed") {
     if (analysis.risk_level === "high") return "text-risk-high";
     if (analysis.risk_level === "medium") return "text-risk-medium";
@@ -1071,10 +1120,9 @@ const getStatusLabel = (analysis: Analysis) => {
 // Removed onMounted since watcher handles immediate check
 
 const lastAnalysisDate = computed(() => {
-  const firstAnalysis = analyses.value[0];
-  if (!firstAnalysis) return "Ninguno";
+  if (!sidebarMetrics.value?.lastAnalysisDate) return "Ninguno";
 
-  const lastDate = new Date(firstAnalysis.created_at);
+  const lastDate = new Date(sidebarMetrics.value.lastAnalysisDate);
   const now = new Date();
   const diffMs = now.getTime() - lastDate.getTime();
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
@@ -1083,33 +1131,19 @@ const lastAnalysisDate = computed(() => {
   if (diffDays === 1) return "Ayer";
   if (diffDays < 7) return `Hace ${diffDays} días`;
 
-  return formatDate(firstAnalysis.created_at);
+  return formatDate(sidebarMetrics.value.lastAnalysisDate);
 });
 
 const totalCriticalFindings = computed(() => {
-  return analyses.value.reduce((acc, a) => {
-    return acc + (a.summary_json?.metricas?.total_rojas || 0);
-  }, 0);
+  return sidebarMetrics.value?.totalCriticalFindings || 0;
 });
 
 const safetyScore = computed(() => {
-  if (analyses.value.length === 0) return 0;
-  const completed = analyses.value.filter((a) => a.status === "completed");
-  if (completed.length === 0) return 100;
-
-  const weights = { low: 100, medium: 50, high: 0 };
-  const sum = completed.reduce((acc, a) => {
-    const level = (a.risk_level as "low" | "medium" | "high") || "low";
-    return acc + weights[level];
-  }, 0);
-  return Math.round(sum / completed.length);
+  return sidebarMetrics.value?.safetyScore || 0;
 });
 
 const monthlyActivity = computed(() => {
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-  return analyses.value.filter((a) => new Date(a.created_at) >= thirtyDaysAgo)
-    .length;
+  return sidebarMetrics.value?.monthlyActivity || 0;
 });
 
 const formatDate = (dateString: string) => {
