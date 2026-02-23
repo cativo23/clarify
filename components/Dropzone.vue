@@ -129,15 +129,54 @@
         </button>
       </div>
 
-      <!-- Upload Progress Bar -->
-      <div v-if="isUploading || uploadProgress !== undefined" class="space-y-2">
+      <!-- Upload Progress with Steps -->
+      <div v-if="isUploading || uploadProgress !== undefined" class="space-y-3">
+        <!-- Step Indicators -->
+        <div class="flex items-center gap-2">
+          <template v-for="(step, index) in uploadSteps" :key="step.key">
+            <div class="flex items-center">
+              <!-- Step Circle -->
+              <div
+                :class="[
+                  'w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300',
+                  getStepClass(step.key),
+                ]"
+              >
+                <span class="text-[9px] font-black uppercase"
+                  >{{ index + 1 }}</span
+                >
+              </div>
+              <!-- Step Label -->
+              <span
+                :class="[
+                  'ml-1.5 text-[9px] font-black uppercase mr-2',
+                  getStepLabelClass(step.key),
+                ]"
+              >
+                {{ step.label }}
+              </span>
+              <!-- Connector Line (except last step) -->
+              <div
+                v-if="index < uploadSteps.length - 1"
+                :class="[
+                  'w-8 h-0.5 transition-all duration-300',
+                  isStepCompleted(step.key)
+                    ? 'bg-secondary/50'
+                    : 'bg-slate-200 dark:bg-slate-700',
+                ]"
+              ></div>
+            </div>
+          </template>
+        </div>
+
+        <!-- Progress Bar -->
         <div class="flex items-center justify-between">
           <span
             class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider"
           >
             {{
               isUploading
-                ? "Subiendo..."
+                ? currentStepLabel
                 : uploadProgress === 100
                   ? "Completado"
                   : `Progreso: ${uploadProgress}%`
@@ -148,12 +187,29 @@
           >
         </div>
         <div
-          class="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden"
+          class="h-2.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden"
         >
           <div
             class="h-full bg-gradient-to-r from-secondary to-accent-indigo transition-all duration-300 ease-out rounded-full"
             :style="{ width: `${uploadProgress ?? 0}%` }"
           ></div>
+        </div>
+
+        <!-- Cancel Button -->
+        <div v-if="isUploading && uploadProgress < 100" class="flex justify-end">
+          <button
+            class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-risk-high hover:text-white transition-all flex items-center justify-center"
+            title="Cancelar subida"
+            @click.stop="handleCancel"
+          >
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fill-rule="evenodd"
+                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </button>
         </div>
       </div>
     </div>
@@ -178,12 +234,80 @@ const props = defineProps<{
 const emit = defineEmits<{
   "update:modelValue": [file: File | null];
   error: [message: string];
+  cancel: [];
+  complete: [];
+  uploaded: [data: { file_url: string }];
 }>();
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const isDragging = ref(false);
 const selectedFile = ref<File | null>(props.modelValue || null);
 const error = ref("");
+
+// Upload steps definition
+const uploadSteps = [
+  { key: "uploading", label: "Subiendo", threshold: 0 },
+  { key: "validating", label: "Validando", threshold: 90 },
+  { key: "complete", label: "Completado", threshold: 100 },
+];
+
+// Current step computed based on progress threshold
+const currentStep = computed(() => {
+  const progress = props.uploadProgress ?? 0;
+  const reversedSteps = [...uploadSteps].reverse();
+  const step = reversedSteps.find((s) => progress >= s.threshold);
+  return step || uploadSteps[0];
+});
+
+// Current step label
+const currentStepLabel = computed(() => {
+  return currentStep.value.label;
+});
+
+// Check if a step is completed (progress has passed its threshold)
+const isStepCompleted = (stepKey: string): boolean => {
+  const step = uploadSteps.find((s) => s.key === stepKey);
+  if (!step) return false;
+  const progress = props.uploadProgress ?? 0;
+  // Step is completed if progress has passed the NEXT step's threshold
+  const nextStepIndex = uploadSteps.findIndex((s) => s.key === stepKey) + 1;
+  if (nextStepIndex >= uploadSteps.length) {
+    return progress >= step.threshold;
+  }
+  return progress >= uploadSteps[nextStepIndex].threshold;
+};
+
+// Check if a step is active (current threshold reached but not next)
+const isStepActive = (stepKey: string): boolean => {
+  return currentStep.value.key === stepKey;
+};
+
+// Get step circle class
+const getStepClass = (stepKey: string): string => {
+  if (isStepActive(stepKey)) {
+    return "bg-secondary text-white";
+  }
+  if (isStepCompleted(stepKey)) {
+    return "bg-secondary/20 text-secondary";
+  }
+  return "bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-600";
+};
+
+// Get step label class
+const getStepLabelClass = (stepKey: string): string => {
+  if (isStepActive(stepKey)) {
+    return "text-secondary";
+  }
+  if (isStepCompleted(stepKey)) {
+    return "text-secondary/70";
+  }
+  return "text-slate-400 dark:text-slate-600";
+};
+
+// Handle cancel button click
+const handleCancel = () => {
+  emit("cancel");
+};
 
 const openFilePicker = () => {
   fileInput.value?.click();
@@ -263,6 +387,16 @@ watch(
   () => props.modelValue,
   (newValue) => {
     selectedFile.value = newValue || null;
+  },
+);
+
+// Watch upload progress for completion
+watch(
+  () => props.uploadProgress,
+  (newVal) => {
+    if (newVal === 100) {
+      emit("complete");
+    }
   },
 );
 </script>
