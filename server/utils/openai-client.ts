@@ -164,7 +164,7 @@ ${processedText}
     // Debug logging for Forensic tier
     if (analysisType === "forensic") {
       console.log("[Forensic] Forensic tier selected - using gpt-5 with 120k input / 30k output tokens");
-      console.log("[Forensic] Preprocessing buffer: 5k tokens reserved for system prompt");
+      console.log("[Forensic] Optimized prompt v2.0 - target 8k-20k output for faster completion");
     }
     console.log("Using model:", model);
     console.log("Using limits:", limits);
