@@ -47,11 +47,12 @@ Plans:
   2. User can see upload progress as percentage bar during file upload
   3. User understands difference between tiers (speed vs accuracy tradeoffs)
   4. User's credit balance is visible on dashboard
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: Build tier selector UI with clear differentiation
-- [ ] 02-02: Add upload progress indicator
+- [ ] 02-01-PLAN.md — Tier selector enhancement with comparison modal and token tooltips
+- [ ] 02-02-PLAN.md — Upload progress indicator with step display (Subiendo → Validando → Completado)
+- [ ] 02-03-PLAN.md — Analysis status badge with real-time updates via Supabase Realtime
 
 ### Phase 3: PDF Export & History
 **Goal**: Users can export results and revisit past analyses
@@ -137,7 +138,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Core Analysis Foundation | 3/3 | Complete   | 2026-02-22 |
-| 2. Tier Selection & UX | 0/2 | Not started | - |
+| 2. Tier Selection & UX | 0/3 | Not started | - |
 | 3. PDF Export & History | 0/2 | Not started | - |
 | 4. Stripe & Monetization | 0/3 | Not started | - |
 | 5. Free Credits & Onboarding | 0/3 | Not started | - |
