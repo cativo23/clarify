@@ -152,7 +152,7 @@
     >
       <div
         v-if="hasCreditsForForensic"
-        class="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-glow"
+        class="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-secondary to-accent-indigo text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-glow"
       >
         Máximo Detalle
       </div>
