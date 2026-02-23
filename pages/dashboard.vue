@@ -512,14 +512,8 @@
               >
             </div>
 
-            <div v-if="loading" class="grid gap-8 lg:grid-cols-4">
-              <!-- Sidebar Skeleton -->
-              <SkeletonSidebar />
-              <!-- Main Content Skeleton -->
-              <div class="lg:col-span-3 space-y-8">
-                <SkeletonCard />
-                <SkeletonCard />
-              </div>
+            <div v-if="loading" class="grid gap-6 md:grid-cols-2 2xl:grid-cols-4">
+              <SkeletonRecentAnalysis v-for="i in 4" :key="i" />
             </div>
 
             <!-- Empty State: No Analyses -->
@@ -593,12 +587,29 @@
                     <div
                       :class="[
                         'w-14 h-14 rounded-2xl flex items-center justify-center transition-all group-hover:scale-110',
-                        getRiskColor(analysis.risk_level),
+                        analysis.status === 'failed'
+                          ? 'bg-red-500/10 text-red-500 dark:text-red-400'
+                          : getRiskColor(analysis.risk_level),
                       ]"
                     >
+                      <!-- Failed status icon -->
+                      <svg
+                        v-if="analysis.status === 'failed'"
+                        class="w-7 h-7"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2.5"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
                       <!-- Completed status icons -->
                       <svg
-                        v-if="
+                        v-else-if="
                           analysis.status === 'completed' &&
                           analysis.risk_level === 'high'
                         "
@@ -648,7 +659,7 @@
                           d="M5 13l4 4L19 7"
                         />
                       </svg>
-                      <!-- Processing/pending/failed icons -->
+                      <!-- Processing/pending icons -->
                       <svg
                         v-else
                         class="w-6 h-6"
@@ -1024,6 +1035,7 @@ const getRiskColor = (riskLevel: string | null) => {
 };
 
 const getStatusDotClass = (analysis: Analysis) => {
+  if (analysis.status === "failed") return "bg-red-500";
   if (analysis.status === "processing") return "bg-secondary animate-pulse";
   if (analysis.status === "completed") {
     if (analysis.risk_level === "high") return "bg-risk-high";
@@ -1034,6 +1046,7 @@ const getStatusDotClass = (analysis: Analysis) => {
 };
 
 const getStatusTextClass = (analysis: Analysis) => {
+  if (analysis.status === "failed") return "text-red-500 dark:text-red-400 font-black";
   if (analysis.status === "completed") {
     if (analysis.risk_level === "high") return "text-risk-high";
     if (analysis.risk_level === "medium") return "text-risk-medium";

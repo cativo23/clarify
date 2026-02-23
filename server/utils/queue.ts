@@ -37,6 +37,7 @@ export const getAnalysisQueue = () => {
           type: "exponential",
           delay: 5000,
         },
+        timeout: 650000, // 10.8 minutes (must exceed OpenAI timeout of 10 minutes for forensic tier)
         removeOnComplete: { count: 100 }, // Keep last 100 completed
         removeOnFail: { count: 1000 }, // Keep last 1000 failed for debugging
       },
