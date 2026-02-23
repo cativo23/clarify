@@ -31,12 +31,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Forensic tier uses gpt-5 model with dedicated exhaustive analysis prompt
   3. Long-running analyses (2-5 min) complete without timeout via BullMQ queue
   4. Uploaded files are validated via magic bytes (not just extension)
-**Plans**: 3 plans
+**Plans**: 4 plans
 
 Plans:
 - [x] 01-01-PLAN.md — Create Forensic analysis prompt (100% coverage, cross-clause analysis, exhaustive omissions)
 - [x] 01-02-PLAN.md — Update OpenAI client to support Forensic tier (prompt loading, gpt-5 model, token limits)
 - [x] 01-03-PLAN.md — Add database support and config-driven credit costs for Forensic tier
+- [x] 01-04-PLAN.md — Add UI components to display Forensic-specific analysis sections (analisis_cruzado, omisiones, mapa_estructural)
 
 ### Phase 2: Tier Selection & UX
 **Goal**: Users can choose analysis tier and understand what they're paying for
@@ -140,7 +141,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Core Analysis Foundation | 3/3 | Complete   | 2026-02-22 |
+| 1. Core Analysis Foundation | 4/4 | Complete   | 2026-02-23 |
 | 2. Tier Selection & UX | 3/6 | In progress | 2026-02-23 |
 | 3. PDF Export & History | 0/2 | Not started | - |
 | 4. Stripe & Monetization | 0/3 | Not started | - |
