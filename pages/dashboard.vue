@@ -1076,8 +1076,39 @@ const setupRealtimeSubscription = () => {
         console.log("Successfully subscribed to analyses updates");
       } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
         console.error("Realtime subscription error:", status);
+        // Trigger more aggressive polling when realtime fails
+        console.log("Realtime failed, relying on polling fallback");
       }
     });
+};
+
+// Fetch analyses only (for polling fallback)
+const fetchAnalyses = async () => {
+  try {
+    const headers = useRequestHeaders(["cookie"]);
+    const response = await $fetch(
+      "/api/analyses?limit=8&projection=id,contract_name,status,risk_level,created_at,user_id",
+      { headers: headers as any },
+    );
+    analyses.value = response.analyses || [];
+  } catch (error) {
+    console.error("Error fetching analyses in polling:", error);
+  }
+};
+
+// Polling fallback for pending analyses when realtime is unavailable
+const startStatusPolling = () => {
+  // Poll every 5 seconds for analyses with pending/processing status
+  setInterval(async () => {
+    const hasPendingAnalyses = analyses.value.some(
+      (a) => a.status === 'pending' || a.status === 'processing' || a.status === 'queued'
+    );
+
+    if (hasPendingAnalyses) {
+      console.log('Polling: Refreshing pending analyses...');
+      await fetchAnalyses();
+    }
+  }, 5000);
 };
 
 onUnmounted(() => {
@@ -1094,7 +1125,8 @@ watch(
     if (newId) {
       await fetchUserData();
       setupRealtimeSubscription();
-      console.log("Realtime subscription setup complete");
+      startStatusPolling();
+      console.log("Realtime subscription and polling setup complete");
     }
   },
   { immediate: true },
