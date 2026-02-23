@@ -38,9 +38,7 @@
                 </h2>
                 <p
                   class="mb-5 text-[10px] font-bold tracking-widest uppercase text-slate-500 dark:text-slate-400"
-                >
-                  Plan Estándar
-                </p>
+                >Plan Estándar</p>
 
                 <!-- Credits badge -->
                 <div
@@ -85,9 +83,7 @@
                 <div class="flex items-center justify-between mb-5">
                   <h3
                     class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]"
-                  >
-                    Resumen de Seguridad
-                  </h3>
+                  >Resumen de Seguridad</h3>
                   <span
                     class="px-2 py-0.5 bg-secondary/10 text-secondary text-[8px] font-black uppercase rounded-full border border-secondary/20"
                   >
@@ -132,9 +128,7 @@
                   <div>
                     <p
                       class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tighter mb-0.5"
-                    >
-                      Índice de Protección
-                    </p>
+                    >Índice de Protección</p>
                     <p
                       class="text-xs font-black text-slate-900 dark:text-white"
                     >
@@ -152,9 +146,7 @@
                 <!-- Divider label -->
                 <p
                   class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3"
-                >
-                  Indicadores Mensuales
-                </p>
+                >Indicadores Mensuales</p>
 
                 <!-- Stats -->
                 <div
@@ -742,6 +734,7 @@ import type { RealtimeChannel } from "@supabase/supabase-js";
 import { timeAgo } from "~/composables/useTimeAgo";
 import { useAnalysisStatus } from "~/composables/useAnalysisStatus";
 import AnalysisStatusBadge from "~/components/AnalysisStatusBadge.vue";
+import SkeletonRecentAnalysis from "~/components/SkeletonRecentAnalysis.vue";
 
 definePageMeta({
   middleware: "auth",
