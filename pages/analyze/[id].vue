@@ -546,6 +546,27 @@
           </div>
         </div>
 
+        <!-- Forensic-specific sections -->
+        <div v-if="isForensic">
+          <!-- Análisis Cruzado -->
+          <CrossClauseAnalysis
+            v-if="analysis.summary_json.analisis_cruzado?.length"
+            :analisis-cruzado="analysis.summary_json.analisis_cruzado"
+          />
+
+          <!-- Omisiones Críticas -->
+          <CriticalOmissions
+            v-if="analysis.summary_json.omisiones?.length"
+            :omisiones="analysis.summary_json.omisiones"
+          />
+
+          <!-- Mapa Estructural -->
+          <StructuralMap
+            v-if="analysis.summary_json.mapa_estructural"
+            :mapa="analysis.summary_json.mapa_estructural"
+          />
+        </div>
+
         <!-- Cláusulas No Clasificadas -->
         <div
           v-if="summary.clausulas_no_clasificadas?.length"
@@ -677,6 +698,9 @@
 
 <script setup lang="ts">
 import type { Analysis, AnalysisSummary } from "~/types";
+import CrossClauseAnalysis from "~/components/analysis/CrossClauseAnalysis.vue";
+import CriticalOmissions from "~/components/analysis/CriticalOmissions.vue";
+import StructuralMap from "~/components/analysis/StructuralMap.vue";
 
 definePageMeta({
   middleware: "auth",
@@ -708,6 +732,8 @@ const summary = computed<AnalysisSummary>(() => {
     }
   );
 });
+
+const isForensic = computed(() => analysis.value?.analysis_type === 'forensic')
 
 const fetchAnalysis = async () => {
   const id = route.params.id as string;
