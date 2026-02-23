@@ -27,7 +27,9 @@ export const fetchUserProfile = async (forceRefresh = false) => {
   const supabase = useSupabaseClient();
   const router = useRouter();
 
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   const userId = session?.user?.id;
 
   if (!userId) return null;
@@ -83,7 +85,9 @@ export const signOut = async () => {
 // Fetch user's analyses
 export const useUserAnalyses = async () => {
   const supabase = useSupabaseClient();
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   if (!session?.user?.id) return [];
 
   try {
@@ -117,7 +121,9 @@ export const saveAnalysis = async (
 // Upload file to Supabase Storage
 export const uploadContractFile = async (file: File) => {
   const client = useSupabaseClient();
-  const { data: { session } } = await client.auth.getSession();
+  const {
+    data: { session },
+  } = await client.auth.getSession();
 
   if (!session?.user?.id) throw new Error("User not authenticated");
 
