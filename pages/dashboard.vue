@@ -306,6 +306,16 @@
               @error="handleDropzoneError"
             />
 
+            <!-- Error Message (Moved outside file check) -->
+            <div
+              v-if="analyzeError"
+              class="p-4 mt-4 border bg-risk-high/10 border-risk-high rounded-2xl animate-shake"
+            >
+              <p class="text-xs font-bold text-risk-high">
+                {{ analyzeError }}
+              </p>
+            </div>
+
             <div v-if="selectedFile" class="space-y-8 animate-slide-up">
               <!-- Analysis Type Selector -->
               <div>
@@ -485,15 +495,6 @@
                 </div>
               </div>
 
-              <!-- Error Message -->
-              <div
-                v-if="analyzeError"
-                class="p-4 mt-4 border bg-risk-high/10 border-risk-high rounded-2xl animate-shake"
-              >
-                <p class="text-xs font-bold text-risk-high">
-                  {{ analyzeError }}
-                </p>
-              </div>
             </div>
           </div>
 

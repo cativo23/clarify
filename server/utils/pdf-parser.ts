@@ -1,13 +1,14 @@
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
-const pdfParse = require("pdf-parse");
+const { PDFParse } = require("pdf-parse");
 
 export const extractTextFromPDF = async (
   fileBuffer: Buffer,
 ): Promise<string> => {
   try {
-    const data = await pdfParse(fileBuffer);
-    return data.text;
+    const parser = new PDFParse({ data: fileBuffer });
+    const result = await parser.getText();
+    return result.text;
   } catch (error) {
     console.error("Error parsing PDF:", error);
     throw new Error("Failed to extract text from PDF");
