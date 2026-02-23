@@ -60,9 +60,9 @@ export const analyzeContract = async (
   // Define timeouts per tier (in milliseconds)
   // Forensic tier needs longer timeout for 120k input / 30k output token processing
   const timeouts = {
-    basic: 120000,     // 2 minutes
-    premium: 300000,   // 5 minutes
-    forensic: 600000,  // 10 minutes
+    basic: 120000, // 2 minutes
+    premium: 300000, // 5 minutes
+    forensic: 600000, // 10 minutes
   };
   const timeout = timeouts[analysisType];
 
@@ -163,8 +163,12 @@ ${processedText}
   try {
     // Debug logging for Forensic tier
     if (analysisType === "forensic") {
-      console.log("[Forensic] Forensic tier selected - using gpt-5 with 120k input / 30k output tokens");
-      console.log("[Forensic] Optimized prompt v2.0 - target 8k-20k output for faster completion");
+      console.log(
+        "[Forensic] Forensic tier selected - using gpt-5 with 120k input / 30k output tokens",
+      );
+      console.log(
+        "[Forensic] Optimized prompt v2.0 - target 8k-20k output for faster completion",
+      );
     }
     console.log("Using model:", model);
     console.log("Using limits:", limits);
