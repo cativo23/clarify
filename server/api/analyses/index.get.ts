@@ -1,4 +1,5 @@
 import { serverSupabaseClient } from "#supabase/server";
+import { getQuery } from "h3";
 import {
   sanitizeAnalysesList,
   getRequestUserContext,
@@ -22,13 +23,18 @@ export default defineEventHandler(async (event) => {
 
     const client = await serverSupabaseClient(event);
 
+    // Get query parameters for limit and projection
+    const query = getQuery(event);
+    const limit = parseInt(query.limit as string) || 50;
+    const projection = (query.projection as string) || "*";
+
     // Fetch user's analyses
     const { data: analyses, error } = await client
       .from("analyses")
-      .select("*")
+      .select(projection)
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
-      .limit(50);
+      .limit(limit);
 
     if (error) {
       console.error("Error fetching analyses:", error);

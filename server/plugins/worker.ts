@@ -152,7 +152,7 @@ export default defineNitroPlugin((_nitroApp) => {
         removeOnComplete: { count: 100 }, // Keep last 100 completed
         removeOnFail: { count: 1000 }, // Keep last 1000 failed for debugging
       },
-    },
+    } as any, // Cast to any to resolve BullMQ WorkerOptions type mismatch
   );
 
   worker.on("completed", (job) => {
