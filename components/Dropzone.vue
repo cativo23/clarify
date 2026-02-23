@@ -216,19 +216,19 @@
 
     <!-- Error Message -->
     <div
-      v-if="error"
+      v-if="error || uploadError"
       class="mt-4 p-4 bg-risk-high/10 border border-risk-high rounded-lg animate-slide-up"
     >
-      <p class="text-risk-high text-sm">{{ error }}</p>
+      <p class="text-risk-high text-sm">{{ uploadError || error }}</p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useUploadProgress } from "~/composables/useUploadProgress";
+
 const props = defineProps<{
   modelValue?: File | null;
-  uploadProgress?: number;
-  isUploading?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -238,6 +238,16 @@ const emit = defineEmits<{
   complete: [];
   uploaded: [data: { file_url: string }];
 }>();
+
+// Use upload progress composable
+const {
+  uploadProgress,
+  isUploading,
+  uploadError,
+  uploadFile,
+  cancelUpload,
+  resetProgress,
+} = useUploadProgress();
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const isDragging = ref(false);
@@ -253,7 +263,7 @@ const uploadSteps = [
 
 // Current step computed based on progress threshold
 const currentStep = computed(() => {
-  const progress = props.uploadProgress ?? 0;
+  const progress = uploadProgress.value;
   const reversedSteps = [...uploadSteps].reverse();
   const step = reversedSteps.find((s) => progress >= s.threshold);
   return step || uploadSteps[0];
@@ -268,7 +278,7 @@ const currentStepLabel = computed(() => {
 const isStepCompleted = (stepKey: string): boolean => {
   const step = uploadSteps.find((s) => s.key === stepKey);
   if (!step) return false;
-  const progress = props.uploadProgress ?? 0;
+  const progress = uploadProgress.value;
   // Step is completed if progress has passed the NEXT step's threshold
   const nextStepIndex = uploadSteps.findIndex((s) => s.key === stepKey) + 1;
   if (nextStepIndex >= uploadSteps.length) {
@@ -306,6 +316,7 @@ const getStepLabelClass = (stepKey: string): string => {
 
 // Handle cancel button click
 const handleCancel = () => {
+  cancelUpload();
   emit("cancel");
 };
 
@@ -334,13 +345,29 @@ const validateFile = (file: File): boolean => {
   return true;
 };
 
+// Upload file after validation
+const uploadFileAfterValidation = async (file: File) => {
+  selectedFile.value = file;
+  emit("update:modelValue", file);
+
+  try {
+    const result = await uploadFile(file, "/api/upload");
+    if (result.success && result.file_url) {
+      emit("uploaded", { file_url: result.file_url });
+    } else if (result.error) {
+      emit("error", result.error);
+    }
+  } catch (err: any) {
+    emit("error", err.message || "Error al subir archivo");
+  }
+};
+
 const handleFileChange = (event: Event) => {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
 
   if (file && validateFile(file)) {
-    selectedFile.value = file;
-    emit("update:modelValue", file);
+    uploadFileAfterValidation(file);
   }
 };
 
@@ -357,12 +384,12 @@ const handleDrop = (event: DragEvent) => {
 
   const file = event.dataTransfer?.files[0];
   if (file && validateFile(file)) {
-    selectedFile.value = file;
-    emit("update:modelValue", file);
+    uploadFileAfterValidation(file);
   }
 };
 
 const clearFile = () => {
+  resetProgress();
   selectedFile.value = null;
   error.value = "";
   emit("update:modelValue", null);
@@ -392,7 +419,7 @@ watch(
 
 // Watch upload progress for completion
 watch(
-  () => props.uploadProgress,
+  () => uploadProgress.value,
   (newVal) => {
     if (newVal === 100) {
       emit("complete");

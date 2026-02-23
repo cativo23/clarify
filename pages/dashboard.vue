@@ -304,6 +304,9 @@
               v-model="selectedFile"
               class="mb-8"
               @error="handleDropzoneError"
+              @uploaded="handleDropzoneUploaded"
+              @complete="handleDropzoneComplete"
+              @cancel="handleDropzoneCancel"
             />
 
             <!-- Error Message (Moved outside file check) -->
@@ -1159,34 +1162,17 @@ const handleDropzoneError = (message: string) => {
   analyzeError.value = message;
 };
 
-// Watch selectedFile to trigger immediate upload and token check
-watch(selectedFile, async (newFile) => {
-  if (!newFile) {
-    uploadedFileUrl.value = "";
-    tokenCheckResult.value = null;
-    return;
-  }
+// Handle uploaded event from Dropzone - file was uploaded successfully
+const handleDropzoneUploaded = async (data: { file_url: string }) => {
+  if (!data.file_url) return;
 
   checkingTokens.value = true;
   analyzeError.value = "";
 
   try {
-    // 1. Upload Immediately
-    const formData = new FormData();
-    formData.append("file", newFile);
+    uploadedFileUrl.value = data.file_url;
 
-    const uploadResponse = await $fetch("/api/upload", {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!uploadResponse.success || !uploadResponse.file_url) {
-      throw new Error(uploadResponse.error || "Error al subir archivo");
-    }
-
-    uploadedFileUrl.value = uploadResponse.file_url;
-
-    // 2. Check Tokens
+    // Check Tokens
     const tokenResponse = await $fetch<any>("/api/check-tokens", {
       method: "POST",
       body: { file_url: uploadedFileUrl.value },
@@ -1200,18 +1186,31 @@ watch(selectedFile, async (newFile) => {
   } catch (error: any) {
     // Extract error message from h3/Nuxt error structure
     const errorMessage =
-      error.data?.message || // From createError({ message: ... })
-      error.message || // Direct message
-      error.statusMessage || // HTTP status message
-      "Error processing file";
+      error.data?.message ||
+      error.message ||
+      error.statusMessage ||
+      "Error calculating tokens";
     analyzeError.value = errorMessage;
-    selectedFile.value = null; // clear to force re-selection
+    selectedFile.value = null;
     uploadedFileUrl.value = "";
     tokenCheckResult.value = null;
   } finally {
     checkingTokens.value = false;
   }
-});
+};
+
+// Handle complete event - upload reached 100%
+const handleDropzoneComplete = () => {
+  // Upload completed, tier selector will be shown
+};
+
+// Handle cancel event - user cancelled upload
+const handleDropzoneCancel = () => {
+  selectedFile.value = null;
+  uploadedFileUrl.value = "";
+  tokenCheckResult.value = null;
+  analyzeError.value = "";
+};
 
 const handleAnalyze = async () => {
   if (!uploadedFileUrl.value || !contractName.value) return;
