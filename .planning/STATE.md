@@ -10,31 +10,31 @@ See: .planning/PROJECT.md (updated 2026-02-21)
 ## Current Position
 
 Phase: 2 of 6 (Tier Selection & UX)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In Progress
-Last activity: 2026-02-23 — Plan 02-01 completed (Tier selection UX with comparison modal and token tooltips)
+Last activity: 2026-02-23 — Plan 02-02 completed (Upload progress with step indicators and cancel support)
 
-Progress: [████░░░░░░░░] 33%
+Progress: [████████░░░░] 66%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
+- Total plans completed: 5
 - Average duration: ~4 min
-- Total execution time: ~16 min
+- Total execution time: ~20 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1 | 3 | 12 min | 4 min |
-| 2 | 1 | 5 min | 5 min |
+| 2 | 2 | 9 min | 4.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (~5 min), 01-03 (~5 min), 01-02 (~3 min), 01-01 (~4 min)
+- Last 5 plans: 02-02 (~8 min), 02-01 (~5 min), 01-03 (~5 min), 01-02 (~3 min), 01-01 (~4 min)
 - Trend: On track
 | Phase 01-core-analysis-foundation P01 | 293 | 1 tasks | 1 files |
-| Phase 02-tier-selection-ux P01 | ~300 | 3 tasks | 3 files |
+| Phase 02-tier-selection-ux P02 | ~430 | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -54,6 +54,8 @@ Recent decisions affecting current work:
 - [Phase 02-tier-selection-ux]: CSS-only tooltips over Popper.js for simplicity and lighter dependencies
 - [Phase 02-tier-selection-ux]: Expand-on-click for tier cards (not hover) for deliberate user control
 - [Phase 02-tier-selection-ux]: Token explanations use page analogies (8K≈2-3 páginas) for non-technical users
+- [Phase 02-tier-selection-ux Plan 02]: XHR over Fetch for native progress event support (no manual chunking)
+- [Phase 02-tier-selection-ux Plan 02]: Dropzone owns upload logic, emits uploaded event with file_url to parent
 
 ### Pending Todos
 
@@ -73,6 +75,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-23 — Plan 02-01 execution
-Stopped at: Completed 02-tier-selection-ux-02-01-PLAN.md (Tier selection UX enhancements)
+Last session: 2026-02-23 — Plan 02-02 execution
+Stopped at: Completed 02-tier-selection-ux-02-02-PLAN.md (Upload progress indicator with step indicators)
 Resume file: None
