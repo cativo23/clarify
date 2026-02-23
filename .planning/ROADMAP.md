@@ -51,7 +51,7 @@ Plans:
 
 Plans:
 - [x] 02-01-PLAN.md — Tier selector enhancement with comparison modal and token tooltips
-- [ ] 02-02-PLAN.md — Upload progress indicator with step display (Subiendo → Validando → Completado)
+- [x] 02-02-PLAN.md — Upload progress indicator with step display (Subiendo → Validando → Completado)
 - [ ] 02-03-PLAN.md — Analysis status badge with real-time updates via Supabase Realtime
 
 ### Phase 3: PDF Export & History
@@ -138,7 +138,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Core Analysis Foundation | 3/3 | Complete   | 2026-02-22 |
-| 2. Tier Selection & UX | 1/3 | In progress | - |
+| 2. Tier Selection & UX | 2/3 | In progress | - |
 | 3. PDF Export & History | 0/2 | Not started | - |
 | 4. Stripe & Monetization | 0/3 | Not started | - |
 | 5. Free Credits & Onboarding | 0/3 | Not started | - |
@@ -153,7 +153,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | TIER-02 | Tier Selection UI — Users can select Basic/Premium/Forensic before analysis | Phase 2 | Complete |
 | TIER-03 | 3-tier analysis strategy (Basic/Premium/Forensic) | Phase 1 | Complete |
 | UPLOAD-01 | Secure file upload with magic byte validation | Phase 1 | Pending |
-| UPLOAD-02 | Upload progress indicator | Phase 2 | Pending |
+| UPLOAD-02 | Upload progress indicator | Phase 2 | Complete |
 | QUEUE-01 | BullMQ/Upstash queue for async processing | Phase 1 | Complete |
 | PROMPT-01 | Forensic Analysis Prompt — Dedicated prompt for exhaustive 100% coverage analysis | Phase 1 | Complete |
 | PDF-01 | PDF Export — Export analysis results as formatted PDF | Phase 3 | Pending |
@@ -177,5 +177,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 - Unmapped: 0 ✓
 
 ---
-*Roadmap updated: 2026-02-23*
+*Roadmap updated: 2026-02-23 (Plan 02-02 complete)*
 *Based on PROJECT.md and research/SUMMARY.md*
