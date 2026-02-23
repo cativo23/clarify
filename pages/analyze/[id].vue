@@ -735,6 +735,17 @@ const summary = computed<AnalysisSummary>(() => {
 
 const isForensic = computed(() => analysis.value?.analysis_type === 'forensic')
 
+// Debug logging for Forensic sections
+watchEffect(() => {
+  if (analysis.value) {
+    console.log('[Forensic Debug] analysis_type:', analysis.value.analysis_type)
+    console.log('[Forensic Debug] isForensic:', isForensic.value)
+    console.log('[Forensic Debug] analisis_cruzado:', analysis.value.summary_json?.analisis_cruzado?.length || 0, 'items')
+    console.log('[Forensic Debug] omisiones:', analysis.value.summary_json?.omisiones?.length || 0, 'items')
+    console.log('[Forensic Debug] mapa_estructural:', analysis.value.summary_json?.mapa_estructural ? 'present' : 'missing')
+  }
+})
+
 const fetchAnalysis = async () => {
   const id = route.params.id as string;
 
