@@ -28,7 +28,7 @@
           </div>
 
           <!-- Feature Comparison Table -->
-          <div class="overflow-x-auto mb-8">
+          <div class="overflow-visible mb-8">
             <table class="w-full">
               <thead>
                 <tr class="border-b-2 border-slate-200 dark:border-slate-800">
