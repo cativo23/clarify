@@ -339,7 +339,7 @@
                     checkingTokens ||
                     !uploadedFileUrl ||
                     !contractName ||
-                    (sharedCredits || 0) < (analysisType === 'premium' ? 3 : 1)
+                    (sharedCredits || 0) < (analysisType === 'forensic' ? 10 : analysisType === 'premium' ? 3 : 1)
                   "
                   class="px-10 py-4 bg-secondary text-white rounded-2xl font-black text-lg hover:shadow-glow hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex items-center gap-3"
                   @click="handleAnalyze"
@@ -480,6 +480,40 @@
                     @click="analysisType = 'basic'"
                   >
                     Usar Rápido (1)
+                  </button>
+                  <NuxtLink
+                    to="/credits"
+                    class="text-[10px] font-black uppercase tracking-widest text-secondary hover:underline whitespace-nowrap"
+                  >
+                    Comprar Créditos
+                  </NuxtLink>
+                </div>
+              </div>
+
+              <!-- Forensic Credits Warning -->
+              <div
+                v-else-if="needsMoreForForensic"
+                class="flex items-center justify-between gap-4 p-4 border bg-accent-indigo/5 rounded-2xl border-accent-indigo/10 animate-slide-up"
+              >
+                <div class="flex items-center gap-3">
+                  <div
+                    class="flex items-center justify-center w-8 h-8 rounded-full bg-accent-indigo/10 text-accent-indigo"
+                  >
+                    <ShieldCheckIcon class="w-4 h-4" />
+                  </div>
+                  <p
+                    class="text-xs font-bold text-slate-600 dark:text-slate-400"
+                  >
+                    Necesitas 10 créditos para
+                    <span class="text-accent-indigo">Auditoría Forense</span>.
+                  </p>
+                </div>
+                <div class="flex items-center gap-4">
+                  <button
+                    class="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                    @click="analysisType = 'premium'"
+                  >
+                    Usar Premium (3)
                   </button>
                   <NuxtLink
                     to="/credits"
@@ -731,6 +765,7 @@
 <script setup lang="ts">
 import type { Analysis } from "~/types";
 import type { RealtimeChannel } from "@supabase/supabase-js";
+import { ShieldCheckIcon } from "@heroicons/vue/24/outline";
 import { timeAgo } from "~/composables/useTimeAgo";
 import { useAnalysisStatus } from "~/composables/useAnalysisStatus";
 import AnalysisStatusBadge from "~/components/AnalysisStatusBadge.vue";
@@ -762,7 +797,7 @@ const riskDistributionData = ref<any>(null);
 
 const selectedFile = ref<File | null>(null);
 const contractName = ref("");
-const analysisType = ref<"basic" | "premium">("premium");
+const analysisType = ref<"basic" | "premium" | "forensic">("premium");
 const analyzing = ref(false);
 const analyzeError = ref("");
 
@@ -776,6 +811,7 @@ let realtimeChannel: RealtimeChannel | null = null;
 const analyzeButtonText = computed(() => {
   if (analyzing.value) return "Procesando...";
   if (checkingTokens.value) return "Calculando tokens...";
+  if (analysisType.value === "forensic") return "Auditoría Forense";
   return analysisType.value === "premium"
     ? "Análisis Completo"
     : "Análisis Rápido";
@@ -787,6 +823,12 @@ const needsMoreForPremium = computed(
     analysisType.value === "premium" &&
     (sharedCredits.value || 0) > 0 &&
     (sharedCredits.value || 0) < 3,
+);
+const needsMoreForForensic = computed(
+  () =>
+    analysisType.value === "forensic" &&
+    (sharedCredits.value || 0) > 0 &&
+    (sharedCredits.value || 0) < 10,
 );
 
 // Chart Logic (from dedicated endpoint)
