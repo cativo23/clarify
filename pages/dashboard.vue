@@ -479,8 +479,10 @@ let realtimeChannel: any = null
 const setupRealtimeSubscription = () => {
   if (realtimeChannel || !user.value?.id) return
 
+  console.log('Setting up realtime subscription for user:', user.value?.id)
+
   realtimeChannel = supabase
-    .channel('analyses-updates')
+    .channel(`analyses-updates-${user.value?.id}`)
     .on(
       'postgres_changes',
       {
@@ -549,7 +551,14 @@ const setupRealtimeSubscription = () => {
         }
       }
     )
-    .subscribe()
+    .subscribe((status) => {
+      console.log('Realtime subscription status:', status)
+      if (status === 'SUBSCRIBED') {
+        console.log('Successfully subscribed to analyses updates')
+      } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+        console.error('Realtime subscription error:', status)
+      }
+    })
 }
 
 onUnmounted(() => {
@@ -560,9 +569,11 @@ onUnmounted(() => {
 
 // Watch for user changes to fetch data and setup realtime
 watch(() => user.value, async (newUser) => {
+  console.log('User changed, new user ID:', newUser?.id)
   if (newUser?.id) {
     await fetchUserData()
     setupRealtimeSubscription()
+    console.log('Realtime subscription setup complete')
   }
 }, { immediate: true })
 
