@@ -683,15 +683,7 @@
                           class="text-[10px] font-bold text-slate-500 dark:text-slate-400"
                           >{{ timeAgo(analysis.created_at) }}</span
                         >
-                        <span
-                          class="w-1.5 h-1.5 rounded-full"
-                          :class="[getStatusDotClass(analysis)]"
-                        ></span>
-                        <span
-                          class="text-[9px] font-black uppercase tracking-tighter"
-                          :class="[getStatusTextClass(analysis)]"
-                          >{{ getStatusLabel(analysis) }}</span
-                        >
+                        <AnalysisStatusBadge :status="analysis.status" size="sm" />
                       </div>
                     </div>
                   </div>
@@ -730,18 +722,7 @@
                           class="text-[10px] font-bold text-slate-500 dark:text-slate-400"
                           >{{ timeAgo(analysis.created_at) }}</span
                         >
-                        <span
-                          v-if="analysis.status === 'processing'"
-                          class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"
-                        ></span>
-                        <span
-                          class="text-[9px] font-black uppercase text-slate-500 dark:text-slate-400"
-                          >{{
-                            analysis.status === "processing"
-                              ? "Analizando..."
-                              : "Pendiente"
-                          }}</span
-                        >
+                        <AnalysisStatusBadge :status="analysis.status" size="sm" />
                       </div>
                     </div>
                   </div>
@@ -759,6 +740,8 @@
 import type { Analysis } from "~/types";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { timeAgo } from "~/composables/useTimeAgo";
+import { useAnalysisStatus } from "~/composables/useAnalysisStatus";
+import AnalysisStatusBadge from "~/components/AnalysisStatusBadge.vue";
 
 definePageMeta({
   middleware: "auth",
@@ -1085,42 +1068,6 @@ const getRiskColor = (riskLevel: string | null) => {
   }
 };
 
-const getStatusDotClass = (analysis: Analysis) => {
-  if (analysis.status === "failed") return "bg-red-500";
-  if (analysis.status === "processing") return "bg-secondary animate-pulse";
-  if (analysis.status === "completed") {
-    if (analysis.risk_level === "high") return "bg-risk-high";
-    if (analysis.risk_level === "medium") return "bg-risk-medium";
-    if (analysis.risk_level === "low") return "bg-risk-low";
-  }
-  return "bg-slate-400";
-};
-
-const getStatusTextClass = (analysis: Analysis) => {
-  if (analysis.status === "failed")
-    return "text-red-500 dark:text-red-400 font-black";
-  if (analysis.status === "completed") {
-    if (analysis.risk_level === "high") return "text-risk-high";
-    if (analysis.risk_level === "medium") return "text-risk-medium";
-    if (analysis.risk_level === "low") return "text-risk-low";
-  }
-  return "text-slate-400";
-};
-
-const getStatusLabel = (analysis: Analysis) => {
-  if (analysis.status === "completed") {
-    if (analysis.risk_level === "high") return "Alto Riesgo";
-    if (analysis.risk_level === "medium") return "Cautela";
-    if (analysis.risk_level === "low") return "Seguro";
-  }
-  if (analysis.status === "processing") return "Procesando...";
-  if (analysis.status === "failed") return "Fallido";
-  return "Pendiente";
-};
-
-// Removed onMounted since watcher handles immediate check
-
-// Removed onMounted since watcher handles immediate check
 
 const lastAnalysisDate = computed(() => {
   if (!sidebarMetrics.value?.lastAnalysisDate) return "Ninguno";
