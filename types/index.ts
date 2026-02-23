@@ -45,7 +45,47 @@ export interface AnalysisSummary {
     clausula: string;
     motivo: string;
   }[];
+
+  // Forensic-specific fields
+  analisis_cruzado?: AnalisisCruzadoItem[];
+  omisiones?: OmisionCritic[];
+  mapa_estructural?: MapaEstructural;
+
   _debug?: any;
+}
+
+// Forensic-specific interfaces
+export interface AnalisisCruzadoItem {
+  inconsistencia_id: string;
+  tipo: string;
+  clausula_origen: string;
+  clausula_destino: string;
+  texto_origen: string;
+  texto_destino: string;
+  inconsistencia: string;
+  impacto: string;
+  recomendacion: string;
+  severidad: "rojo" | "amarillo";
+}
+
+export interface OmisionCritic {
+  omision_id: string;
+  categoria: string;
+  que_falta: string;
+  por_que_critico: string;
+  riesgo_usuario: string;
+  clausula_sugerida: string;
+}
+
+export interface MapaEstructural {
+  total_secciones: number;
+  total_anexos: number;
+  total_paginas: number;
+  secciones: Array<{
+    nombre: string;
+    paginas: string;
+    riesgo: "rojo" | "amarillo" | "verde" | "gris";
+  }>;
 }
 
 export interface Hallazgo {
