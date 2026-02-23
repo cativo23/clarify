@@ -1,5 +1,5 @@
 <template>
-  <div class="relative group inline-block">
+  <div class="relative inline-block">
     <slot name="trigger">
       <span class="underline decoration-dashed decoration-secondary/50 cursor-help">
         <slot />
@@ -7,7 +7,7 @@
     </slot>
 
     <div
-      class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-4 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm rounded-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 w-72 shadow-xl z-50"
+      class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-4 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm rounded-xl opacity-0 invisible hover:opacity-100 hover:visible transition-all duration-200 w-72 shadow-xl z-50"
     >
       <slot name="content">
         <p class="font-bold mb-2">¿Qué es un token?</p>
