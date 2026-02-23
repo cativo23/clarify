@@ -1150,7 +1150,13 @@ watch(selectedFile, async (newFile) => {
 
     tokenCheckResult.value = tokenResponse;
   } catch (error: any) {
-    analyzeError.value = error.message || "Error processing file";
+    // Extract error message from h3/Nuxt error structure
+    const errorMessage =
+      error.data?.message || // From createError({ message: ... })
+      error.message || // Direct message
+      error.statusMessage || // HTTP status message
+      "Error processing file";
+    analyzeError.value = errorMessage;
     selectedFile.value = null; // clear to force re-selection
     uploadedFileUrl.value = "";
     tokenCheckResult.value = null;
