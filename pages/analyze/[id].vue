@@ -41,6 +41,185 @@
         </NuxtLink>
       </div>
 
+      <!-- Failed Analysis State -->
+      <div
+        v-else-if="analysis.status === 'failed'"
+        class="animate-fade-in"
+      >
+        <div
+          class="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-premium p-10 mb-10 border border-slate-100 dark:border-slate-800 relative overflow-hidden"
+        >
+          <div
+            class="absolute top-0 right-0 w-64 h-64 bg-risk-high/5 rounded-full blur-3xl -mr-32 -mt-32"
+          ></div>
+
+          <div class="text-center mb-8 relative z-10">
+            <div
+              class="w-20 h-20 bg-risk-high/10 rounded-full flex items-center justify-center mx-auto mb-6"
+            >
+              <svg
+                class="w-10 h-10 text-risk-high"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <h2
+              class="text-3xl font-black text-slate-900 dark:text-white mb-3"
+            >
+              Análisis Fallido
+            </h2>
+            <p class="text-slate-600 dark:text-slate-400 text-lg">
+              No se pudo completar el análisis de tu contrato
+            </p>
+          </div>
+
+          <!-- Error Message Display -->
+          <div
+            class="p-6 bg-risk-high/5 dark:bg-risk-high/10 rounded-2xl border border-risk-high/20 mb-8"
+          >
+            <div class="flex items-start gap-4">
+              <div
+                class="w-10 h-10 rounded-full bg-risk-high/20 flex items-center justify-center shrink-0"
+              >
+                <svg
+                  class="w-5 h-5 text-risk-high"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2.5"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
+                </svg>
+              </div>
+              <div class="flex-1">
+                <h3
+                  class="text-sm font-black text-risk-high uppercase tracking-widest mb-2"
+                >
+                  Error Detectado
+                </h3>
+                <p
+                  class="text-slate-700 dark:text-slate-300 font-medium leading-relaxed"
+                >
+                  {{ analysis.error_message || "Error desconocido durante el análisis" }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Common Timeout Error Specific Guidance -->
+          <div
+            v-if="analysis.error_message?.includes('timed out') || analysis.error_message?.includes('tiempo')"
+            class="p-6 bg-amber-50 dark:bg-amber-950/20 rounded-2xl border border-amber-200 dark:border-amber-800/50 mb-8"
+          >
+            <h3
+              class="text-sm font-black text-amber-800 dark:text-amber-400 uppercase tracking-widest mb-3"
+            >
+              Análisis Timeout - Documento Complejo
+            </h3>
+            <p
+              class="text-sm text-amber-900 dark:text-amber-300 font-medium mb-4"
+            >
+              El análisis excedió el tiempo máximo de procesamiento. Esto puede
+              deberse a:
+            </p>
+            <ul
+              class="text-sm text-amber-900 dark:text-amber-300 space-y-2 mb-6"
+            >
+              <li class="flex items-start gap-2">
+                <span class="text-amber-600 dark:text-amber-500 mt-1">•</span>
+                <span
+                  >Un contrato muy extenso (>100 páginas)</span
+                >
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-amber-600 dark:text-amber-500 mt-1">•</span>
+                <span
+                  >Complejidad excepcional en las cláusulas</span
+                >
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-amber-600 dark:text-amber-500 mt-1">•</span>
+                <span
+                  >Latencia temporal del servicio de IA</span
+                >
+              </li>
+            </ul>
+            <div class="flex flex-wrap gap-3">
+              <button
+                @click="retryAnalysis"
+                :disabled="retrying"
+                class="px-6 py-3 bg-secondary text-white rounded-xl font-bold text-sm hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                <svg
+                  v-if="retrying"
+                  class="w-4 h-4 animate-spin"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+                <span v-else>Reintentar Análisis</span>
+              </button>
+              <NuxtLink
+                to="/dashboard"
+                class="px-6 py-3 bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-all"
+              >
+                Volver al Dashboard
+              </NuxtLink>
+            </div>
+          </div>
+
+          <!-- Generic Retry Actions -->
+          <div v-else class="flex flex-wrap gap-3 justify-center">
+            <button
+              @click="retryAnalysis"
+              :disabled="retrying"
+              class="px-8 py-4 bg-secondary text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              <svg
+                v-if="retrying"
+                class="w-5 h-5 animate-spin"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+              <span v-else>Reintentar Análisis</span>
+            </button>
+            <NuxtLink
+              to="/dashboard"
+              class="px-8 py-4 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-900 transition-all"
+            >
+              Volver al Dashboard
+            </NuxtLink>
+          </div>
+        </div>
+      </div>
+
       <div v-else class="animate-fade-in">
         <!-- Header -->
         <div
@@ -511,6 +690,7 @@ definePageMeta({
 const route = useRoute();
 const analysis = ref<Analysis | null>(null);
 const loading = ref(true);
+const retrying = ref(false);
 
 const summary = computed<AnalysisSummary>(() => {
   return (
@@ -562,6 +742,34 @@ const formatDate = (dateString: string) => {
 const downloadPDF = () => {
   // TODO: Implement PDF export
   alert("Funcionalidad de descarga en desarrollo");
+};
+
+const retryAnalysis = async () => {
+  if (!analysis.value) return;
+
+  retrying.value = true;
+
+  try {
+    // Call the analyze endpoint with the same parameters
+    await $fetch("/api/analyze", {
+      method: "POST",
+      body: {
+        file_url: analysis.value.file_url,
+        contract_name: analysis.value.contract_name,
+        analysis_type: analysis.value.analysis_type || "premium",
+      },
+    });
+
+    // Refresh analysis status after retry
+    await fetchAnalysis();
+  } catch (error: any) {
+    console.error("Retry failed:", error);
+    alert(
+      error.message || "No se pudo reiniciar el análisis. Intente nuevamente.",
+    );
+  } finally {
+    retrying.value = false;
+  }
 };
 
 // Debug & Admin Logic

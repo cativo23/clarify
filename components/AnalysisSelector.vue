@@ -1,5 +1,5 @@
 <template>
-  <div class="grid md:grid-cols-2 gap-4">
+  <div class="grid md:grid-cols-3 gap-4">
     <!-- Basic Analysis Card -->
     <div
       :class="[
@@ -134,6 +134,88 @@
         <CheckIcon class="w-4 h-4" />
       </div>
     </div>
+
+    <!-- Forensic Analysis Card -->
+    <div
+      :class="[
+        'relative p-6 rounded-3xl border-2 transition-all group',
+        hasCreditsForForensic
+          ? 'cursor-pointer'
+          : 'opacity-60 grayscale cursor-not-allowed',
+        modelValue === 'forensic'
+          ? 'border-secondary bg-secondary/5 ring-4 ring-secondary/10'
+          : 'border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-200 dark:hover:border-slate-700',
+      ]"
+      @click="
+        hasCreditsForForensic ? $emit('update:modelValue', 'forensic') : null
+      "
+    >
+      <div
+        v-if="hasCreditsForForensic"
+        class="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-secondary to-accent-indigo text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-glow"
+      >
+        Máximo Detalle
+      </div>
+
+      <div class="flex items-center justify-between mb-4">
+        <div
+          :class="[
+            'w-12 h-12 rounded-2xl flex items-center justify-center transition-colors',
+            modelValue === 'forensic'
+              ? 'bg-secondary text-white'
+              : 'bg-slate-100 dark:bg-slate-800 text-slate-500',
+          ]"
+        >
+          <ShieldCheckIcon class="w-6 h-6" />
+        </div>
+        <div class="text-right">
+          <span
+            class="block text-xs font-black uppercase tracking-widest text-slate-400"
+            >10 Créditos</span
+          >
+          <span
+            v-if="!hasCreditsForForensic"
+            class="text-[10px] text-risk-high font-bold"
+            >Faltan créditos</span
+          >
+        </div>
+      </div>
+
+      <h3 class="text-xl font-black text-slate-900 dark:text-white mb-2">
+        Auditoría Forense
+      </h3>
+      <p
+        class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-4"
+      >
+        "Voy a negociar algo importante". Análisis exhaustivo de CADA cláusula,
+        inconsistencias y omisiones críticas.
+      </p>
+
+      <ul class="space-y-2">
+        <li
+          class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+        >
+          <CheckIcon class="w-4 h-4 text-secondary" /> 100% Cobertura total
+        </li>
+        <li
+          class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+        >
+          <CheckIcon class="w-4 h-4 text-secondary" /> Análisis cruzado de cláusulas
+        </li>
+        <li
+          class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+        >
+          <CheckIcon class="w-4 h-4 text-secondary" /> Cláusulas sugeridas
+        </li>
+      </ul>
+
+      <div
+        v-if="modelValue === 'forensic'"
+        class="absolute -top-2 -right-2 bg-secondary text-white p-1 rounded-full shadow-lg"
+      >
+        <CheckIcon class="w-4 h-4" />
+      </div>
+    </div>
   </div>
 
   <!-- Tier Comparison Table -->
@@ -200,11 +282,12 @@ import {
 } from "lucide-vue-next";
 
 const props = defineProps<{
-  modelValue: "basic" | "premium";
+  modelValue: "basic" | "premium" | "forensic";
   userCredits: number;
 }>();
 
 defineEmits(["update:modelValue"]);
 
 const hasCreditsForPremium = computed(() => props.userCredits >= 3);
+const hasCreditsForForensic = computed(() => props.userCredits >= 10);
 </script>
