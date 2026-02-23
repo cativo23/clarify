@@ -3,18 +3,18 @@
     <!-- Basic Analysis Card -->
     <div
       :class="[
-        'relative p-6 rounded-3xl border-2 transition-all cursor-pointer group',
-        modelValue === 'basic'
+        'relative p-6 rounded-3xl border-2 transition-all duration-300 cursor-pointer group',
+        isExpanded === 'basic'
           ? 'border-secondary bg-secondary/5 ring-4 ring-secondary/10'
           : 'border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-200 dark:hover:border-slate-700',
       ]"
-      @click="$emit('update:modelValue', 'basic')"
+      @click="toggleExpand('basic')"
     >
       <div class="flex items-center justify-between mb-4">
         <div
           :class="[
             'w-12 h-12 rounded-2xl flex items-center justify-center transition-colors',
-            modelValue === 'basic'
+            isExpanded === 'basic' || modelValue === 'basic'
               ? 'bg-secondary text-white'
               : 'bg-slate-100 dark:bg-slate-800 text-slate-500',
           ]"
@@ -30,25 +30,78 @@
       <h3 class="text-xl font-black text-slate-900 dark:text-white mb-2">
         Análisis Rápido
       </h3>
-      <p
-        class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-4"
-      >
-        "Solo quiero saber si hay algo peligroso". Ideal para escaneos rápidos y
-        alertas rojas.
-      </p>
 
-      <ul class="space-y-2">
-        <li
-          class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+      <!-- Compact view -->
+      <template v-if="!isExpanded">
+        <p
+          class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-4"
         >
-          <CheckIcon class="w-4 h-4 text-secondary" /> Top 5 riesgos críticos
-        </li>
-        <li
-          class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+          "Solo quiero saber si hay algo peligroso". Ideal para escaneos rápidos
+          y alertas rojas.
+        </p>
+
+        <ul class="space-y-2">
+          <li
+            class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+          >
+            <CheckIcon class="w-4 h-4 text-secondary" /> Top 5 riesgos críticos
+          </li>
+          <li
+            class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+          >
+            <CheckIcon class="w-4 h-4 text-secondary" /> Veredicto accionable
+          </li>
+        </ul>
+      </template>
+
+      <!-- Expanded view -->
+      <template v-else>
+        <p
+          class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-4"
         >
-          <CheckIcon class="w-4 h-4 text-secondary" /> Veredicto accionable
-        </li>
-      </ul>
+          Perfecto para obtener una visión general rápida. Nuestro IA escanea el
+          contrato en busca de las cláusulas más peligrosas y te da un veredicto
+          claro: ¿firmar o renegociar?
+        </p>
+
+        <div
+          class="mb-4 px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg"
+        >
+          <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">
+            Límite de tokens
+          </p>
+          <TokenTooltip tokenExplanation="8K tokens ≈ 2-3 páginas">
+            <span
+              class="text-sm font-bold text-slate-700 dark:text-slate-300 underline decoration-dashed decoration-secondary/50 cursor-help"
+              >~8K tokens</span
+            >
+          </TokenTooltip>
+        </div>
+
+        <ul class="space-y-2">
+          <li
+            class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+          >
+            <CheckIcon class="w-4 h-4 text-secondary" /> Top 5 riesgos críticos
+          </li>
+          <li
+            class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+          >
+            <CheckIcon class="w-4 h-4 text-secondary" /> Veredicto accionable
+          </li>
+          <li
+            class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+          >
+            <CheckIcon class="w-4 h-4 text-secondary" /> ~30 segundos
+          </li>
+          <li
+            class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+          >
+            <CheckIcon class="w-4 h-4 text-secondary" /> Ideal para contratos
+            simples
+          </li>
+        </ul>
+      </template>
 
       <div
         v-if="modelValue === 'basic'"
@@ -61,16 +114,16 @@
     <!-- Premium Analysis Card -->
     <div
       :class="[
-        'relative p-6 rounded-3xl border-2 transition-all group',
+        'relative p-6 rounded-3xl border-2 transition-all duration-300 group',
         hasCreditsForPremium
           ? 'cursor-pointer'
           : 'opacity-60 grayscale cursor-not-allowed',
-        modelValue === 'premium'
+        isExpanded === 'premium'
           ? 'border-secondary bg-secondary/5 ring-4 ring-secondary/10'
           : 'border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-200 dark:hover:border-slate-700',
       ]"
       @click="
-        hasCreditsForPremium ? $emit('update:modelValue', 'premium') : null
+        hasCreditsForPremium ? toggleExpand('premium') : null
       "
     >
       <div
@@ -84,7 +137,7 @@
         <div
           :class="[
             'w-12 h-12 rounded-2xl flex items-center justify-center transition-colors',
-            modelValue === 'premium'
+            isExpanded === 'premium' || modelValue === 'premium'
               ? 'bg-secondary text-white'
               : 'bg-slate-100 dark:bg-slate-800 text-slate-500',
           ]"
@@ -107,25 +160,79 @@
       <h3 class="text-xl font-black text-slate-900 dark:text-white mb-2">
         Auditoría Completa
       </h3>
-      <p
-        class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-4"
-      >
-        "Voy a firmar o negociar". Revisa TODO el contrato, lo obvio y lo que
-        está escondido.
-      </p>
 
-      <ul class="space-y-2">
-        <li
-          class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+      <!-- Compact view -->
+      <template v-if="!isExpanded">
+        <p
+          class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-4"
         >
-          <CheckIcon class="w-4 h-4 text-secondary" /> 95%+ Cobertura total
-        </li>
-        <li
-          class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+          "Voy a firmar o negociar". Revisa TODO el contrato, lo obvio y lo que
+          está escondido.
+        </p>
+
+        <ul class="space-y-2">
+          <li
+            class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+          >
+            <CheckIcon class="w-4 h-4 text-secondary" /> 95%+ Cobertura total
+          </li>
+          <li
+            class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+          >
+            <CheckIcon class="w-4 h-4 text-secondary" /> Estrategia de
+            negociación
+          </li>
+        </ul>
+      </template>
+
+      <!-- Expanded view -->
+      <template v-else>
+        <p
+          class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-4"
         >
-          <CheckIcon class="w-4 h-4 text-secondary" /> Estrategia de negociación
-        </li>
-      </ul>
+          El análisis más popular. Nuestra IA examina minuciosamente cada
+          cláusula, identifica riesgos ocultos, inconsistencias y te proporciona
+          una estrategia concreta de negociación.
+        </p>
+
+        <div
+          class="mb-4 px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg"
+        >
+          <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">
+            Límite de tokens
+          </p>
+          <TokenTooltip tokenExplanation="35K tokens ≈ 8-10 páginas">
+            <span
+              class="text-sm font-bold text-secondary underline decoration-dashed decoration-secondary/50 cursor-help"
+              >~35K tokens</span
+            >
+          </TokenTooltip>
+        </div>
+
+        <ul class="space-y-2">
+          <li
+            class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+          >
+            <CheckIcon class="w-4 h-4 text-secondary" /> 95%+ Cobertura total
+          </li>
+          <li
+            class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+          >
+            <CheckIcon class="w-4 h-4 text-secondary" /> Estrategia de
+            negociación
+          </li>
+          <li
+            class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+          >
+            <CheckIcon class="w-4 h-4 text-secondary" /> ~2 minutos
+          </li>
+          <li
+            class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+          >
+            <CheckIcon class="w-4 h-4 text-secondary" /> Mejor costo-beneficio
+          </li>
+        </ul>
+      </template>
 
       <div
         v-if="modelValue === 'premium'"
@@ -138,16 +245,16 @@
     <!-- Forensic Analysis Card -->
     <div
       :class="[
-        'relative p-6 rounded-3xl border-2 transition-all group',
+        'relative p-6 rounded-3xl border-2 transition-all duration-300 group',
         hasCreditsForForensic
           ? 'cursor-pointer'
           : 'opacity-60 grayscale cursor-not-allowed',
-        modelValue === 'forensic'
+        isExpanded === 'forensic'
           ? 'border-secondary bg-secondary/5 ring-4 ring-secondary/10'
           : 'border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-200 dark:hover:border-slate-700',
       ]"
       @click="
-        hasCreditsForForensic ? $emit('update:modelValue', 'forensic') : null
+        hasCreditsForForensic ? toggleExpand('forensic') : null
       "
     >
       <div
@@ -161,7 +268,7 @@
         <div
           :class="[
             'w-12 h-12 rounded-2xl flex items-center justify-center transition-colors',
-            modelValue === 'forensic'
+            isExpanded === 'forensic' || modelValue === 'forensic'
               ? 'bg-secondary text-white'
               : 'bg-slate-100 dark:bg-slate-800 text-slate-500',
           ]"
@@ -184,31 +291,90 @@
       <h3 class="text-xl font-black text-slate-900 dark:text-white mb-2">
         Auditoría Forense
       </h3>
-      <p
-        class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-4"
-      >
-        "Voy a negociar algo importante". Análisis exhaustivo de CADA cláusula,
-        inconsistencias y omisiones críticas.
-      </p>
 
-      <ul class="space-y-2">
-        <li
-          class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+      <!-- Compact view -->
+      <template v-if="!isExpanded">
+        <p
+          class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-4"
         >
-          <CheckIcon class="w-4 h-4 text-secondary" /> 100% Cobertura total
-        </li>
-        <li
-          class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+          "Voy a negociar algo importante". Análisis exhaustivo de CADA
+          cláusula, inconsistencias y omisiones críticas.
+        </p>
+
+        <ul class="space-y-2">
+          <li
+            class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+          >
+            <CheckIcon class="w-4 h-4 text-secondary" /> 100% Cobertura total
+          </li>
+          <li
+            class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+          >
+            <CheckIcon class="w-4 h-4 text-secondary" /> Análisis cruzado de
+            cláusulas
+          </li>
+          <li
+            class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+          >
+            <CheckIcon class="w-4 h-4 text-secondary" /> Cláusulas sugeridas
+          </li>
+        </ul>
+      </template>
+
+      <!-- Expanded view -->
+      <template v-else>
+        <p
+          class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-4"
         >
-          <CheckIcon class="w-4 h-4 text-secondary" /> Análisis cruzado de
-          cláusulas
-        </li>
-        <li
-          class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+          El análisis más exhaustivo disponible. Nuestra IA examina cada palabra,
+          detecta inconsistencias entre cláusulas, omisiones críticas y te
+          proporciona lenguaje contractual sugerido para proteger tus intereses.
+        </p>
+
+        <div
+          class="mb-4 px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg"
         >
-          <CheckIcon class="w-4 h-4 text-secondary" /> Cláusulas sugeridas
-        </li>
-      </ul>
+          <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">
+            Límite de tokens
+          </p>
+          <TokenTooltip tokenExplanation="120K tokens ≈ 25-30 páginas">
+            <span
+              class="text-sm font-bold text-slate-700 dark:text-slate-300 underline decoration-dashed decoration-secondary/50 cursor-help"
+              >~120K tokens</span
+            >
+          </TokenTooltip>
+        </div>
+
+        <ul class="space-y-2">
+          <li
+            class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+          >
+            <CheckIcon class="w-4 h-4 text-secondary" /> 100% Cobertura total
+          </li>
+          <li
+            class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+          >
+            <CheckIcon class="w-4 h-4 text-secondary" /> Análisis cruzado de
+            cláusulas
+          </li>
+          <li
+            class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+          >
+            <CheckIcon class="w-4 h-4 text-secondary" /> Cláusulas sugeridas
+          </li>
+          <li
+            class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+          >
+            <CheckIcon class="w-4 h-4 text-secondary" /> ~5 minutos
+          </li>
+          <li
+            class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+          >
+            <CheckIcon class="w-4 h-4 text-secondary" /> Para alto valor (&gt;
+            $10k)
+          </li>
+        </ul>
+      </template>
 
       <div
         v-if="modelValue === 'forensic'"
@@ -239,7 +405,13 @@
         <p class="text-xs font-bold text-slate-700 dark:text-slate-300">
           Básico
         </p>
-        <p class="text-[10px] text-slate-400">~8K tokens</p>
+        <TokenTooltip tokenExplanation="8K tokens ≈ 2-3 páginas">
+          <p
+            class="text-[10px] text-slate-400 underline decoration-dashed decoration-secondary/50 cursor-help"
+          >
+            ~8K tokens
+          </p>
+        </TokenTooltip>
         <p class="text-[9px] font-black text-slate-500 uppercase">1 crédito</p>
       </div>
       <!-- Premium Column -->
@@ -252,7 +424,13 @@
           <SearchIcon class="w-5 h-5" />
         </div>
         <p class="text-xs font-bold text-secondary">Premium</p>
-        <p class="text-[10px] text-slate-400">~35K tokens</p>
+        <TokenTooltip tokenExplanation="35K tokens ≈ 8-10 páginas">
+          <p
+            class="text-[10px] text-slate-400 underline decoration-dashed decoration-secondary/50 cursor-help"
+          >
+            ~35K tokens
+          </p>
+        </TokenTooltip>
         <p class="text-[9px] font-black text-secondary uppercase">3 créditos</p>
       </div>
       <!-- Forensic Column -->
@@ -265,13 +443,32 @@
         <p class="text-xs font-bold text-slate-700 dark:text-slate-300">
           Forensic
         </p>
-        <p class="text-[10px] text-slate-400">~120K tokens</p>
+        <TokenTooltip tokenExplanation="120K tokens ≈ 25-30 páginas">
+          <p
+            class="text-[10px] text-slate-400 underline decoration-dashed decoration-secondary/50 cursor-help"
+          >
+            ~120K tokens
+          </p>
+        </TokenTooltip>
         <p class="text-[9px] font-black text-slate-500 uppercase">
           10 créditos
         </p>
       </div>
     </div>
+
+    <!-- Comparison Modal Trigger -->
+    <div class="mt-6 text-center">
+      <button
+        @click="isComparisonModalOpen = true"
+        class="text-xs font-black uppercase tracking-widest text-secondary hover:underline transition-colors"
+      >
+        ¿Cuál nivel es para mí?
+      </button>
+    </div>
   </div>
+
+  <!-- Comparison Modal -->
+  <TierComparisonModal v-model:isOpen="isComparisonModalOpen" />
 </template>
 
 <script setup lang="ts">
@@ -281,14 +478,34 @@ import {
   CheckIcon,
   ShieldCheckIcon,
 } from "lucide-vue-next";
+import TokenTooltip from "./TokenTooltip.vue";
+import TierComparisonModal from "./TierComparisonModal.vue";
 
 const props = defineProps<{
   modelValue: "basic" | "premium" | "forensic";
   userCredits: number;
 }>();
 
-defineEmits(["update:modelValue"]);
+const emit = defineEmits(["update:modelValue"]);
 
 const hasCreditsForPremium = computed(() => props.userCredits >= 3);
 const hasCreditsForForensic = computed(() => props.userCredits >= 10);
+
+// Expand-on-click state
+const isExpanded = ref<"basic" | "premium" | "forensic" | null>(null);
+
+const toggleExpand = (tier: "basic" | "premium" | "forensic") => {
+  isExpanded.value = isExpanded.value === tier ? null : tier;
+  // Also select the tier when clicked (if credits available)
+  if (
+    tier === "basic" ||
+    (tier === "premium" && hasCreditsForPremium.value) ||
+    (tier === "forensic" && hasCreditsForForensic.value)
+  ) {
+    emit("update:modelValue", tier);
+  }
+};
+
+// Comparison modal state
+const isComparisonModalOpen = ref(false);
 </script>
