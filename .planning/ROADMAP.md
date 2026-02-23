@@ -50,7 +50,7 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Tier selector enhancement with comparison modal and token tooltips
+- [x] 02-01-PLAN.md — Tier selector enhancement with comparison modal and token tooltips
 - [ ] 02-02-PLAN.md — Upload progress indicator with step display (Subiendo → Validando → Completado)
 - [ ] 02-03-PLAN.md — Analysis status badge with real-time updates via Supabase Realtime
 
@@ -138,7 +138,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Core Analysis Foundation | 3/3 | Complete   | 2026-02-22 |
-| 2. Tier Selection & UX | 0/3 | Not started | - |
+| 2. Tier Selection & UX | 1/3 | In progress | - |
 | 3. PDF Export & History | 0/2 | Not started | - |
 | 4. Stripe & Monetization | 0/3 | Not started | - |
 | 5. Free Credits & Onboarding | 0/3 | Not started | - |
@@ -150,7 +150,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | ID | Requirement | Phase | Status |
 |----|-------------|-------|--------|
 | TIER-01 | Forensic Tier Backend — gpt-5 model configured and working | Phase 1 | Complete |
-| TIER-02 | Tier Selection UI — Users can select Basic/Premium/Forensic before analysis | Phase 2 | Pending |
+| TIER-02 | Tier Selection UI — Users can select Basic/Premium/Forensic before analysis | Phase 2 | Complete |
 | TIER-03 | 3-tier analysis strategy (Basic/Premium/Forensic) | Phase 1 | Complete |
 | UPLOAD-01 | Secure file upload with magic byte validation | Phase 1 | Pending |
 | UPLOAD-02 | Upload progress indicator | Phase 2 | Pending |
@@ -177,5 +177,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 - Unmapped: 0 ✓
 
 ---
-*Roadmap updated: 2026-02-22*
+*Roadmap updated: 2026-02-23*
 *Based on PROJECT.md and research/SUMMARY.md*
