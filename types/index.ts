@@ -21,6 +21,7 @@ export interface Analysis {
   credits_used: number;
   status: "pending" | "processing" | "completed" | "failed";
   error_message?: string;
+  analysis_type?: "basic" | "premium" | "forensic";
   created_at: string;
 }
 

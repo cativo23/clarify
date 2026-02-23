@@ -55,9 +55,23 @@ function validateModel(model: string): {
 
 export const analyzeContract = async (
   contractText: string,
-  analysisType: "basic" | "premium" = "premium",
+  analysisType: "basic" | "premium" | "forensic" = "premium",
 ) => {
-  const openai = createOpenAIClient();
+  // Define timeouts per tier (in milliseconds)
+  // Forensic tier needs longer timeout for 120k input / 30k output token processing
+  const timeouts = {
+    basic: 120000,     // 2 minutes
+    premium: 300000,   // 5 minutes
+    forensic: 600000,  // 10 minutes
+  };
+  const timeout = timeouts[analysisType];
+
+  const config = useRuntimeConfig();
+
+  const openai = new OpenAI({
+    apiKey: config.openaiApiKey,
+    timeout,
+  });
 
   // 1. Load Dynamic Configuration
   const promptConfig = await getPromptConfig();
@@ -80,10 +94,13 @@ export const analyzeContract = async (
   const limits = tier.tokenLimits || { input: 8000, output: 800 };
 
   // 3. Load System Prompt -- Strict V2 Path
+  // Explicitly handle all three tiers: basic, premium, forensic
   const promptFile =
     analysisType === "basic"
       ? "basic-analysis-prompt.txt"
-      : "analysis-prompt.txt";
+      : analysisType === "forensic"
+        ? "forensic-analysis-prompt.txt"
+        : "analysis-prompt.txt";
   const promptPath = path.resolve(
     process.cwd(),
     `server/prompts/${versionToUse}/${promptFile}`,
@@ -103,8 +120,11 @@ export const analyzeContract = async (
   let metadata: any = {};
 
   if (features.preprocessing) {
-    // Reserve buffer for system prompt (~2k tokens) + safety
-    const availableContext = limits.input - 2000;
+    // Reserve buffer for system prompt + safety
+    // Forensic tier gets larger buffer (5k) to maximize 120k context window
+    // for its target 15k-40k output. Basic/Premium use 2k buffer.
+    const buffer = analysisType === "forensic" ? 5000 : 2000;
+    const availableContext = limits.input - buffer;
     const result = preprocessDocument(contractText, availableContext);
 
     processedText = result.processedText;
@@ -141,6 +161,11 @@ ${processedText}
 
   let rawContent = "";
   try {
+    // Debug logging for Forensic tier
+    if (analysisType === "forensic") {
+      console.log("[Forensic] Forensic tier selected - using gpt-5 with 120k input / 30k output tokens");
+      console.log("[Forensic] Optimized prompt v2.0 - target 8k-20k output for faster completion");
+    }
     console.log("Using model:", model);
     console.log("Using limits:", limits);
     const isReasoningOrGpt5 =
@@ -170,6 +195,16 @@ ${processedText}
     }
 
     const response = await openai.chat.completions.create(completionParams);
+
+    // Log token usage for Forensic tier
+    if (analysisType === "forensic" && response.usage) {
+      console.log("[Forensic] Token usage:", {
+        prompt_tokens: response.usage.prompt_tokens,
+        completion_tokens: response.usage.completion_tokens,
+        total_tokens: response.usage.total_tokens,
+      });
+    }
+
     console.log("OpenAI Choice Details:", {
       finish_reason: response.choices[0]?.finish_reason,
       has_message: !!response.choices[0]?.message,
@@ -265,6 +300,12 @@ ${processedText}
     if (error.message?.includes("token")) {
       throw new Error(
         "Token limit exceeded. Please try with a shorter contract.",
+      );
+    }
+
+    if (error.message?.includes("timeout")) {
+      throw new Error(
+        "Analysis timed out due to document complexity. Consider using a shorter document or contact support for forensic analysis.",
       );
     }
 

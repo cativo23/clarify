@@ -10,28 +10,29 @@ See: .planning/PROJECT.md (updated 2026-02-21)
 ## Current Position
 
 Phase: 1 of 6 (Core Analysis Foundation)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-02-21 — Roadmap created
+Plan: 3 of 3 in current phase
+Status: Complete
+Last activity: 2026-02-22 — Plan 01-03 completed (Database constraints and credit cost logic for Forensic tier)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
-- Average duration: N/A
-- Total execution time: N/A
+- Total plans completed: 3
+- Average duration: ~4 min
+- Total execution time: ~12 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 1 | 3 | 12 min | 4 min |
 
 **Recent Trend:**
-- Last 5 plans: N/A
-- Trend: N/A
+- Last 5 plans: 01-03 (~5 min), 01-02 (~3 min), 01-01 (~4 min)
+- Trend: On track
+| Phase 01-core-analysis-foundation P01 | 293 | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -45,6 +46,9 @@ Recent decisions affecting current work:
 - **Serverless deployment (Vercel)**: Zero infra management, scales automatically
 - **Async job processing (BullMQ)**: Long-running AI jobs need queue, not HTTP
 - **PDF export for results**: Users want portable, shareable reports
+- **Forensic tier buffer allocation** (2026-02-22): 5k token buffer for Forensic (vs 2k for Basic/Premium) to maximize 120k context window
+- **Explicit three-tier prompt resolution** (2026-02-22): No fallback defaults; each tier maps to specific prompt file
+- [Phase 01-core-analysis-foundation]: Config-driven credit costs: Use getPromptConfig().tiers[analysis_type]?.credits instead of hardcoded values for maintainability
 
 ### Pending Todos
 
@@ -64,6 +68,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-21 — Roadmap planning
-Stopped at: Roadmap created, awaiting phase planning approval
+Last session: 2026-02-22 — Plan 01-03 execution
+Stopped at: Completed 01-core-analysis-foundation-01-03-PLAN.md (Phase 1 complete)
 Resume file: None
