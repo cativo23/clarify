@@ -4,7 +4,7 @@
     <div
       :class="[
         'relative p-6 rounded-3xl border-2 transition-all duration-300 cursor-pointer group',
-        isExpanded === 'basic'
+        expandedTiers.basic
           ? 'border-secondary bg-secondary/5 ring-4 ring-secondary/10'
           : 'border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-200 dark:hover:border-slate-700',
       ]"
@@ -14,7 +14,7 @@
         <div
           :class="[
             'w-12 h-12 rounded-2xl flex items-center justify-center transition-colors',
-            isExpanded === 'basic' || modelValue === 'basic'
+            expandedTiers.basic || modelValue === 'basic'
               ? 'bg-secondary text-white'
               : 'bg-slate-100 dark:bg-slate-800 text-slate-500',
           ]"
@@ -32,7 +32,7 @@
       </h3>
 
       <!-- Compact view -->
-      <template v-if="!isExpanded">
+      <template v-if="!expandedTiers.basic">
         <p
           class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-4"
         >
@@ -118,7 +118,7 @@
         hasCreditsForPremium
           ? 'cursor-pointer'
           : 'opacity-60 grayscale cursor-not-allowed',
-        isExpanded === 'premium'
+        expandedTiers.premium
           ? 'border-secondary bg-secondary/5 ring-4 ring-secondary/10'
           : 'border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-200 dark:hover:border-slate-700',
       ]"
@@ -137,7 +137,7 @@
         <div
           :class="[
             'w-12 h-12 rounded-2xl flex items-center justify-center transition-colors',
-            isExpanded === 'premium' || modelValue === 'premium'
+            expandedTiers.premium || modelValue === 'premium'
               ? 'bg-secondary text-white'
               : 'bg-slate-100 dark:bg-slate-800 text-slate-500',
           ]"
@@ -162,7 +162,7 @@
       </h3>
 
       <!-- Compact view -->
-      <template v-if="!isExpanded">
+      <template v-if="!expandedTiers.premium">
         <p
           class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-4"
         >
@@ -249,7 +249,7 @@
         hasCreditsForForensic
           ? 'cursor-pointer'
           : 'opacity-60 grayscale cursor-not-allowed',
-        isExpanded === 'forensic'
+        expandedTiers.forensic
           ? 'border-secondary bg-secondary/5 ring-4 ring-secondary/10'
           : 'border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-200 dark:hover:border-slate-700',
       ]"
@@ -268,7 +268,7 @@
         <div
           :class="[
             'w-12 h-12 rounded-2xl flex items-center justify-center transition-colors',
-            isExpanded === 'forensic' || modelValue === 'forensic'
+            expandedTiers.forensic || modelValue === 'forensic'
               ? 'bg-secondary text-white'
               : 'bg-slate-100 dark:bg-slate-800 text-slate-500',
           ]"
@@ -293,7 +293,7 @@
       </h3>
 
       <!-- Compact view -->
-      <template v-if="!isExpanded">
+      <template v-if="!expandedTiers.forensic">
         <p
           class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-4"
         >
@@ -385,88 +385,6 @@
     </div>
   </div>
 
-  <!-- Tier Comparison Table -->
-  <div
-    class="mt-8 p-6 bg-slate-50 dark:bg-slate-900/50 rounded-3xl border border-slate-100 dark:border-slate-800"
-  >
-    <h4
-      class="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-6 text-center"
-    >
-      Comparativa de Niveles
-    </h4>
-    <div class="grid grid-cols-3 gap-4 text-center">
-      <!-- Basic Column -->
-      <div class="space-y-2">
-        <div
-          class="w-10 h-10 mx-auto rounded-xl bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-500"
-        >
-          <ZapIcon class="w-5 h-5" />
-        </div>
-        <p class="text-xs font-bold text-slate-700 dark:text-slate-300">
-          Básico
-        </p>
-        <TokenTooltip tokenExplanation="8K tokens ≈ 2-3 páginas">
-          <p
-            class="text-[10px] text-slate-400 underline decoration-dashed decoration-secondary/50 cursor-help"
-          >
-            ~8K tokens
-          </p>
-        </TokenTooltip>
-        <p class="text-[9px] font-black text-slate-500 uppercase">1 crédito</p>
-      </div>
-      <!-- Premium Column -->
-      <div
-        class="border-x border-slate-200 dark:border-slate-700 px-4 space-y-2"
-      >
-        <div
-          class="w-10 h-10 mx-auto rounded-xl bg-secondary/10 flex items-center justify-center text-secondary"
-        >
-          <SearchIcon class="w-5 h-5" />
-        </div>
-        <p class="text-xs font-bold text-secondary">Premium</p>
-        <TokenTooltip tokenExplanation="35K tokens ≈ 8-10 páginas">
-          <p
-            class="text-[10px] text-slate-400 underline decoration-dashed decoration-secondary/50 cursor-help"
-          >
-            ~35K tokens
-          </p>
-        </TokenTooltip>
-        <p class="text-[9px] font-black text-secondary uppercase">3 créditos</p>
-      </div>
-      <!-- Forensic Column -->
-      <div class="space-y-2">
-        <div
-          class="w-10 h-10 mx-auto rounded-xl bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-500"
-        >
-          <ShieldCheckIcon class="w-5 h-5" />
-        </div>
-        <p class="text-xs font-bold text-slate-700 dark:text-slate-300">
-          Forensic
-        </p>
-        <TokenTooltip tokenExplanation="120K tokens ≈ 25-30 páginas">
-          <p
-            class="text-[10px] text-slate-400 underline decoration-dashed decoration-secondary/50 cursor-help"
-          >
-            ~120K tokens
-          </p>
-        </TokenTooltip>
-        <p class="text-[9px] font-black text-slate-500 uppercase">
-          10 créditos
-        </p>
-      </div>
-    </div>
-
-    <!-- Comparison Modal Trigger -->
-    <div class="mt-6 text-center">
-      <button
-        @click="isComparisonModalOpen = true"
-        class="text-xs font-black uppercase tracking-widest text-secondary hover:underline transition-colors"
-      >
-        ¿Cuál nivel es para mí?
-      </button>
-    </div>
-  </div>
-
   <!-- Comparison Modal -->
   <TierComparisonModal v-model:isOpen="isComparisonModalOpen" />
 </template>
@@ -491,11 +409,15 @@ const emit = defineEmits(["update:modelValue"]);
 const hasCreditsForPremium = computed(() => props.userCredits >= 3);
 const hasCreditsForForensic = computed(() => props.userCredits >= 10);
 
-// Expand-on-click state
-const isExpanded = ref<"basic" | "premium" | "forensic" | null>(null);
+// Per-card expansion state
+const expandedTiers = ref({
+  basic: false,
+  premium: false,
+  forensic: false,
+});
 
 const toggleExpand = (tier: "basic" | "premium" | "forensic") => {
-  isExpanded.value = isExpanded.value === tier ? null : tier;
+  expandedTiers.value[tier] = !expandedTiers.value[tier];
   // Also select the tier when clicked (if credits available)
   if (
     tier === "basic" ||
