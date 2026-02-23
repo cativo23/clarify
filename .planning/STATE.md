@@ -9,30 +9,31 @@ See: .planning/PROJECT.md (updated 2026-02-21)
 
 ## Current Position
 
-Phase: 1 of 6 (Core Analysis Foundation) — COMPLETE
-Plan: 4 of 4 in current phase
-Status: Complete
-Last activity: 2026-02-23 — Phase 1 Plan 04 complete (Forensic UI sections for analisis_cruzado, omisiones, mapa_estructural)
+Phase: 2 of 6 (Tier Selection UX) — IN PROGRESS
+Plan: 5 of 6 in current phase
+Status: Plan 05 complete
+Last activity: 2026-02-23 — Phase 2 Plan 05 complete (Upload payload limit fix)
 
 Progress: [████████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
+- Total plans completed: 8
 - Average duration: ~4 min
-- Total execution time: ~29 min
+- Total execution time: ~34 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1 | 4 | 17 min | 4 min |
-| 2 | 3 | 12 min | 4 min |
+| 2 | 4 | 17 min | 4 min |
 
 **Recent Trend:**
-- Last 7 plans: 01-04 (~5 min), 02-03 (~4 min), 02-02 (~8 min), 02-01 (~5 min), 01-03 (~5 min), 01-02 (~3 min), 01-01 (~4 min)
+- Last 7 plans: 02-05 (~5 min), 01-04 (~5 min), 02-03 (~4 min), 02-02 (~8 min), 02-01 (~5 min), 01-03 (~5 min), 01-02 (~3 min)
 - Trend: On track
+| Phase 02-tier-selection-ux P05 | 5 | 2 tasks | 3 files |
 | Phase 01-core-analysis-foundation P04 | 5 | 3 tasks | 3 files |
 | Phase 02-tier-selection-ux P02 | ~680 | 6 tasks | 6 files |
 
@@ -59,6 +60,8 @@ Recent decisions affecting current work:
 - [Phase 01-core-analysis-foundation Plan 04]: Collapsible sections default to expanded for immediate Forensic data visibility
 - [Phase 01-core-analysis-foundation Plan 04]: Distinct visual branding per Forensic section (indigo/amber/slate)
 - [Phase 01-core-analysis-foundation Plan 04]: Defensive rendering - components only show when isForensic AND data exists
+- [Phase 02-tier-selection-ux Plan 05]: Nitro-level bodyLimit over route-specific rules for consistent upload handling
+- [Phase 02-tier-selection-ux Plan 05]: Pre-upload validation in Dropzone prevents unnecessary network requests
 
 ### Pending Todos
 
@@ -78,14 +81,18 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-23 — Phase 1 Plan 04 complete
-Stopped at: Phase 1 complete (all 4 plans: 01-01, 01-02, 01-03, 01-04)
-Next: Run `/gsd:verify-work 1` for Phase 1 UAT or transition to Phase 3
+Last session: 2026-02-23 — Phase 2 Plan 05 complete
+Stopped at: Phase 2 Plan 05 complete (upload payload limit fix)
+Next: Execute Phase 2 Plan 06 or run `/gsd:verify-work 2` for Phase 2 UAT
 
-**Phase 1 Deliverables:**
-- 3-tier analysis backend (Basic/Premium/Forensic) with dedicated prompts (01-01, 01-02, 01-03)
-- BullMQ queue processing for async job handling (01-03)
-- Forensic UI components: CrossClauseAnalysis.vue, CriticalOmissions.vue, StructuralMap.vue (01-04)
-- TypeScript interfaces for Forensic data structures (01-04)
+**Phase 2 Deliverables (completed):**
+- Tier comparison table in AnalysisSelector (02-01)
+- Upload progress indicator with cancel button (02-02)
+- Token usage explanations with page analogies (02-03)
+- Upload payload limit fix with 10MB bodyLimit (02-05)
+
+**Phase 2 Deliverables (pending):**
+- Plan 04: [pending]
+- Plan 06: [pending]
 
 **Outstanding:** Database migration for Supabase Realtime (commit 84ec0e4)
