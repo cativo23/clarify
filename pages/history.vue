@@ -186,17 +186,35 @@
               <div
                 :class="[
                   'w-14 h-14 rounded-2xl flex items-center justify-center transition-all group-hover:scale-110 shadow-lg',
-                  analysis.risk_level === 'high'
-                    ? 'bg-risk-high shadow-risk-high/20'
-                    : analysis.risk_level === 'medium'
-                      ? 'bg-risk-medium shadow-risk-medium/20'
-                      : analysis.risk_level === 'low'
-                        ? 'bg-risk-low shadow-risk-low/20'
-                        : 'bg-slate-100',
+                  analysis.status === 'failed'
+                    ? 'bg-red-500/10 shadow-red-500/20'
+                    : analysis.risk_level === 'high'
+                      ? 'bg-risk-high shadow-risk-high/20'
+                      : analysis.risk_level === 'medium'
+                        ? 'bg-risk-medium shadow-risk-medium/20'
+                        : analysis.risk_level === 'low'
+                          ? 'bg-risk-low shadow-risk-low/20'
+                          : 'bg-slate-100',
                 ]"
               >
+                <!-- Failed status icon -->
                 <svg
-                  v-if="analysis.status === 'completed'"
+                  v-if="analysis.status === 'failed'"
+                  class="w-7 h-7 text-red-500 dark:text-red-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2.5"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+                <!-- Completed status icons -->
+                <svg
+                  v-else-if="analysis.status === 'completed'"
                   class="w-7 h-7 text-white"
                   fill="none"
                   stroke="currentColor"
@@ -241,16 +259,18 @@
                 <span
                   :class="[
                     'text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-lg',
-                    analysis.risk_level === 'high'
-                      ? 'bg-risk-high/10 text-risk-high'
-                      : analysis.risk_level === 'medium'
-                        ? 'bg-risk-medium/10 text-risk-medium'
-                        : analysis.risk_level === 'low'
-                          ? 'bg-risk-low/10 text-risk-low'
-                          : 'bg-slate-100 text-slate-400',
+                    analysis.status === 'failed'
+                      ? 'bg-red-500/10 text-red-500 dark:text-red-400'
+                      : analysis.risk_level === 'high'
+                        ? 'bg-risk-high/10 text-risk-high'
+                        : analysis.risk_level === 'medium'
+                          ? 'bg-risk-medium/10 text-risk-medium'
+                          : analysis.risk_level === 'low'
+                            ? 'bg-risk-low/10 text-risk-low'
+                            : 'bg-slate-100 text-slate-400',
                   ]"
                 >
-                  {{ getRiskLabel(analysis) }}
+                  {{ getStatusLabel(analysis) }}
                 </span>
               </div>
             </div>
@@ -324,6 +344,7 @@ const activeFilter = ref("all");
 
 const filters = [
   { id: "all", label: "Todos" },
+  { id: "failed", label: "Fallidos" },
   { id: "high", label: "Riesgo Alto" },
   { id: "medium", label: "Cuidado" },
   { id: "low", label: "Seguro" },
@@ -357,12 +378,17 @@ const filteredAnalyses = computed(() => {
       .toLowerCase()
       .includes(searchQuery.value.toLowerCase());
     const matchesFilter =
-      activeFilter.value === "all" || a.risk_level === activeFilter.value;
+      activeFilter.value === "all" ||
+      (activeFilter.value === "failed"
+        ? a.status === "failed"
+        : a.risk_level === activeFilter.value);
     return matchesSearch && matchesFilter;
   });
 });
 
-const getRiskLabel = (analysis: Analysis) => {
+const getStatusLabel = (analysis: Analysis) => {
+  if (analysis.status === "failed") return "Fallido";
+  if (analysis.status === "processing") return "Procesando";
   if (analysis.status !== "completed") return "Pendiente";
   switch (analysis.risk_level) {
     case "high":

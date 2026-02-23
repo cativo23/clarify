@@ -57,7 +57,21 @@ export const analyzeContract = async (
   contractText: string,
   analysisType: "basic" | "premium" | "forensic" = "premium",
 ) => {
-  const openai = createOpenAIClient();
+  // Define timeouts per tier (in milliseconds)
+  // Forensic tier needs longer timeout for 120k input / 30k output token processing
+  const timeouts = {
+    basic: 120000,     // 2 minutes
+    premium: 300000,   // 5 minutes
+    forensic: 600000,  // 10 minutes
+  };
+  const timeout = timeouts[analysisType];
+
+  const config = useRuntimeConfig();
+
+  const openai = new OpenAI({
+    apiKey: config.openaiApiKey,
+    timeout,
+  });
 
   // 1. Load Dynamic Configuration
   const promptConfig = await getPromptConfig();
@@ -286,6 +300,12 @@ ${processedText}
     if (error.message?.includes("token")) {
       throw new Error(
         "Token limit exceeded. Please try with a shorter contract.",
+      );
+    }
+
+    if (error.message?.includes("timeout")) {
+      throw new Error(
+        "Analysis timed out due to document complexity. Consider using a shorter document or contact support for forensic analysis.",
       );
     }
 
