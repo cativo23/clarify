@@ -942,8 +942,10 @@ const fetchUserData = async () => {
 const setupRealtimeSubscription = () => {
   if (realtimeChannel || !currentUserId.value) return;
 
+  console.log("Setting up realtime subscription for user:", currentUserId.value);
+
   realtimeChannel = supabase
-    .channel("analyses-updates")
+    .channel(`analyses-updates-${currentUserId.value}`)
     .on(
       "postgres_changes",
       {
@@ -1033,7 +1035,14 @@ const setupRealtimeSubscription = () => {
         }
       },
     )
-    .subscribe();
+    .subscribe((status) => {
+      console.log("Realtime subscription status:", status);
+      if (status === "SUBSCRIBED") {
+        console.log("Successfully subscribed to analyses updates");
+      } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+        console.error("Realtime subscription error:", status);
+      }
+    });
 };
 
 onUnmounted(() => {
@@ -1046,9 +1055,11 @@ onUnmounted(() => {
 watch(
   currentUserId,
   async (newId) => {
+    console.log("currentUserId changed:", newId);
     if (newId) {
       await fetchUserData();
       setupRealtimeSubscription();
+      console.log("Realtime subscription setup complete");
     }
   },
   { immediate: true },
