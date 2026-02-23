@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-21)
 ## Current Position
 
 Phase: 2 of 6 (Tier Selection UX) — IN PROGRESS
-Plan: 5 of 6 in current phase
-Status: Plan 05 complete
-Last activity: 2026-02-23 — Phase 2 Plan 05 complete (Upload payload limit fix)
+Plan: 4 of 6 in current phase
+Status: Plan 04 complete
+Last activity: 2026-02-23 — Phase 2 Plan 04 complete (Individual tooltip hover and per-card expansion)
 
 Progress: [████████████] 100%
 
@@ -31,8 +31,9 @@ Progress: [████████████] 100%
 | 2 | 4 | 17 min | 4 min |
 
 **Recent Trend:**
-- Last 7 plans: 02-05 (~5 min), 01-04 (~5 min), 02-03 (~4 min), 02-02 (~8 min), 02-01 (~5 min), 01-03 (~5 min), 01-02 (~3 min)
+- Last 7 plans: 02-04 (~5 min), 02-05 (~5 min), 01-04 (~5 min), 02-03 (~4 min), 02-02 (~8 min), 02-01 (~5 min), 01-03 (~5 min)
 - Trend: On track
+| Phase 02-tier-selection-ux P04 | 5 | 4 tasks | 3 files |
 | Phase 02-tier-selection-ux P05 | 5 | 2 tasks | 3 files |
 | Phase 01-core-analysis-foundation P04 | 5 | 3 tasks | 3 files |
 | Phase 02-tier-selection-ux P02 | ~680 | 6 tasks | 6 files |
@@ -62,6 +63,8 @@ Recent decisions affecting current work:
 - [Phase 01-core-analysis-foundation Plan 04]: Defensive rendering - components only show when isForensic AND data exists
 - [Phase 02-tier-selection-ux Plan 05]: Nitro-level bodyLimit over route-specific rules for consistent upload handling
 - [Phase 02-tier-selection-ux Plan 05]: Pre-upload validation in Dropzone prevents unnecessary network requests
+- [Phase 02-tier-selection-ux Plan 04]: Individual tooltip hover triggers (hover: not group-hover) for independent tooltip display
+- [Phase 02-tier-selection-ux Plan 04]: Per-card expansion state (expandedTiers object) for independent tier card expansion
 
 ### Pending Todos
 
@@ -81,18 +84,18 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-23 — Phase 2 Plan 05 complete
-Stopped at: Phase 2 Plan 05 complete (upload payload limit fix)
+Last session: 2026-02-23 — Phase 2 Plan 04 complete
+Stopped at: Phase 2 Plan 04 complete (individual tooltip hover, per-card expansion, duplicate table removal)
 Next: Execute Phase 2 Plan 06 or run `/gsd:verify-work 2` for Phase 2 UAT
 
 **Phase 2 Deliverables (completed):**
 - Tier comparison table in AnalysisSelector (02-01)
 - Upload progress indicator with cancel button (02-02)
 - Token usage explanations with page analogies (02-03)
+- Individual tooltip hover and per-card expansion (02-04)
 - Upload payload limit fix with 10MB bodyLimit (02-05)
 
 **Phase 2 Deliverables (pending):**
-- Plan 04: [pending]
 - Plan 06: [pending]
 
 **Outstanding:** Database migration for Supabase Realtime (commit 84ec0e4)
