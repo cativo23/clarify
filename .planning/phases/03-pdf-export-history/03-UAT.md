@@ -9,11 +9,11 @@ updated: 2026-02-24T13:35:00Z
 ## Current Test
 <!-- OVERWRITE each test - shows where we are -->
 
-number: 8
-name: History Search
+number: 9
+name: History Risk Filters
 expected: |
-  On history page (/history), typing in search box filters analyses by contract name.
-  Search is case-insensitive and supports partial match.
+  Risk filter buttons (Todos/Fallidos/Riesgo Alto/Cuidado/Seguro) filter the analysis list.
+  Each button shows only analyses matching that risk level.
 awaiting: user response
 
 ## Tests
@@ -54,7 +54,7 @@ root_cause: "PDF generator footer callback not properly configured for all pages
 
 ### 8. History Search
 expected: On history page, typing in search box filters analyses by contract name (case-insensitive, partial match works).
-result: [pending]
+result: pass
 
 ### 9. History Risk Filters
 expected: Risk filter buttons (Todos/Fallidos/Riesgo Alto/Cuidado/Seguro) filter the analysis list to show only matching risk levels.
@@ -75,9 +75,9 @@ result: [pending]
 ## Summary
 
 total: 12
-passed: 5
+passed: 6
 issues: 2
-pending: 5
+pending: 4
 skipped: 0
 
 ## Gaps
