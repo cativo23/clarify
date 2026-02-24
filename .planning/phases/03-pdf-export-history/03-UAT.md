@@ -9,12 +9,11 @@ updated: 2026-02-24T13:35:00Z
 ## Current Test
 <!-- OVERWRITE each test - shows where we are -->
 
-number: 7
-name: PDF Footer Disclaimer
+number: 8
+name: History Search
 expected: |
-  Every PDF page includes footer with:
-  - Legal disclaimer ("No constituye asesoría legal profesional")
-  - Page numbers
+  On history page (/history), typing in search box filters analyses by contract name.
+  Search is case-insensitive and supports partial match.
 awaiting: user response
 
 ## Tests
@@ -48,7 +47,10 @@ result: pass
 
 ### 7. PDF Footer Disclaimer
 expected: Every PDF page includes footer with legal disclaimer ("No constituye asesoría legal profesional") and page numbers.
-result: [pending]
+result: issue
+reported: "Footer and page numbers only appear on last page, not on regular content pages"
+severity: major
+root_cause: "PDF generator footer callback not properly configured for all pages"
 
 ### 8. History Search
 expected: On history page, typing in search box filters analyses by contract name (case-insensitive, partial match works).
@@ -74,8 +76,8 @@ result: [pending]
 
 total: 12
 passed: 5
-issues: 1
-pending: 6
+issues: 2
+pending: 5
 skipped: 0
 
 ## Gaps
@@ -86,5 +88,14 @@ skipped: 0
   severity: minor
   test: 4
   root_cause: "Unicode emoji not supported by pdfkit built-in Helvetica font"
+  artifacts: []
+  missing: []
+
+- truth: "Every PDF page includes footer with legal disclaimer and page numbers"
+  status: failed
+  reason: "User reported: Footer and page numbers only appear on last page, not on regular content pages"
+  severity: major
+  test: 7
+  root_cause: "PDF generator footer callback not properly configured for all pages"
   artifacts: []
   missing: []
