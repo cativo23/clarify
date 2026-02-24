@@ -9,13 +9,13 @@ updated: 2026-02-24T13:35:00Z
 ## Current Test
 <!-- OVERWRITE each test - shows where we are -->
 
-number: 3
-name: PDF Risk Badge
+number: 4
+name: PDF Executive Summary
 expected: |
-  Risk level badge displays with correct traffic light color:
-  - Red (#ef4444) for High / Riesgo Alto
-  - Amber (#f59e0b) for Medium / Cuidado
-  - Green (#10b981) for Low / Seguro
+  PDF includes executive summary section with:
+  - Verdict (Aceptar/Negociar/Rechazar)
+  - Justification text explaining the verdict
+  - Metrics showing count of hallazgos by risk level
 awaiting: user response
 
 ## Tests
@@ -30,7 +30,7 @@ result: pass
 
 ### 3. PDF Risk Badge
 expected: Risk level badge displays with correct traffic light color: red for High (Riesgo Alto), amber for Medium (Cuidado), green for Low (Seguro).
-result: [pending]
+result: pass
 
 ### 4. PDF Executive Summary
 expected: PDF includes executive summary section with verdict (Aceptar/Negociar/Rechazar), justification text, and metrics showing count of hallazgos by risk level.
@@ -71,9 +71,9 @@ result: [pending]
 ## Summary
 
 total: 12
-passed: 2
+passed: 3
 issues: 0
-pending: 10
+pending: 9
 skipped: 0
 
 ## Gaps
