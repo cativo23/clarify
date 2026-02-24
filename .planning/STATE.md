@@ -80,9 +80,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-24 — Phase 2 COMPLETE
-Stopped at: All 6 plans complete, all UAT issues resolved
-Next: `/gsd:progress` or start Phase 3 (PDF Export & History)
+Last session: 2026-02-24 — Phase 3 context gathered
+Stopped at: CONTEXT.md created for Phase 3 (PDF Export & History)
+Next: `/gsd:plan-phase 3` or `/gsd:plan-phase 3 --skip-research`
 
 **Phase 2 Deliverables (completed):**
 - Tier comparison table in AnalysisSelector (02-01)
