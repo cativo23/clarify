@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-02-21)
 
 ## Current Position
 
-Phase: 2 of 6 (Tier Selection UX) — COMPLETE
-Plan: 6 of 6 in current phase
-Status: All plans complete
-Last activity: 2026-02-24 — Phase 2 complete (all UAT gaps closed)
+Phase: 3 of 6 (PDF Export & History) — COMPLETE
+Plan: 2 of 2 in current phase — COMPLETE
+Status: Phase 3 complete (PDF export + history filters + tests)
+Last activity: 2026-02-24 — Phase 3 executed (03-01 implementation, 03-02 testing)
 
 Progress: ██████████ 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
+- Total plans completed: 12
 - Average duration: ~5 min
-- Total execution time: ~50 min
+- Total execution time: ~60 min
 
 **By Phase:**
 
@@ -29,10 +29,15 @@ Progress: ██████████ 100%
 |-------|-------|-------|----------|
 | 1 | 4 | 17 min | 4 min |
 | 2 | 6 | 25 min | 4 min |
+| 3 | 2 | 15 min | 7 min |
 
 **Recent Trend:**
-- Last 6 plans: 02-06 (~10 min), 02-05 (~5 min), 02-04 (~5 min), 01-04 (~5 min), 02-03 (~4 min), 02-02 (~8 min)
+- Last 6 plans: 03-02 (~15 min), 03-01 (~5 min), 02-06 (~10 min), 02-05 (~5 min), 02-04 (~5 min), 02-03 (~4 min)
 - Trend: On track
+
+**Phase 3 Plans:**
+- [x] 03-01: PDF Export & History Filters Implementation (wave 1) - COMPLETE
+- [x] 03-02: Testing & QA (wave 2, depends on 03-01) - COMPLETE
 
 ## Accumulated Context
 
@@ -40,6 +45,13 @@ Progress: ██████████ 100%
 
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
+
+**Phase 3 Decisions (2026-02-24):**
+- PDF generation: Server-side with pdfkit using built-in Helvetica font (no custom fonts)
+- PDF caching: Supabase Storage `analysis-pdfs` bucket with 24h signed URLs
+- History filters: Native date inputs with instant client-side filtering (no "Apply" button)
+- PDF delivery: Direct download via temporary anchor tag (no preview modal)
+- Test strategy: Comprehensive unit + E2E tests with 47 test cases total
 
 - **Credit-based pricing**: Lower commitment for users, easier to test profitability
 - **3-tier analysis strategy**: Balance cost vs accuracy, let users choose (Basic/Premium/Forensic)
@@ -64,7 +76,11 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-None yet.
+**Phase 3 Decisions:**
+- PDF generation: Server-side with pdfkit, cached in Supabase Storage
+- History filters: Native date inputs, instant application (no "Apply" button)
+- PDF delivery: Direct download (no preview modal)
+- Caching: PDFs cached after first generation (avoid regeneration cost)
 
 ### Blockers/Concerns
 
@@ -80,9 +96,21 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-24 — Phase 3 context gathered
-Stopped at: CONTEXT.md created for Phase 3 (PDF Export & History)
-Next: `/gsd:plan-phase 3` or `/gsd:plan-phase 3 --skip-research`
+Last session: 2026-02-24 — Phase 3 COMPLETE
+Stopped at: Completed 03-01 (implementation) and 03-02 (testing)
+Next: `/gsd:execute-phase 4` for Stripe & Monetization
+
+**Phase 3 Deliverables (COMPLETE):**
+- [x] PDF export for analysis results (branded, with legal disclaimer)
+- [x] History page date range filters (FROM/TO pickers)
+- [x] E2E and unit tests for PDF generation and filtering (47 tests)
+- [x] Supabase Storage bucket for PDF caching (documented in STORAGE-SETUP.md)
+
+**Phase 3 Implementation Details:**
+- pdf-generator.ts: Server-side PDF generation with pdfkit
+- export-pdf.get.ts: API endpoint with caching and ownership verification
+- history.vue: Date range filters with client-side filtering
+- Test coverage: 25 unit tests + 22 E2E tests
 
 **Phase 2 Deliverables (completed):**
 - Tier comparison table in AnalysisSelector (02-01)
