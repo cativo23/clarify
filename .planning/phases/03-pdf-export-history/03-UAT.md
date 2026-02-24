@@ -9,11 +9,13 @@ updated: 2026-02-24T13:35:00Z
 ## Current Test
 <!-- OVERWRITE each test - shows where we are -->
 
-number: 2
-name: PDF Header Branding
+number: 3
+name: PDF Risk Badge
 expected: |
-  PDF opens with Clarify text logo in secondary green (#00dc82) at top.
-  Contract name and analysis date displayed in header.
+  Risk level badge displays with correct traffic light color:
+  - Red (#ef4444) for High / Riesgo Alto
+  - Amber (#f59e0b) for Medium / Cuidado
+  - Green (#10b981) for Low / Seguro
 awaiting: user response
 
 ## Tests
@@ -24,7 +26,7 @@ result: pass
 
 ### 2. PDF Header Branding
 expected: PDF opens with Clarify text logo in secondary green (#00dc82) at top. Contract name and analysis date displayed in header.
-result: [pending]
+result: pass
 
 ### 3. PDF Risk Badge
 expected: Risk level badge displays with correct traffic light color: red for High (Riesgo Alto), amber for Medium (Cuidado), green for Low (Seguro).
@@ -69,9 +71,9 @@ result: [pending]
 ## Summary
 
 total: 12
-passed: 1
+passed: 2
 issues: 0
-pending: 11
+pending: 10
 skipped: 0
 
 ## Gaps
