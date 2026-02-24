@@ -63,6 +63,26 @@
             </svg>
           </div>
 
+          <!-- Date Range Filters -->
+          <div class="flex gap-2 items-center">
+            <div class="flex flex-col">
+              <label class="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1">Desde</label>
+              <input
+                v-model="dateFrom"
+                type="date"
+                class="px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white text-sm font-bold focus:ring-2 focus:ring-secondary/50 focus:border-secondary transition-all outline-none"
+              />
+            </div>
+            <div class="flex flex-col">
+              <label class="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1">Hasta</label>
+              <input
+                v-model="dateTo"
+                type="date"
+                class="px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white text-sm font-bold focus:ring-2 focus:ring-secondary/50 focus:border-secondary transition-all outline-none"
+              />
+            </div>
+          </div>
+
           <div
             class="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-2xl border border-slate-200 dark:border-slate-800"
           >
@@ -115,8 +135,8 @@
         </div>
         <h3 class="text-xl font-black text-slate-900 dark:text-white mb-2">
           {{
-            searchQuery
-              ? `No encontramos "${searchQuery}"`
+            hasActiveFilters
+              ? "No encontramos resultados"
               : "Tu historial está vacío"
           }}
         </h3>
@@ -124,14 +144,14 @@
           class="text-slate-500 dark:text-slate-400 font-medium mb-8 max-w-md mx-auto"
         >
           {{
-            searchQuery
-              ? "No hay contratos que coincidan con tu búsqueda. Intenta con otros términos."
+            hasActiveFilters
+              ? "No hay contratos que coincidan con los filtros aplicados. Intenta ajustar los filtros."
               : "Comienza analizando tu primer contrato para ver tu historial aquí."
           }}
         </p>
         <div class="flex items-center justify-center gap-4">
           <button
-            v-if="searchQuery || activeFilter !== 'all'"
+            v-if="hasActiveFilters"
             class="px-6 py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-bold text-sm hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
             @click="resetFilters"
           >
@@ -341,6 +361,8 @@ const analyses = ref<Analysis[]>([]);
 const loading = ref(true);
 const searchQuery = ref("");
 const activeFilter = ref("all");
+const dateFrom = ref<string>("");
+const dateTo = ref<string>("");
 
 const filters = [
   { id: "all", label: "Todos" },
@@ -384,8 +406,17 @@ const filteredAnalyses = computed(() => {
       (activeFilter.value === "failed"
         ? a.status === "failed"
         : a.risk_level === activeFilter.value);
-    return matchesSearch && matchesFilter;
+    const matchesDateFrom = !dateFrom.value || new Date(a.created_at) >= new Date(dateFrom.value);
+    const matchesDateTo = !dateTo.value || new Date(a.created_at) <= new Date(dateTo.value);
+    return matchesSearch && matchesFilter && matchesDateFrom && matchesDateTo;
   });
+});
+
+const hasActiveFilters = computed(() => {
+  return searchQuery.value !== "" ||
+    activeFilter.value !== "all" ||
+    dateFrom.value !== "" ||
+    dateTo.value !== "";
 });
 
 const getStatusLabel = (analysis: Analysis) => {
@@ -415,6 +446,8 @@ const formatDate = (dateString: string) => {
 const resetFilters = () => {
   searchQuery.value = "";
   activeFilter.value = "all";
+  dateFrom.value = "";
+  dateTo.value = "";
 };
 
 onMounted(() => {
