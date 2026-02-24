@@ -2,6 +2,26 @@ import type { RealtimeChannel, SupabaseClient } from '@supabase/supabase-js'
 
 export type AnalysisStatus = 'pending' | 'queued' | 'analyzing' | 'finalizing' | 'completed' | 'failed'
 
+/**
+ * Normalize database status to UI status
+ * DB uses: pending, processing, completed, failed
+ * UI expects: pending, queued, analyzing, finalizing, completed, failed
+ */
+export function normalizeStatus(dbStatus: string): AnalysisStatus {
+  switch (dbStatus) {
+    case 'processing':
+      return 'analyzing' // DB "processing" = UI "analyzing"
+    case 'pending':
+      return 'pending'
+    case 'completed':
+      return 'completed'
+    case 'failed':
+      return 'failed'
+    default:
+      return dbStatus as AnalysisStatus
+  }
+}
+
 export interface Analysis {
   id: string
   user_id: string
@@ -146,7 +166,12 @@ export function subscribeToAnalysis(
       (payload) => {
         const updatedAnalysis = payload.new as Analysis
         if (updatedAnalysis) {
-          callback(updatedAnalysis)
+          // Normalize DB status to UI status
+          const normalizedAnalysis = {
+            ...updatedAnalysis,
+            status: normalizeStatus(updatedAnalysis.status),
+          }
+          callback(normalizedAnalysis)
         }
       },
     )

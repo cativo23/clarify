@@ -767,7 +767,7 @@ import type { Analysis } from "~/types";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { ShieldCheckIcon } from "@heroicons/vue/24/outline";
 import { timeAgo } from "~/composables/useTimeAgo";
-import { useAnalysisStatus } from "~/composables/useAnalysisStatus";
+import { useAnalysisStatus, normalizeStatus } from "~/composables/useAnalysisStatus";
 import AnalysisStatusBadge from "~/components/AnalysisStatusBadge.vue";
 import SkeletonRecentAnalysis from "~/components/SkeletonRecentAnalysis.vue";
 
@@ -991,21 +991,27 @@ const setupRealtimeSubscription = () => {
       },
       async (payload) => {
         const updatedAnalysis = payload.new as Analysis;
-        console.log("Realtime update received:", updatedAnalysis);
+        // Normalize DB status ("processing") to UI status ("analyzing")
+        const normalizedStatus = normalizeStatus(updatedAnalysis.status);
+        console.log("Realtime update received:", { ...updatedAnalysis, status: normalizedStatus });
 
         // Find and update the analysis in the list
         const index = analyses.value.findIndex(
           (a) => a.id === updatedAnalysis.id,
         );
         if (index !== -1) {
-          // Update existing analysis
+          // Update existing analysis with normalized status
           analyses.value[index] = {
             ...analyses.value[index],
             ...updatedAnalysis,
+            status: normalizedStatus,
           };
         } else {
           // Add to the list if it's not already there
-          analyses.value.unshift(updatedAnalysis);
+          analyses.value.unshift({
+            ...updatedAnalysis,
+            status: normalizedStatus,
+          });
         }
 
         // If job completed or failed, refresh user profile to ensure credits are correct
@@ -1090,7 +1096,11 @@ const fetchAnalyses = async () => {
       "/api/analyses?limit=8&projection=id,contract_name,status,risk_level,created_at,user_id",
       { headers: headers as any },
     );
-    analyses.value = response.analyses || [];
+    // Normalize statuses from DB format to UI format
+    analyses.value = (response.analyses || []).map((a: any) => ({
+      ...a,
+      status: normalizeStatus(a.status),
+    }));
   } catch (error) {
     console.error("Error fetching analyses in polling:", error);
   }
@@ -1098,10 +1108,10 @@ const fetchAnalyses = async () => {
 
 // Polling fallback for pending analyses when realtime is unavailable
 const startStatusPolling = () => {
-  // Poll every 5 seconds for analyses with pending/processing status
+  // Poll every 5 seconds for analyses with pending/analyzing status
   setInterval(async () => {
     const hasPendingAnalyses = analyses.value.some(
-      (a) => a.status === 'pending' || a.status === 'processing' || a.status === 'queued'
+      (a) => a.status === 'pending' || a.status === 'analyzing' || a.status === 'queued'
     );
 
     if (hasPendingAnalyses) {
