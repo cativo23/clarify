@@ -9,11 +9,11 @@ updated: 2026-02-24T13:35:00Z
 ## Current Test
 <!-- OVERWRITE each test - shows where we are -->
 
-number: 11
-name: Combined History Filters
+number: 12
+name: Clear All Filters
 expected: |
-  Multiple filters (search + risk + date) apply together with AND logic.
-  Results only match when ALL filters are satisfied.
+  "Clear all filters" button resets search query, risk filter, and date range filters.
+  All analyses should be shown after clearing.
 awaiting: user response
 
 ## Tests
@@ -69,7 +69,7 @@ root_cause: "Date TO comparison might be using < instead of <=, or time componen
 
 ### 11. Combined History Filters
 expected: Multiple filters (search + risk + date) apply together with AND logic. Results only match when ALL filters are satisfied.
-result: [pending]
+result: pass
 
 ### 12. Clear All Filters
 expected: "Clear all filters" button resets search query, risk filter, and date range filters to show all analyses.
@@ -78,9 +78,9 @@ result: [pending]
 ## Summary
 
 total: 12
-passed: 7
+passed: 8
 issues: 3
-pending: 2
+pending: 1
 skipped: 0
 
 ## Gaps
