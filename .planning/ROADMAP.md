@@ -66,11 +66,11 @@ Plans:
   1. User can download analysis results as formatted PDF report
   2. User can search and filter their analysis history
   3. PDF report includes branded header, risk summary, and key clauses
-**Plans**: TBD
+**Plans**: 2 plans — COMPLETE
 
 Plans:
-- [ ] 03-01: Implement PDF generation with pdfkit
-- [ ] 03-02: Add search and filter to history page
+- [x] 03-01: PDF Export & History Filters Implementation (pdfkit, date range pickers, Supabase Storage caching)
+- [x] 03-02: Testing & QA (unit tests, E2E tests, manual QA checklist)
 
 ### Phase 4: Stripe & Monetization
 **Goal**: Enable credit purchases with real payments
@@ -143,7 +143,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 |-------|----------------|--------|-----------|
 | 1. Core Analysis Foundation | 4/4 | Complete   | 2026-02-23 |
 | 2. Tier Selection & UX | 6/6 | Complete   | 2026-02-24 |
-| 3. PDF Export & History | 0/2 | Not started | - |
+| 3. PDF Export & History | 2/2 | Complete   | 2026-02-24 |
 | 4. Stripe & Monetization | 0/3 | Not started | - |
 | 5. Free Credits & Onboarding | 0/3 | Not started | - |
 | 6. Admin Analytics | 0/2 | Not started | - |
@@ -161,9 +161,9 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | TIER-02 | Tier Selection UI — Users can select Basic/Premium/Forensic before analysis | Phase 2 | Complete |
 | QUEUE-01 | BullMQ/Upstash queue for async processing | Phase 1 | Complete |
 | PROMPT-01 | Forensic Analysis Prompt — Dedicated prompt for exhaustive 100% coverage analysis | Phase 1 | Complete |
-| PDF-01 | PDF Export — Export analysis results as formatted PDF | Phase 3 | Pending |
-| HISTORY-01 | Searchable analysis history | Phase 3 | Pending |
-| HISTORY-02 | Analysis history with filters | Phase 3 | Pending |
+| PDF-01 | PDF Export — Export analysis results as formatted PDF | Phase 3 | Complete |
+| HISTORY-01 | Searchable analysis history | Phase 3 | Complete |
+| HISTORY-02 | Analysis history with filters | Phase 3 | Complete |
 | STRIPE-01 | Stripe Configuration — Price IDs, webhook secret, checkout flow working | Phase 4 | Pending |
 | STRIPE-02 | Credit Purchase Flow — Users can buy credit packages (5/$4.99, 10/$8.99, 25/$19.99) | Phase 4 | Pending |
 | STRIPE-03 | Webhook Handling — Atomic credit increment on successful payment | Phase 4 | Pending |
