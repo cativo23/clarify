@@ -2,7 +2,7 @@
 
 ## Overview
 
-Clarify is an AI-powered contract auditing platform that analyzes legal documents and produces risk assessments. This roadmap delivers a complete MVP with 3-tier analysis (Basic/Premium/Forensic), credit-based monetization via Stripe, PDF export, and admin analytics. The journey starts with completing core analysis functionality, moves through monetization and user acquisition features, and ends with production deployment and operational visibility.
+Clarify is an AI-powered contract auditing platform (Micro-SaaS) that analyzes legal documents and produces risk assessments. Democratizing legal advice by translating legalese into plain language.
 
 ## Phases
 
@@ -66,11 +66,12 @@ Plans:
   1. User can download analysis results as formatted PDF report
   2. User can search and filter their analysis history
   3. PDF report includes branded header, risk summary, and key clauses
-**Plans**: 2 plans — COMPLETE
+**Plans**: 3 plans (2 original + 1 gap closure)
 
 Plans:
-- [x] 03-01: PDF Export & History Filters Implementation (pdfkit, date range pickers, Supabase Storage caching)
-- [x] 03-02: Testing & QA (unit tests, E2E tests, manual QA checklist)
+- [x] 03-01-PLAN.md — PDF Export & History Filters Implementation (pdfkit, date range pickers, Supabase Storage caching)
+- [x] 03-02-PLAN.md — Testing & QA (unit tests, E2E tests, manual QA checklist)
+- [x] 03-03-PLAN.md — Gap Closure: PDF emoji garbled, footer missing, TO date filter, clear filters button
 
 ### Phase 4: Stripe & Monetization
 **Goal**: Enable credit purchases with real payments
@@ -143,7 +144,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 |-------|----------------|--------|-----------|
 | 1. Core Analysis Foundation | 4/4 | Complete   | 2026-02-23 |
 | 2. Tier Selection & UX | 6/6 | Complete   | 2026-02-24 |
-| 3. PDF Export & History | 2/2 | Complete   | 2026-02-24 |
+| 3. PDF Export & History | 2/3 | Complete   | 2026-02-24 |
 | 4. Stripe & Monetization | 0/3 | Not started | - |
 | 5. Free Credits & Onboarding | 0/3 | Not started | - |
 | 6. Admin Analytics | 0/2 | Not started | - |
