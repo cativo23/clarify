@@ -9,13 +9,14 @@ updated: 2026-02-24T13:35:00Z
 ## Current Test
 <!-- OVERWRITE each test - shows where we are -->
 
-number: 4
-name: PDF Executive Summary
+number: 5
+name: PDF Hallazgos Section
 expected: |
-  PDF includes executive summary section with:
-  - Verdict (Aceptar/Negociar/Rechazar)
-  - Justification text explaining the verdict
-  - Metrics showing count of hallazgos by risk level
+  All hallazgos appear in PDF with:
+  - Risk-colored left border
+  - Explanation text
+  - Risk level indicator
+  - Mitigation suggestion for each finding
 awaiting: user response
 
 ## Tests
@@ -34,7 +35,10 @@ result: pass
 
 ### 4. PDF Executive Summary
 expected: PDF includes executive summary section with verdict (Aceptar/Negociar/Rechazar), justification text, and metrics showing count of hallazgos by risk level.
-result: [pending]
+result: issue
+reported: "Metrics show garbled characters: 'Métricas: Ø=Ý4 0 Ø=ßá 4 Ø=ßâ 22' instead of colored circles"
+severity: minor
+root_cause: "Unicode emoji not supported by pdfkit built-in Helvetica font"
 
 ### 5. PDF Hallazgos Section
 expected: All hallazgos appear in PDF with risk-colored left border, explanation, risk level, and mitigation suggestion for each finding.
@@ -72,10 +76,17 @@ result: [pending]
 
 total: 12
 passed: 3
-issues: 0
-pending: 9
+issues: 1
+pending: 8
 skipped: 0
 
 ## Gaps
 
-[none yet]
+- truth: "PDF includes executive summary section with verdict, justification, and metrics showing count of hallazgos by risk level using colored indicators"
+  status: failed
+  reason: "User reported: Metrics show garbled characters instead of colored circles"
+  severity: minor
+  test: 4
+  root_cause: "Unicode emoji not supported by pdfkit built-in Helvetica font"
+  artifacts: []
+  missing: []
