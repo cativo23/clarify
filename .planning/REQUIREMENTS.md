@@ -11,7 +11,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Analysis Tiers
 
 - [ ] **TIER-01**: Forensic Tier Backend — gpt-5 model configured and working
-- [ ] **TIER-02**: Tier Selection UI — Users can select Basic/Premium/Forensic before analysis
+- [x] **TIER-02**: Tier Selection UI — Users can select Basic/Premium/Forensic before analysis
 - [x] **TIER-03**: 3-tier analysis strategy with clear credit costs (1/3/10 credits)
 
 ### Prompt Management
@@ -90,7 +90,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | TIER-01 | Phase 1 | In Progress |
-| TIER-02 | Phase 2 | Pending |
+| TIER-02 | Phase 2 | Complete |
 | TIER-03 | Phase 1 | In Progress |
 | PROMPT-01 | Phase 1 | Complete |
 | UPLOAD-01 | Phase 1 | Pending |

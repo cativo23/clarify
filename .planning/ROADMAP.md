@@ -48,15 +48,15 @@ Plans:
   2. User can see upload progress as percentage bar during file upload
   3. User understands difference between tiers (speed vs accuracy tradeoffs)
   4. User's credit balance is visible on dashboard
-**Plans**: 6 plans (3 original + 3 gap closure)
+**Plans**: 6 plans (3 original + 3 gap closure) — COMPLETE
 
 Plans:
 - [x] 02-01-PLAN.md — Tier selector enhancement with comparison modal and token tooltips
 - [x] 02-02-PLAN.md — Upload progress indicator with step display (Subiendo → Validando → Completado)
 - [x] 02-03-PLAN.md — Analysis status badge with real-time updates via Supabase Realtime
-- [ ] 02-04-PLAN.md — Fix tooltips triggering together + tier cards expanding together (UAT gap closure)
-- [ ] 02-05-PLAN.md — Fix upload payload limit for 10MB files (UAT gap closure)
-- [ ] 02-06-PLAN.md — Fix analysis status realtime updates + polling fallback (UAT gap closure)
+- [x] 02-04-PLAN.md — Fix tooltips triggering together + tier cards expanding together (UAT gap closure)
+- [x] 02-05-PLAN.md — Fix upload payload limit for 10MB files (UAT gap closure)
+- [x] 02-06-PLAN.md — Fix analysis status realtime updates + polling fallback (UAT gap closure)
 
 ### Phase 3: PDF Export & History
 **Goal**: Users can export results and revisit past analyses
@@ -142,7 +142,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Core Analysis Foundation | 4/4 | Complete   | 2026-02-23 |
-| 2. Tier Selection & UX | 4/6 | In Progress|  |
+| 2. Tier Selection & UX | 6/6 | Complete   | 2026-02-24 |
 | 3. PDF Export & History | 0/2 | Not started | - |
 | 4. Stripe & Monetization | 0/3 | Not started | - |
 | 5. Free Credits & Onboarding | 0/3 | Not started | - |
@@ -182,5 +182,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 - Unmapped: 0 ✓
 
 ---
-*Roadmap updated: 2026-02-23 (Phase 2 gap closure plans created)*
+*Roadmap updated: 2026-02-24 (Phase 2 COMPLETE - all 6 plans executed, all UAT issues resolved)*
 *Based on PROJECT.md and research/SUMMARY.md*
