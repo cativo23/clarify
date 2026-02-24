@@ -9,14 +9,12 @@ updated: 2026-02-24T13:35:00Z
 ## Current Test
 <!-- OVERWRITE each test - shows where we are -->
 
-number: 6
-name: PDF Forensic Sections
+number: 7
+name: PDF Footer Disclaimer
 expected: |
-  For Forensic analyses, PDF includes additional sections:
-  - Analisis cruzado (cross-clause analysis)
-  - Omisiones (critical omissions)
-  - Mapa estructural (structural map)
-  Note: Skip if your analysis is not Forensic tier.
+  Every PDF page includes footer with:
+  - Legal disclaimer ("No constituye asesoría legal profesional")
+  - Page numbers
 awaiting: user response
 
 ## Tests
@@ -46,7 +44,7 @@ result: pass
 
 ### 6. PDF Forensic Sections
 expected: For Forensic analyses, PDF includes analisis_cruzado (cross-clause analysis), omisiones (critical omissions), and mapa_estructural (structural map) sections.
-result: [pending]
+result: pass
 
 ### 7. PDF Footer Disclaimer
 expected: Every PDF page includes footer with legal disclaimer ("No constituye asesoría legal profesional") and page numbers.
@@ -75,9 +73,9 @@ result: [pending]
 ## Summary
 
 total: 12
-passed: 4
+passed: 5
 issues: 1
-pending: 7
+pending: 6
 skipped: 0
 
 ## Gaps
