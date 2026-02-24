@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Core Analysis Foundation** - Complete 3-tier analysis backend with secure upload and async processing
 - [x] **Phase 2: Tier Selection & UX** - Users can select analysis tier and see progress during upload/analysis
-- [ ] **Phase 3: PDF Export & History** - Export results as branded PDF, searchable analysis history
+- [x] **Phase 3: PDF Export & History** - Export results as branded PDF, searchable analysis history
 - [ ] **Phase 4: Stripe & Monetization** - Enable credit purchases with real payments
 - [ ] **Phase 5: Free Credits & Onboarding** - 10 credits on signup + 1 free Basic analysis/month
 - [ ] **Phase 6: Admin Analytics** - Revenue dashboard, conversion tracking, cost analysis, user management
@@ -182,5 +182,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 - Unmapped: 0 ✓
 
 ---
-*Roadmap updated: 2026-02-24 (Phase 2 COMPLETE - all 6 plans executed, all UAT issues resolved)*
+*Roadmap updated: 2026-02-24 (Phase 3 COMPLETE - PDF export + history filters + 47 tests)*
 *Based on PROJECT.md and research/SUMMARY.md*
