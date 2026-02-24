@@ -679,10 +679,11 @@
           class="flex flex-col sm:flex-row gap-4 justify-center items-center py-10 border-t border-slate-100 dark:border-slate-800"
         >
           <button
-            class="w-full sm:w-auto px-10 py-4 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-900 transition-all shadow-soft"
+            class="w-full sm:w-auto px-10 py-4 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-900 transition-all shadow-soft disabled:opacity-50 disabled:cursor-not-allowed"
             @click="downloadPDF"
+            :disabled="downloading"
           >
-            Descargar Reporte (PDF)
+            {{ downloading ? "Generando PDF..." : "Descargar Reporte (PDF)" }}
           </button>
           <NuxtLink
             to="/dashboard"
@@ -710,6 +711,7 @@ const route = useRoute();
 const analysis = ref<Analysis | null>(null);
 const loading = ref(true);
 const retrying = ref(false);
+const downloading = ref(false);
 
 const summary = computed<AnalysisSummary>(() => {
   return (
@@ -771,9 +773,34 @@ const formatDate = (dateString: string) => {
   });
 };
 
-const downloadPDF = () => {
-  // TODO: Implement PDF export
-  alert("Funcionalidad de descarga en desarrollo");
+const downloadPDF = async () => {
+  if (!analysis.value) return;
+
+  downloading.value = true;
+
+  try {
+    // Call PDF export endpoint
+    const response = await $fetch(`/api/analyses/${analysis.value.id}/export-pdf`);
+
+    if (response.success && response.url) {
+      // Create temporary download link
+      const link = document.createElement("a");
+      link.href = response.url;
+      link.download = response.filename || `clarify-${analysis.value.contract_name}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Show success feedback
+      alert(`Reporte PDF generado exitosamente. ${response.cached ? "(caché)" : ""}`);
+    }
+  } catch (error: any) {
+    console.error("PDF download failed:", error);
+    const message = error.data?.message || error.message || "Error al generar el PDF";
+    alert(`Error: ${message}`);
+  } finally {
+    downloading.value = false;
+  }
 };
 
 const retryAnalysis = async () => {
