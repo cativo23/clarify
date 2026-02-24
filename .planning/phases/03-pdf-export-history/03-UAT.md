@@ -9,12 +9,11 @@ updated: 2026-02-24T13:35:00Z
 ## Current Test
 <!-- OVERWRITE each test - shows where we are -->
 
-number: 10
-name: History Date Range Filters
+number: 11
+name: Combined History Filters
 expected: |
-  Date FROM and TO inputs filter analyses by date range.
-  - Setting FROM excludes earlier analyses
-  - Setting TO excludes later analyses
+  Multiple filters (search + risk + date) apply together with AND logic.
+  Results only match when ALL filters are satisfied.
 awaiting: user response
 
 ## Tests
@@ -63,7 +62,10 @@ result: pass
 
 ### 10. History Date Range Filters
 expected: Date FROM and TO inputs filter analyses by date range. Setting FROM excludes earlier analyses. Setting TO excludes later analyses.
-result: [pending]
+result: issue
+reported: "Filtering from Feb 17 to 21 didn't show analysis on Feb 21 - TO date not inclusive"
+severity: major
+root_cause: "Date TO comparison might be using < instead of <=, or time component issue"
 
 ### 11. Combined History Filters
 expected: Multiple filters (search + risk + date) apply together with AND logic. Results only match when ALL filters are satisfied.
@@ -77,8 +79,8 @@ result: [pending]
 
 total: 12
 passed: 7
-issues: 2
-pending: 3
+issues: 3
+pending: 2
 skipped: 0
 
 ## Gaps
@@ -98,5 +100,14 @@ skipped: 0
   severity: major
   test: 7
   root_cause: "PDF generator footer callback not properly configured for all pages"
+  artifacts: []
+  missing: []
+
+- truth: "Date FROM and TO inputs filter analyses by date range inclusively (includes both FROM and TO dates)"
+  status: failed
+  reason: "User reported: Filtering from Feb 17 to 21 didn't show analysis on Feb 21 - TO date not inclusive"
+  severity: major
+  test: 10
+  root_cause: "Date TO comparison might be using < instead of <=, or time component issue"
   artifacts: []
   missing: []
