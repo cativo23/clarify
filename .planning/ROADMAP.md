@@ -13,7 +13,7 @@ Clarify is an AI-powered contract auditing platform that analyzes legal document
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Core Analysis Foundation** - Complete 3-tier analysis backend with secure upload and async processing
-- [ ] **Phase 2: Tier Selection & UX** - Users can select analysis tier and see progress during upload/analysis
+- [x] **Phase 2: Tier Selection & UX** - Users can select analysis tier and see progress during upload/analysis
 - [ ] **Phase 3: PDF Export & History** - Export results as branded PDF, searchable analysis history
 - [ ] **Phase 4: Stripe & Monetization** - Enable credit purchases with real payments
 - [ ] **Phase 5: Free Credits & Onboarding** - 10 credits on signup + 1 free Basic analysis/month
