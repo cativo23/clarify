@@ -6,7 +6,7 @@
  */
 
 import PDFDocument from "pdfkit";
-import type { Analysis, AnalysisSummary, Hallazgo } from "~/types";
+import type { Analysis, AnalysisSummary } from "~/types";
 
 interface PDFGenerationOptions {
   includeBranding?: boolean;
@@ -62,10 +62,6 @@ export async function generateAnalysisPDF(
     doc.on("end", () => resolve(Buffer.concat(chunks)));
     doc.on("error", reject);
 
-    // Register fonts
-    const boldFont = doc.font("Helvetica-Bold");
-    const normalFont = doc.font("Helvetica");
-
     // Generate header
     generateHeader(doc, analysis, includeBranding);
 
@@ -79,7 +75,10 @@ export async function generateAnalysisPDF(
     generateHallazgos(doc, summary);
 
     // Generate forensic sections if present
-    if (analysis.analysis_type === "forensic" || analysis.analysis_type === "premium") {
+    if (
+      analysis.analysis_type === "forensic" ||
+      analysis.analysis_type === "premium"
+    ) {
       generateForensicSections(doc, summary);
     }
 
@@ -296,10 +295,7 @@ function generateExecutiveSummary(
 /**
  * Generate findings (hallazgos) section
  */
-function generateHallazgos(
-  doc: PDFKit.PDFDocument,
-  summary: AnalysisSummary,
-) {
+function generateHallazgos(doc: PDFKit.PDFDocument, summary: AnalysisSummary) {
   const { left } = doc.page.margins;
   const pageWidth =
     doc.page.width - doc.page.margins.left - doc.page.margins.right;
@@ -608,55 +604,55 @@ function generateForensicSections(
       })
       .moveDown(0.5);
 
+    doc
+      .fontSize(10)
+      .font("Helvetica")
+      .fillColor("#4b5563")
+      .text(
+        `Total secciones: ${mapa.total_secciones} | Anexos: ${mapa.total_anexos} | Páginas: ${mapa.total_paginas || "N/A"}`,
+        left,
+        doc.y,
+        {
+          width: pageWidth,
+          align: "left",
+        },
+      );
+
+    doc.moveDown(0.5);
+
+    // Section list
+    if (mapa.secciones && mapa.secciones.length > 0) {
       doc
         .fontSize(10)
-        .font("Helvetica")
-        .fillColor("#4b5563")
-        .text(
-          `Total secciones: ${mapa.total_secciones} | Anexos: ${mapa.total_anexos} | Páginas: ${mapa.total_paginas || "N/A"}`,
-          left,
-          doc.y,
-          {
-            width: pageWidth,
-            align: "left",
-          },
-        );
+        .font("Helvetica-Bold")
+        .fillColor("#374151")
+        .text("Secciones:", left, doc.y, {
+          width: pageWidth,
+          align: "left",
+        });
 
-      doc.moveDown(0.5);
+      doc.moveDown(0.3);
 
-      // Section list
-      if (mapa.secciones && mapa.secciones.length > 0) {
+      for (const seccion of mapa.secciones) {
+        const riskColor =
+          RISK_COLORS[seccion.riesgo as keyof typeof RISK_COLORS] ||
+          RISK_COLORS.gris;
+
         doc
-          .fontSize(10)
-          .font("Helvetica-Bold")
-          .fillColor("#374151")
-          .text("Secciones:", left, doc.y, {
+          .fontSize(9)
+          .font("Helvetica")
+          .fillColor(riskColor)
+          .text(`• ${seccion.nombre} (pág. ${seccion.paginas})`, left, doc.y, {
             width: pageWidth,
             align: "left",
           });
 
-        doc.moveDown(0.3);
-
-        for (const seccion of mapa.secciones) {
-          const riskColor =
-            RISK_COLORS[seccion.riesgo as keyof typeof RISK_COLORS] ||
-            RISK_COLORS.gris;
-
-          doc
-            .fontSize(9)
-            .font("Helvetica")
-            .fillColor(riskColor)
-            .text(`• ${seccion.nombre} (pág. ${seccion.paginas})`, left, doc.y, {
-              width: pageWidth,
-              align: "left",
-            });
-
-          if (doc.y > doc.page.height - 80) {
-            doc.addPage();
-            doc.y = 50;
-          }
+        if (doc.y > doc.page.height - 80) {
+          doc.addPage();
+          doc.y = 50;
         }
       }
+    }
 
     doc.moveDown(1);
   }
