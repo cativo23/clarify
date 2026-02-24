@@ -10,6 +10,7 @@
 
 import { serverSupabaseClient } from "#supabase/server";
 import { createClient } from "@supabase/supabase-js";
+import type { H3Event } from "h3";
 import { generateAnalysisPDF } from "~/server/utils/pdf-generator";
 import { sanitizeAnalysisSummary } from "~/server/utils/analysis-security";
 import { applyRateLimit, RateLimitPresets } from "~/server/utils/rate-limit";
@@ -111,16 +112,11 @@ export default defineEventHandler(async (event) => {
 
     if (existingFile) {
       // Generate signed URL for cached PDF (24h expiry)
-      const { data: signedUrlData, error: urlError } =
-        await adminClient.storage.from(storageBucket).createSignedUrl(
-          storagePath,
-          24 * 60 * 60, // 24 hours
-          {
-            transform: {
-              format: "origin",
-            },
-          },
-        );
+      const { data: signedUrlData, error: urlError } = await adminClient.storage
+        .from(storageBucket)
+        .createSignedUrl(storagePath, 24 * 60 * 60, {
+          transform: { format: "origin" },
+        });
 
       if (urlError || !signedUrlData) {
         console.error("[PDF Export] Error generating signed URL:", urlError);
@@ -136,14 +132,10 @@ export default defineEventHandler(async (event) => {
     }
 
     // Generate PDF
-    const pdfBuffer = await generateAnalysisPDF(
-      analysis as Analysis,
-      summary,
-      {
-        includeBranding: true,
-        includeDisclaimer: true,
-      },
-    );
+    const pdfBuffer = await generateAnalysisPDF(analysis as Analysis, summary, {
+      includeBranding: true,
+      includeDisclaimer: true,
+    });
 
     // Upload to Supabase Storage
     const { error: uploadError } = await adminClient.storage
@@ -163,16 +155,11 @@ export default defineEventHandler(async (event) => {
     }
 
     // Generate signed URL for newly uploaded PDF
-    const { data: signedUrlData, error: urlError } =
-      await adminClient.storage.from(storageBucket).createSignedUrl(
-        storagePath,
-        24 * 60 * 60, // 24 hours
-        {
-          transform: {
-            format: "origin",
-          },
-        },
-      );
+    const { data: signedUrlData, error: urlError } = await adminClient.storage
+      .from(storageBucket)
+      .createSignedUrl(storagePath, 24 * 60 * 60, {
+        transform: { format: "origin" },
+      });
 
     if (urlError || !signedUrlData) {
       console.error("[PDF Export] Signed URL error:", urlError);
@@ -188,7 +175,7 @@ export default defineEventHandler(async (event) => {
       cached: false,
       filename: generateFilename(analysis),
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     handleApiError(error, {
       userId,
       endpoint: "/api/analyses/[id]/export-pdf",
@@ -218,7 +205,7 @@ function generateFilename(analysis: Analysis): string {
 /**
  * Get request user context (helper for admin check)
  */
-async function getRequestUserContext(event: any) {
+async function getRequestUserContext(event: H3Event) {
   const client = await serverSupabaseClient(event);
   const user = (await client.auth.getUser()).data.user;
 
