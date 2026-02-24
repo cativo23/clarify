@@ -9,14 +9,14 @@ updated: 2026-02-24T13:35:00Z
 ## Current Test
 <!-- OVERWRITE each test - shows where we are -->
 
-number: 5
-name: PDF Hallazgos Section
+number: 6
+name: PDF Forensic Sections
 expected: |
-  All hallazgos appear in PDF with:
-  - Risk-colored left border
-  - Explanation text
-  - Risk level indicator
-  - Mitigation suggestion for each finding
+  For Forensic analyses, PDF includes additional sections:
+  - Analisis cruzado (cross-clause analysis)
+  - Omisiones (critical omissions)
+  - Mapa estructural (structural map)
+  Note: Skip if your analysis is not Forensic tier.
 awaiting: user response
 
 ## Tests
@@ -42,7 +42,7 @@ root_cause: "Unicode emoji not supported by pdfkit built-in Helvetica font"
 
 ### 5. PDF Hallazgos Section
 expected: All hallazgos appear in PDF with risk-colored left border, explanation, risk level, and mitigation suggestion for each finding.
-result: [pending]
+result: pass
 
 ### 6. PDF Forensic Sections
 expected: For Forensic analyses, PDF includes analisis_cruzado (cross-clause analysis), omisiones (critical omissions), and mapa_estructural (structural map) sections.
@@ -75,9 +75,9 @@ result: [pending]
 ## Summary
 
 total: 12
-passed: 3
+passed: 4
 issues: 1
-pending: 8
+pending: 7
 skipped: 0
 
 ## Gaps
