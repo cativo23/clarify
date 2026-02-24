@@ -1,20 +1,15 @@
 ---
-status: testing
+status: complete
 phase: 03-pdf-export-history
 source: [03-01-SUMMARY.md, 03-02-SUMMARY.md]
 started: 2026-02-24T13:35:00Z
-updated: 2026-02-24T13:35:00Z
+updated: 2026-02-24T14:30:00Z
 ---
 
 ## Current Test
 <!-- OVERWRITE each test - shows where we are -->
 
-number: 12
-name: Clear All Filters
-expected: |
-  "Clear all filters" button resets search query, risk filter, and date range filters.
-  All analyses should be shown after clearing.
-awaiting: user response
+[testing complete]
 
 ## Tests
 
@@ -73,14 +68,17 @@ result: pass
 
 ### 12. Clear All Filters
 expected: "Clear all filters" button resets search query, risk filter, and date range filters to show all analyses.
-result: [pending]
+result: issue
+reported: "No hay boton de limpiar todos los filtros" (No "Clear all filters" button exists)
+severity: major
+root_cause: "Clear all filters button not implemented in history page"
 
 ## Summary
 
 total: 12
 passed: 8
-issues: 3
-pending: 1
+issues: 4
+pending: 0
 skipped: 0
 
 ## Gaps
@@ -92,7 +90,8 @@ skipped: 0
   test: 4
   root_cause: "Unicode emoji not supported by pdfkit built-in Helvetica font"
   artifacts: []
-  missing: []
+  missing:
+    - "Replace emoji with text labels (ROJAS/AMARILLAS/VERDES) or ASCII symbols"
 
 - truth: "Every PDF page includes footer with legal disclaimer and page numbers"
   status: failed
@@ -101,7 +100,8 @@ skipped: 0
   test: 7
   root_cause: "PDF generator footer callback not properly configured for all pages"
   artifacts: []
-  missing: []
+  missing:
+    - "Fix pdf-generator.ts page break handler to show footer on all pages"
 
 - truth: "Date FROM and TO inputs filter analyses by date range inclusively (includes both FROM and TO dates)"
   status: failed
@@ -110,4 +110,16 @@ skipped: 0
   test: 10
   root_cause: "Date TO comparison might be using < instead of <=, or time component issue"
   artifacts: []
-  missing: []
+  missing:
+    - "Fix date TO comparison to include entire end day (set hours to 23:59:59)"
+
+- truth: "'Clear all filters' button resets search query, risk filter, and date range filters to show all analyses"
+  status: failed
+  reason: "User reported: No hay boton de limpiar todos los filtros (button doesn't exist)"
+  severity: major
+  test: 12
+  root_cause: "Clear all filters button not implemented in history page"
+  artifacts: []
+  missing:
+    - "Add 'Limpiar filtros' button to history.vue filter bar"
+    - "Implement clearFilters() function to reset all filter state"
