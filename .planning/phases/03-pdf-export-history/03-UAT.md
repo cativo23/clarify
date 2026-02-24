@@ -88,38 +88,46 @@ skipped: 0
   reason: "User reported: Metrics show garbled characters instead of colored circles"
   severity: minor
   test: 4
-  root_cause: "Unicode emoji not supported by pdfkit built-in Helvetica font"
-  artifacts: []
+  root_cause: "server/utils/pdf-generator.ts:330 - Unicode emoji (🔴🟡🟢) rendered with Helvetica font which only supports Latin-1 character set. Emoji glyphs not available, causing garbled output like 'Ø=Ý'."
+  artifacts:
+    - path: "server/utils/pdf-generator.ts"
+      issue: "Emoji in metrics text on line 330"
   missing:
-    - "Replace emoji with text labels (ROJAS/AMARILLAS/VERDES) or ASCII symbols"
+    - "Replace emoji with Latin-1 compatible symbols (●) with risk colors, or text labels [ROJAS/AMARILLAS/VERDES]"
 
 - truth: "Every PDF page includes footer with legal disclaimer and page numbers"
   status: failed
   reason: "User reported: Footer and page numbers only appear on last page, not on regular content pages"
   severity: major
   test: 7
-  root_cause: "PDF generator footer callback not properly configured for all pages"
-  artifacts: []
+  root_cause: "server/utils/pdf-generator.ts:94-108 - Footer only drawn at doc.end() for last page. addFooterAndBreak callback only triggers on content overflow, not on every page. pdfkit with autoFirstPage:false doesn't auto-draw footers."
+  artifacts:
+    - path: "server/utils/pdf-generator.ts"
+      issue: "Footer drawing logic at lines 105-108 only runs at end"
   missing:
-    - "Fix pdf-generator.ts page break handler to show footer on all pages"
+    - "Use doc.on('pageAdded') event listener to draw footer on every page automatically"
 
 - truth: "Date FROM and TO inputs filter analyses by date range inclusively (includes both FROM and TO dates)"
   status: failed
   reason: "User reported: Filtering from Feb 17 to 21 didn't show analysis on Feb 21 - TO date not inclusive"
   severity: major
   test: 10
-  root_cause: "Date TO comparison might be using < instead of <=, or time component issue"
-  artifacts: []
+  root_cause: "pages/history.vue:410 - new Date(dateTo.value) creates midnight timestamp (00:00:00). Analyses with time > midnight (e.g., 14:30) fail the <= comparison. Example: 2026-02-21T14:30 <= 2026-02-21T00:00 = false."
+  artifacts:
+    - path: "pages/history.vue"
+      issue: "matchesDateTo comparison on line 410"
   missing:
-    - "Fix date TO comparison to include entire end day (set hours to 23:59:59)"
+    - "Set TO date to end of day: toDate.setHours(23, 59, 59, 999)"
 
 - truth: "'Clear all filters' button resets search query, risk filter, and date range filters to show all analyses"
   status: failed
   reason: "User reported: No hay boton de limpiar todos los filtros (button doesn't exist)"
   severity: major
   test: 12
-  root_cause: "Clear all filters button not implemented in history page"
-  artifacts: []
+  root_cause: "pages/history.vue:152-159 - 'Limpiar filtros' button only exists in empty state (v-else-if='filteredAnalyses.length === 0'). Main filter bar (lines 42-103) has no clear button. resetFilters() function exists (lines 446-451) but no UI trigger when results visible."
+  artifacts:
+    - path: "pages/history.vue"
+      issue: "Clear button only in empty state, not in main filter bar"
   missing:
-    - "Add 'Limpiar filtros' button to history.vue filter bar"
-    - "Implement clearFilters() function to reset all filter state"
+    - "Add 'Limpiar filtros' button to main filter bar, visible when hasActiveFilters is true"
+    - "Button should call existing resetFilters() function"
