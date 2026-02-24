@@ -9,11 +9,12 @@ updated: 2026-02-24T13:35:00Z
 ## Current Test
 <!-- OVERWRITE each test - shows where we are -->
 
-number: 9
-name: History Risk Filters
+number: 10
+name: History Date Range Filters
 expected: |
-  Risk filter buttons (Todos/Fallidos/Riesgo Alto/Cuidado/Seguro) filter the analysis list.
-  Each button shows only analyses matching that risk level.
+  Date FROM and TO inputs filter analyses by date range.
+  - Setting FROM excludes earlier analyses
+  - Setting TO excludes later analyses
 awaiting: user response
 
 ## Tests
@@ -58,7 +59,7 @@ result: pass
 
 ### 9. History Risk Filters
 expected: Risk filter buttons (Todos/Fallidos/Riesgo Alto/Cuidado/Seguro) filter the analysis list to show only matching risk levels.
-result: [pending]
+result: pass
 
 ### 10. History Date Range Filters
 expected: Date FROM and TO inputs filter analyses by date range. Setting FROM excludes earlier analyses. Setting TO excludes later analyses.
@@ -75,9 +76,9 @@ result: [pending]
 ## Summary
 
 total: 12
-passed: 6
+passed: 7
 issues: 2
-pending: 4
+pending: 3
 skipped: 0
 
 ## Gaps
