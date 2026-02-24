@@ -9,27 +9,22 @@ updated: 2026-02-24T13:35:00Z
 ## Current Test
 <!-- OVERWRITE each test - shows where we are -->
 
-number: 8
-name: History Search
+number: 2
+name: PDF Header Branding
 expected: |
-  On history page (/history), typing in search box filters analyses by contract name.
-  Search is case-insensitive (e.g., "servicios" matches "Servicios").
-  Partial match works (e.g., "Serv" matches "Servicios").
+  PDF opens with Clarify text logo in secondary green (#00dc82) at top.
+  Contract name and analysis date displayed in header.
 awaiting: user response
 
 ## Tests
 
 ### 1. Download Analysis PDF
 expected: On analysis detail page, clicking "Descargar Reporte (PDF)" initiates browser download. PDF file downloads with appropriate filename. Loading state shows during generation.
-result: issue
-reported: "500 Server Error on /api/analyses/[id]/export-pdf"
-severity: blocker
-root_cause: "Supabase Storage bucket 'analysis-pdfs' not created - manual setup required"
+result: pass
 
 ### 2. PDF Header Branding
 expected: PDF opens with Clarify text logo in secondary green (#00dc82) at top. Contract name and analysis date displayed in header.
-result: skipped
-reason: "Blocked by Test 1 - requires Supabase Storage bucket setup"
+result: [pending]
 
 ### 3. PDF Risk Badge
 expected: Risk level badge displays with correct traffic light color: red for High (Riesgo Alto), amber for Medium (Cuidado), green for Low (Seguro).
@@ -74,22 +69,11 @@ result: [pending]
 ## Summary
 
 total: 12
-passed: 0
-issues: 1
-pending: 10
-skipped: 1
+passed: 1
+issues: 0
+pending: 11
+skipped: 0
 
 ## Gaps
 
-- truth: "On analysis detail page, clicking 'Descargar Reporte (PDF)' initiates browser download. PDF file downloads with appropriate filename. Loading state shows during generation."
-  status: failed
-  reason: "User reported: 500 Server Error on /api/analyses/[id]/export-pdf"
-  severity: blocker
-  test: 1
-  root_cause: "Supabase Storage bucket 'analysis-pdfs' not created - manual setup required"
-  artifacts:
-    - path: ".planning/phases/03-pdf-export-history/STORAGE-SETUP.md"
-      issue: "Setup documentation exists but bucket not created in Supabase"
-  missing:
-    - "Create 'analysis-pdfs' bucket in Supabase Storage Dashboard"
-    - "Add RLS policies for user isolation"
+[none yet]
