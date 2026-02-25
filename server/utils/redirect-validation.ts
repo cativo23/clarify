@@ -3,6 +3,7 @@ import { URL } from "url";
 /**
  * Validates redirect URLs to prevent open redirect/phishing attacks.
  * Only allows redirects to configured application domains.
+ * Used by Stripe checkout to ensure secure redirects after payment.
  *
  * @param redirectUrl - The URL to validate
  * @param allowedOrigins - List of allowed origin domains
