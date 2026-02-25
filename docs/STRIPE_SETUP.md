@@ -17,7 +17,7 @@ STRIPE_SECRET_KEY=sk_test_...
 
 ## 2. Create Products (Credit Packages)
 
-You need to create 3 products in Stripe to match the packages in the application.
+You need to create 3 products in Stripe to match the exact credit packages used in the application:
 
 1.  Go to **Product catalog** > **Add product**.
 2.  **Basic Pack (5 Credits)**:
@@ -32,6 +32,15 @@ You need to create 3 products in Stripe to match the packages in the application
     - **Name**: 25 Clarify Credits
     - **Price**: 19.99 USD
     - **Billing**: One-time
+
+### Configure Product Metadata (Optional but Recommended)
+
+For better tracking and analytics, add metadata to each product to identify the credit amount:
+
+- Go to each product's page in Stripe Dashboard
+- Under "Additional details", scroll to "Metadata"
+- Add a key-value pair: `key: "credits"`, `value: "5"` (for the 5-credit package)
+- Repeat for other packages with their respective credit amounts (10, 25)
 
 ### Copy Price IDs
 
@@ -85,3 +94,21 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 3.  **Endpoint URL**: `https://your-domain.com/api/stripe/webhook`
 4.  **Events to send**: Select `checkout.session.completed`.
 5.  Copy the **Signing secret** and add it to your production environment variables.
+
+### Required Environment Variables
+
+Make sure to set these environment variables in your `.env` file:
+
+```env
+# Stripe API Keys
+STRIPE_PUBLISHABLE_KEY=pk_live_...        # Your live publishable key (production)
+STRIPE_SECRET_KEY=sk_live_...             # Your live secret key (production)
+STRIPE_WEBHOOK_SECRET=whsec_...           # Your webhook signing secret
+```
+
+For local development:
+```env
+STRIPE_PUBLISHABLE_KEY=pk_test_...        # Your test publishable key
+STRIPE_SECRET_KEY=sk_test_...             # Your test secret key
+STRIPE_WEBHOOK_SECRET=whsec_...           # Your test webhook signing secret
+```
