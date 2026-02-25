@@ -102,14 +102,29 @@ export const updateUserCreditsInDb = async (
   console.log(
     `Successfully added ${credits} credits to user ${userId}. New balance: ${newCredits}`,
   );
-  // Log transaction
-  await supabaseAdmin.from("transactions").insert({
-    user_id: userId,
-    amount: 0, // We don't have the amount here easily available without more logic, typically price
-    credits: credits,
-    type: "purchase",
-    description: `Purchase of ${credits} credits via Stripe`,
-  });
+
+  // Find the package to get the price for transaction logging
+  const packageInfo = CREDIT_PACKAGES.find((pack) => pack.credits === credits);
+  const price = packageInfo ? packageInfo.price : 0;
+
+  // Log transaction - only if credits were successfully updated
+  const { error: transactionError } = await supabaseAdmin
+    .from("transactions")
+    .insert({
+      user_id: userId,
+      amount: price, // Using the actual package price
+      credits: credits,
+      type: "purchase",
+      description: `Purchase of ${credits} credits via Stripe`,
+    });
+
+  if (transactionError) {
+    console.error(
+      `Error logging transaction for user ${userId}:`,
+      transactionError,
+    );
+    // Don't return false here as credits were updated successfully
+  }
 
   return true;
 };
