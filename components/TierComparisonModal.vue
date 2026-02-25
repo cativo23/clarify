@@ -14,11 +14,14 @@
         >
           <!-- Header -->
           <div class="flex items-center justify-between mb-8">
-            <h2
-              class="text-2xl font-black text-slate-900 dark:text-white"
-            >
-              Compara los Niveles de Análisis
-            </h2>
+            <div>
+              <h2 class="text-2xl font-black text-slate-900 dark:text-white">
+                Comparar Niveles de Análisis
+              </h2>
+              <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                {{ selectedTiers.length }} nivel{{ selectedTiers.length !== 1 ? 'es' : '' }} seleccionado{{ selectedTiers.length !== 1 ? 's' : '' }}
+              </p>
+            </div>
             <button
               @click="close"
               class="w-10 h-10 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center justify-center"
@@ -37,27 +40,23 @@
                   >
                     Característica
                   </th>
-                  <th class="text-center p-4 min-w-[140px]">
-                    <span
-                      class="block text-sm font-bold text-slate-700 dark:text-slate-300"
-                      >Básico</span
-                    >
-                    <span class="block text-xs text-slate-400">1 crédito</span>
-                  </th>
                   <th
-                    class="text-center p-4 min-w-[140px] bg-secondary/5 border-x border-secondary/20"
+                    v-for="tier in selectedTiers"
+                    :key="tier"
+                    class="text-center p-4 min-w-[140px]"
+                    :class="{
+                      'bg-secondary/5 border-x border-secondary/20': tier === 'premium',
+                    }"
                   >
-                    <span class="block text-sm font-bold text-secondary"
-                      >Premium</span
-                    >
-                    <span class="block text-xs text-slate-400">3 créditos</span>
-                  </th>
-                  <th class="text-center p-4 min-w-[140px]">
                     <span
-                      class="block text-sm font-bold text-slate-700 dark:text-slate-300"
-                      >Forensic</span
+                      class="block text-sm font-bold"
+                      :class="getTierNameClass(tier)"
                     >
-                    <span class="block text-xs text-slate-400">10 créditos</span>
+                      {{ getTierName(tier) }}
+                    </span>
+                    <span class="block text-xs text-slate-400">
+                      {{ getTierCredits(tier) }}
+                    </span>
                   </th>
                 </tr>
               </thead>
@@ -71,21 +70,24 @@
                   >
                     Límite de tokens
                   </td>
-                  <td class="text-center p-4">
-                    <TokenTooltip tokenExplanation="8K tokens ≈ 2-3 páginas">
-                      ~8K tokens
-                    </TokenTooltip>
-                  </td>
                   <td
-                    class="text-center p-4 bg-secondary/5 border-x border-secondary/20"
+                    v-for="tier in selectedTiers"
+                    :key="tier"
+                    class="text-center p-4"
+                    :class="{
+                      'bg-secondary/5 border-x border-secondary/20': tier === 'premium',
+                    }"
                   >
-                    <TokenTooltip tokenExplanation="35K tokens ≈ 8-10 páginas">
-                      <span class="text-secondary font-bold">~35K tokens</span>
-                    </TokenTooltip>
-                  </td>
-                  <td class="text-center p-4">
-                    <TokenTooltip tokenExplanation="120K tokens ≈ 25-30 páginas">
-                      ~120K tokens
+                    <TokenTooltip :tokenExplanation="getTokenExplanation(tier)">
+                      <span
+                        v-if="tier === 'premium'"
+                        class="text-secondary font-bold"
+                      >
+                        {{ getTokenLimit(tier) }}
+                      </span>
+                      <span v-else>
+                        {{ getTokenLimit(tier) }}
+                      </span>
                     </TokenTooltip>
                   </td>
                 </tr>
@@ -99,16 +101,26 @@
                   >
                     Cobertura
                   </td>
-                  <td class="text-center p-4 text-sm text-slate-600 dark:text-slate-400">
-                    Top 5 riesgos
-                  </td>
                   <td
-                    class="text-center p-4 bg-secondary/5 border-x border-secondary/20"
+                    v-for="tier in selectedTiers"
+                    :key="tier"
+                    class="text-center p-4"
+                    :class="{
+                      'bg-secondary/5 border-x border-secondary/20': tier === 'premium',
+                    }"
                   >
-                    <span class="text-secondary font-bold">95%+ total</span>
-                  </td>
-                  <td class="text-center p-4 text-sm text-slate-600 dark:text-slate-400">
-                    100% total
+                    <span
+                      v-if="tier === 'premium'"
+                      class="text-secondary font-bold"
+                    >
+                      {{ getCoverage(tier) }}
+                    </span>
+                    <span
+                      v-else
+                      class="text-sm text-slate-600 dark:text-slate-400"
+                    >
+                      {{ getCoverage(tier) }}
+                    </span>
                   </td>
                 </tr>
 
@@ -121,16 +133,26 @@
                   >
                     Velocidad
                   </td>
-                  <td class="text-center p-4 text-sm text-slate-600 dark:text-slate-400">
-                    ~30 segundos
-                  </td>
                   <td
-                    class="text-center p-4 bg-secondary/5 border-x border-secondary/20"
+                    v-for="tier in selectedTiers"
+                    :key="tier"
+                    class="text-center p-4"
+                    :class="{
+                      'bg-secondary/5 border-x border-secondary/20': tier === 'premium',
+                    }"
                   >
-                    <span class="text-secondary font-bold">~2 minutos</span>
-                  </td>
-                  <td class="text-center p-4 text-sm text-slate-600 dark:text-slate-400">
-                    ~5 minutos
+                    <span
+                      v-if="tier === 'premium'"
+                      class="text-secondary font-bold"
+                    >
+                      {{ getSpeed(tier) }}
+                    </span>
+                    <span
+                      v-else
+                      class="text-sm text-slate-600 dark:text-slate-400"
+                    >
+                      {{ getSpeed(tier) }}
+                    </span>
                   </td>
                 </tr>
 
@@ -141,34 +163,43 @@
                   >
                     Ideal para
                   </td>
-                  <td class="text-center p-4 text-xs text-slate-600 dark:text-slate-400">
-                    Escaneos rápidos
-                  </td>
                   <td
-                    class="text-center p-4 bg-secondary/5 border-x border-secondary/20"
+                    v-for="tier in selectedTiers"
+                    :key="tier"
+                    class="text-center p-4"
+                    :class="{
+                      'bg-secondary/5 border-x border-secondary/20': tier === 'premium',
+                    }"
                   >
-                    <span class="text-secondary text-xs font-bold"
-                      >Contratos estándar</span
+                    <span
+                      v-if="tier === 'premium'"
+                      class="text-secondary text-xs font-bold"
                     >
-                  </td>
-                  <td class="text-center p-4 text-xs text-slate-600 dark:text-slate-400">
-                    Alto valor
+                      {{ getIdealFor(tier) }}
+                    </span>
+                    <span
+                      v-else
+                      class="text-xs text-slate-600 dark:text-slate-400"
+                    >
+                      {{ getIdealFor(tier) }}
+                    </span>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          <!-- Use Cases Section -->
-          <div>
+          <!-- Use Cases Section - Only show selected tiers -->
+          <div v-if="selectedTiers.length > 0">
             <h3
               class="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-6 text-center"
             >
               ¿Cuál es para ti?
             </h3>
-            <div class="grid md:grid-cols-3 gap-4">
+            <div :class="getUseCasesGridClass">
               <!-- Basic Use Case -->
               <div
+                v-if="selectedTiers.includes('basic')"
                 class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800"
               >
                 <div
@@ -191,6 +222,7 @@
 
               <!-- Premium Use Case -->
               <div
+                v-if="selectedTiers.includes('premium')"
                 class="p-5 rounded-2xl bg-secondary/5 border-2 border-secondary/20"
               >
                 <div
@@ -213,6 +245,7 @@
 
               <!-- Forensic Use Case -->
               <div
+                v-if="selectedTiers.includes('forensic')"
                 class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800"
               >
                 <div
@@ -241,11 +274,13 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
 import { XIcon, ZapIcon, SearchIcon, ShieldCheckIcon } from "lucide-vue-next";
 import TokenTooltip from "./TokenTooltip.vue";
 
 const props = defineProps<{
   isOpen: boolean;
+  selectedTiers: ("basic" | "premium" | "forensic")[];
 }>();
 
 const emit = defineEmits(["update:isOpen"]);
@@ -253,6 +288,86 @@ const emit = defineEmits(["update:isOpen"]);
 const close = () => {
   emit("update:isOpen", false);
 };
+
+// Helper functions for dynamic tier data
+const getTierName = (tier: "basic" | "premium" | "forensic") => {
+  const names = {
+    basic: "Básico",
+    premium: "Premium",
+    forensic: "Forensic",
+  };
+  return names[tier];
+};
+
+const getTierNameClass = (tier: "basic" | "premium" | "forensic") => {
+  const classes = {
+    basic: "text-slate-700 dark:text-slate-300",
+    premium: "text-secondary",
+    forensic: "text-slate-700 dark:text-slate-300",
+  };
+  return classes[tier];
+};
+
+const getTierCredits = (tier: "basic" | "premium" | "forensic") => {
+  const credits = {
+    basic: "1 crédito",
+    premium: "3 créditos",
+    forensic: "10 créditos",
+  };
+  return credits[tier];
+};
+
+const getTokenLimit = (tier: "basic" | "premium" | "forensic") => {
+  const limits = {
+    basic: "~8K tokens",
+    premium: "~35K tokens",
+    forensic: "~120K tokens",
+  };
+  return limits[tier];
+};
+
+const getTokenExplanation = (tier: "basic" | "premium" | "forensic") => {
+  const explanations = {
+    basic: "8K tokens ≈ 2-3 páginas",
+    premium: "35K tokens ≈ 8-10 páginas",
+    forensic: "120K tokens ≈ 25-30 páginas",
+  };
+  return explanations[tier];
+};
+
+const getCoverage = (tier: "basic" | "premium" | "forensic") => {
+  const coverage = {
+    basic: "Top 5 riesgos",
+    premium: "95%+ total",
+    forensic: "100% total",
+  };
+  return coverage[tier];
+};
+
+const getSpeed = (tier: "basic" | "premium" | "forensic") => {
+  const speed = {
+    basic: "~30 segundos",
+    premium: "~2 minutos",
+    forensic: "~5 minutos",
+  };
+  return speed[tier];
+};
+
+const getIdealFor = (tier: "basic" | "premium" | "forensic") => {
+  const idealFor = {
+    basic: "Escaneos rápidos",
+    premium: "Contratos estándar",
+    forensic: "Alto valor",
+  };
+  return idealFor[tier];
+};
+
+const getUseCasesGridClass = computed(() => {
+  const count = props.selectedTiers.length;
+  if (count === 1) return "grid md:grid-cols-1 max-w-md mx-auto gap-4";
+  if (count === 2) return "grid md:grid-cols-2 gap-4";
+  return "grid md:grid-cols-3 gap-4";
+});
 </script>
 
 <style scoped>

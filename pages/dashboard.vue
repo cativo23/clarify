@@ -1207,6 +1207,12 @@ const handleDropzoneUploaded = async (data: { file_url: string }) => {
   try {
     uploadedFileUrl.value = data.file_url;
 
+    // Auto-fill contract name with file name (without extension)
+    if (selectedFile.value && !contractName.value) {
+      const fileName = selectedFile.value.name.replace(/\.[^/.]+$/, "");
+      contractName.value = fileName;
+    }
+
     // Check Tokens
     const tokenResponse = await $fetch<any>("/api/check-tokens", {
       method: "POST",
