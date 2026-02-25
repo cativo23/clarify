@@ -32,9 +32,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Stripe & Payments
 
-- [ ] **STRIPE-01**: Stripe Configuration — Price IDs, webhook secret, checkout flow working
-- [ ] **STRIPE-02**: Credit Purchase Flow — Users can buy credit packages (5/$4.99, 10/$8.99, 25/$19.99)
-- [ ] **STRIPE-03**: Webhook Handling — Atomic credit increment on successful payment via PostgreSQL RPC
+- [x] **STRIPE-01**: Stripe Configuration — Price IDs, webhook secret, checkout flow working
+- [x] **STRIPE-02**: Credit Purchase Flow — Users can buy credit packages (5/$4.99, 10/$8.99, 25/$19.99)
+- [x] **STRIPE-03**: Webhook Handling — Atomic credit increment on successful payment via PostgreSQL RPC
 
 ### Credits & Onboarding
 
@@ -99,9 +99,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PDF-01 | Phase 3 | Pending |
 | HISTORY-01 | Phase 3 | Pending |
 | HISTORY-02 | Phase 3 | Pending |
-| STRIPE-01 | Phase 4 | Pending |
-| STRIPE-02 | Phase 4 | Pending |
-| STRIPE-03 | Phase 4 | Pending |
+| STRIPE-01 | Phase 4 | Complete |
+| STRIPE-02 | Phase 4 | Complete |
+| STRIPE-03 | Phase 4 | Complete |
 | CREDIT-01 | Phase 5 | Pending |
 | CREDIT-02 | Phase 5 | Pending |
 | DEMO-01 | Phase 5 | Pending |
