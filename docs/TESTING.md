@@ -215,6 +215,72 @@ jobs:
 
 ---
 
+## Stripe Sandbox Testing
+
+To properly test the credit purchase flow with Stripe, use the following procedures:
+
+### Stripe Test Cards
+
+Stripe provides special test card numbers for different scenarios:
+
+**Successful payments:**
+- `4242 4242 4242 4242` - Standard card
+- `4000002500003155` - Prepaid card
+
+**Declined payments:**
+- `4000000000000002` - General decline
+- `4000000000009995` - Insufficient funds
+- `4000000000009987` - Lost card
+- `4000000000009979` - Stolen card
+
+**Special scenarios:**
+- `4000000000003063` - Successful authentication required
+- `4000008260003178` - 3DS2 authentication
+
+### Testing the Complete Flow
+
+1. **Environment Setup**
+   - Use test mode Stripe keys (start with `pk_test_` or `sk_test_`)
+   - Set `STRIPE_WEBHOOK_SECRET` to the test webhook secret
+   - Ensure you have the webhook endpoint configured for testing
+
+2. **Webhook Testing**
+   - Use Stripe CLI for local webhook testing:
+     ```bash
+     # Install Stripe CLI
+     brew install stripe/stripe-cli/stripe
+
+     # Login to Stripe CLI
+     stripe login
+
+     # Listen for webhooks locally
+     stripe listen --forward-to localhost:3001/api/stripe/webhook
+     ```
+
+3. **Test Scenarios**
+   - Valid payment with 4242 4242 4242 4242
+   - Payment declined with 4000000000000002
+   - Payment with authentication required
+   - Verify credit balances update correctly after successful payment
+   - Verify no credits are added after failed payment
+
+4. **Using Stripe Dashboard**
+   - Access the [Stripe Test Dashboard](https://dashboard.stripe.com/test)
+   - Monitor test payments in "Payments" section
+   - Check webhook logs in "Developers > Webhooks" section
+
+### E2E Testing Considerations
+
+Since E2E tests can't actually process real payments, our tests verify:
+- Stripe checkout sessions are created correctly
+- Redirects to Stripe checkout occur
+- Credit balances update after simulated successful payments
+- Error handling for invalid packages
+
+For full end-to-end testing including actual payment processing, you would need to use Stripe's test mode with real test cards.
+
+---
+
 ## Manual Testing
 
 For scenarios that cannot be automated, see:
