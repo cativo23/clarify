@@ -269,7 +269,7 @@ const handlePurchase = async (pack: any) => {
       throw new Error("Error al cargar Stripe");
     }
 
-    // Create checkout session
+    // Create checkout session with enhanced error handling
     // Note: Redirect URLs are now constructed server-side for security (C3 fix)
     const { data } = await $fetch("/api/stripe/checkout", {
       method: "POST",
