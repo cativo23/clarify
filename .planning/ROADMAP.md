@@ -82,12 +82,12 @@ Plans:
   2. User can select package, complete checkout, and receive credits automatically
   3. Webhook successfully triggers atomic credit increment via PostgreSQL RPC
   4. Transaction logged to `transactions` table with full audit trail
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 04-01: Create Stripe products and Price IDs in dashboard
-- [ ] 04-02: Configure Stripe webhook endpoint and secret
-- [ ] 04-03: Test end-to-end purchase flow with real payment
+- [ ] 04-01-PLAN.md — Finalize Stripe Configuration and Credit Packages
+- [ ] 04-02-PLAN.md — Implement Frontend Purchase Experience
+- [ ] 04-03-PLAN.md — Create Comprehensive Test Suite for Stripe Integration
 
 ### Phase 5: Free Credits & Onboarding
 **Goal**: Remove barrier to trial with free credits while preventing abuse
@@ -183,5 +183,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 - Unmapped: 0 ✓
 
 ---
-*Roadmap updated: 2026-02-24 (Phase 3 COMPLETE - PDF export + history filters + 47 tests)*
+*Roadmap updated: 2026-02-25 (Phase 4 planning complete - Stripe integration with 3 plans)*
 *Based on PROJECT.md and research/SUMMARY.md*
