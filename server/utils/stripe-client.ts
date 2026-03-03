@@ -17,6 +17,7 @@ export const CREDIT_PACKAGES = [
     credits: 5,
     price: 4.99,
     priceId: process.env.STRIPE_PRICE_ID_5_CREDITS || "price_5credits", // Fallback for development
+    productId: "prod_U5Cnr6Ap3EEMRi", // 5 credits product
     popular: false,
   },
   {
@@ -24,6 +25,7 @@ export const CREDIT_PACKAGES = [
     credits: 10,
     price: 8.99,
     priceId: process.env.STRIPE_PRICE_ID_10_CREDITS || "price_10credits", // Fallback for development
+    productId: "prod_U5CoJApTkeFoaZ", // 10 credits product
     popular: true,
   },
   {
@@ -31,6 +33,7 @@ export const CREDIT_PACKAGES = [
     credits: 25,
     price: 19.99,
     priceId: process.env.STRIPE_PRICE_ID_25_CREDITS || "price_25credits", // Fallback for development
+    productId: "prod_U5CoyWM9uTAemH", // 25 credits product
     popular: false,
   },
 ];
