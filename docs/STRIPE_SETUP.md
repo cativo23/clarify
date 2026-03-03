@@ -42,31 +42,18 @@ For better tracking and analytics, add metadata to each product to identify the 
 - Add a key-value pair: `key: "credits"`, `value: "5"` (for the 5-credit package)
 - Repeat for other packages with their respective credit amounts (10, 25)
 
-### Copy Price IDs
+### Configure Price ID Environment Variables
 
-After creating each product, copy the **API ID** of the *Price* (starts with `price_...`) and update the `server/utils/stripe-client.ts` file:
+Instead of hardcoding Price IDs in the source code, use environment variables to make the configuration more flexible and secure. Update your `.env` file with the actual Price IDs:
 
-```typescript
-// server/utils/stripe-client.ts
-
-export const CREDIT_PACKAGES = [
-    {
-        id: 'pack_5',
-        // ...
-        priceId: 'price_XXXXXX', // <-- Paste the 5-credit price ID here
-    },
-    {
-        id: 'pack_10',
-        // ...
-        priceId: 'price_XXXXXX', // <-- Paste the 10-credit price ID here
-    },
-    {
-        id: 'pack_25',
-        // ...
-        priceId: 'price_XXXXXX', // <-- Paste the 25-credit price ID here
-    },
-]
+```env
+# Stripe Price IDs for credit packages
+STRIPE_PRICE_ID_5_CREDITS=price_xxxxxxxx    # 5 Clarify Credits ($4.99)
+STRIPE_PRICE_ID_10_CREDITS=price_xxxxxxxx   # 10 Clarify Credits ($8.99) - Popular
+STRIPE_PRICE_ID_25_CREDITS=price_xxxxxxxx   # 25 Clarify Credits ($19.99)
 ```
+
+These environment variables will be used by the application to configure the credit packages dynamically.
 
 ## 3. Configure Webhooks
 
@@ -104,6 +91,11 @@ Make sure to set these environment variables in your `.env` file:
 STRIPE_PUBLISHABLE_KEY=pk_live_...        # Your live publishable key (production)
 STRIPE_SECRET_KEY=sk_live_...             # Your live secret key (production)
 STRIPE_WEBHOOK_SECRET=whsec_...           # Your webhook signing secret
+
+# Stripe Price IDs for credit packages
+STRIPE_PRICE_ID_5_CREDITS=price_xxxxxxxx    # 5 Clarify Credits ($4.99)
+STRIPE_PRICE_ID_10_CREDITS=price_xxxxxxxx   # 10 Clarify Credits ($8.99) - Popular
+STRIPE_PRICE_ID_25_CREDITS=price_xxxxxxxx   # 25 Clarify Credits ($19.99)
 ```
 
 For local development:
@@ -111,4 +103,9 @@ For local development:
 STRIPE_PUBLISHABLE_KEY=pk_test_...        # Your test publishable key
 STRIPE_SECRET_KEY=sk_test_...             # Your test secret key
 STRIPE_WEBHOOK_SECRET=whsec_...           # Your test webhook signing secret
+
+# Stripe Price IDs for credit packages (development/test)
+STRIPE_PRICE_ID_5_CREDITS=price_xxxxxxxx    # 5 Clarify Credits ($4.99)
+STRIPE_PRICE_ID_10_CREDITS=price_xxxxxxxx   # 10 Clarify Credits ($8.99) - Popular
+STRIPE_PRICE_ID_25_CREDITS=price_xxxxxxxx   # 25 Clarify Credits ($19.99)
 ```
