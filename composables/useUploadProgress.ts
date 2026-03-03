@@ -62,7 +62,8 @@ export function useUploadProgress() {
 
           // Specific handling for 413 Payload Too Large
           if (xhr.status === 413) {
-            errorMsg = "El archivo excede el tamaño máximo de 10MB. Por favor sube un documento más pequeño.";
+            errorMsg =
+              "El archivo excede el tamaño máximo de 10MB. Por favor sube un documento más pequeño.";
           } else {
             errorMsg = `Error ${xhr.status}: ${xhr.statusText}`;
             try {
@@ -82,7 +83,8 @@ export function useUploadProgress() {
       xhr.addEventListener("error", () => {
         xhrRef = null;
         abortController.value = null;
-        const errorMsg = "Error de red. Verifica tu conexión e intenta de nuevo.";
+        const errorMsg =
+          "Error de red. Verifica tu conexión e intenta de nuevo.";
         uploadError.value = errorMsg;
         isUploading.value = false;
         reject(new Error(errorMsg));

@@ -38,7 +38,9 @@
                 </h2>
                 <p
                   class="mb-5 text-[10px] font-bold tracking-widest uppercase text-slate-500 dark:text-slate-400"
-                >Plan Estándar</p>
+                >
+                  Plan Estándar
+                </p>
 
                 <!-- Credits badge -->
                 <div
@@ -83,7 +85,9 @@
                 <div class="flex items-center justify-between mb-5">
                   <h3
                     class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]"
-                  >Resumen de Seguridad</h3>
+                  >
+                    Resumen de Seguridad
+                  </h3>
                   <span
                     class="px-2 py-0.5 bg-secondary/10 text-secondary text-[8px] font-black uppercase rounded-full border border-secondary/20"
                   >
@@ -128,7 +132,9 @@
                   <div>
                     <p
                       class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tighter mb-0.5"
-                    >Índice de Protección</p>
+                    >
+                      Índice de Protección
+                    </p>
                     <p
                       class="text-xs font-black text-slate-900 dark:text-white"
                     >
@@ -146,7 +152,9 @@
                 <!-- Divider label -->
                 <p
                   class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3"
-                >Indicadores Mensuales</p>
+                >
+                  Indicadores Mensuales
+                </p>
 
                 <!-- Stats -->
                 <div
@@ -339,7 +347,12 @@
                     checkingTokens ||
                     !uploadedFileUrl ||
                     !contractName ||
-                    (sharedCredits || 0) < (analysisType === 'forensic' ? 10 : analysisType === 'premium' ? 3 : 1)
+                    (sharedCredits || 0) <
+                      (analysisType === 'forensic'
+                        ? 10
+                        : analysisType === 'premium'
+                          ? 3
+                          : 1)
                   "
                   class="px-10 py-4 bg-secondary text-white rounded-2xl font-black text-lg hover:shadow-glow hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex items-center gap-3"
                   @click="handleAnalyze"
@@ -709,7 +722,10 @@
                           class="text-[10px] font-bold text-slate-500 dark:text-slate-400"
                           >{{ timeAgo(analysis.created_at) }}</span
                         >
-                        <AnalysisStatusBadge :status="analysis.status" size="sm" />
+                        <AnalysisStatusBadge
+                          :status="analysis.status"
+                          size="sm"
+                        />
                       </div>
                     </div>
                   </div>
@@ -748,7 +764,10 @@
                           class="text-[10px] font-bold text-slate-500 dark:text-slate-400"
                           >{{ timeAgo(analysis.created_at) }}</span
                         >
-                        <AnalysisStatusBadge :status="analysis.status" size="sm" />
+                        <AnalysisStatusBadge
+                          :status="analysis.status"
+                          size="sm"
+                        />
                       </div>
                     </div>
                   </div>
@@ -767,7 +786,10 @@ import type { Analysis } from "~/types";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { ShieldCheckIcon } from "@heroicons/vue/24/outline";
 import { timeAgo } from "~/composables/useTimeAgo";
-import { useAnalysisStatus, normalizeStatus } from "~/composables/useAnalysisStatus";
+import {
+  useAnalysisStatus,
+  normalizeStatus,
+} from "~/composables/useAnalysisStatus";
 import AnalysisStatusBadge from "~/components/AnalysisStatusBadge.vue";
 import SkeletonRecentAnalysis from "~/components/SkeletonRecentAnalysis.vue";
 
@@ -977,7 +999,10 @@ const fetchUserData = async () => {
 const setupRealtimeSubscription = () => {
   if (realtimeChannel || !currentUserId.value) return;
 
-  console.log("Setting up realtime subscription for user:", currentUserId.value);
+  console.log(
+    "Setting up realtime subscription for user:",
+    currentUserId.value,
+  );
 
   realtimeChannel = supabase
     .channel(`analyses-updates-${currentUserId.value}`)
@@ -993,7 +1018,10 @@ const setupRealtimeSubscription = () => {
         const updatedAnalysis = payload.new as Analysis;
         // Normalize DB status ("processing") to UI status ("analyzing")
         const normalizedStatus = normalizeStatus(updatedAnalysis.status);
-        console.log("Realtime update received:", { ...updatedAnalysis, status: normalizedStatus });
+        console.log("Realtime update received:", {
+          ...updatedAnalysis,
+          status: normalizedStatus,
+        });
 
         // Find and update the analysis in the list
         const index = analyses.value.findIndex(
@@ -1111,11 +1139,14 @@ const startStatusPolling = () => {
   // Poll every 5 seconds for analyses with pending/analyzing status
   setInterval(async () => {
     const hasPendingAnalyses = analyses.value.some(
-      (a) => a.status === 'pending' || a.status === 'analyzing' || a.status === 'queued'
+      (a) =>
+        a.status === "pending" ||
+        a.status === "analyzing" ||
+        a.status === "queued",
     );
 
     if (hasPendingAnalyses) {
-      console.log('Polling: Refreshing pending analyses...');
+      console.log("Polling: Refreshing pending analyses...");
       await fetchAnalyses();
     }
   }, 5000);
@@ -1155,7 +1186,6 @@ const getRiskColor = (riskLevel: string | null) => {
       return "bg-slate-100 text-slate-400";
   }
 };
-
 
 const lastAnalysisDate = computed(() => {
   if (!sidebarMetrics.value?.lastAnalysisDate) return "Ninguno";

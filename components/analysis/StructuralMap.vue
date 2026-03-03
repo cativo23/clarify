@@ -4,14 +4,16 @@
   >
     <!-- Header with collapsible toggle -->
     <button
-      @click="isExpanded = !isExpanded"
       class="w-full flex items-center gap-3 mb-4 group"
       :aria-expanded="isExpanded"
+      @click="isExpanded = !isExpanded"
     >
       <div
         class="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-700 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform"
       >
-        <DocumentChartBarIcon class="w-5 h-5 text-slate-600 dark:text-slate-400" />
+        <DocumentChartBarIcon
+          class="w-5 h-5 text-slate-600 dark:text-slate-400"
+        />
       </div>
       <div class="flex-1 text-left">
         <h3
@@ -19,10 +21,9 @@
         >
           Mapa Estructural
         </h3>
-        <p
-          class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1"
-        >
-          {{ mapa.total_secciones }} secciones · {{ mapa.total_paginas }} páginas · {{ mapa.total_anexos }} anexos
+        <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1">
+          {{ mapa.total_secciones }} secciones ·
+          {{ mapa.total_paginas }} páginas · {{ mapa.total_anexos }} anexos
         </p>
       </div>
       <ChevronDownIcon
@@ -32,16 +33,15 @@
     </button>
 
     <!-- Collapsible content -->
-    <div
-      v-show="isExpanded"
-      class="space-y-4 animate-fade-in pl-14"
-    >
+    <div v-show="isExpanded" class="space-y-4 animate-fade-in pl-14">
       <!-- Summary stats -->
       <div class="grid grid-cols-3 gap-4 mb-4">
         <div
           class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 text-center"
         >
-          <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+          <p
+            class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1"
+          >
             Secciones
           </p>
           <p class="text-2xl font-black text-slate-900 dark:text-white">
@@ -51,7 +51,9 @@
         <div
           class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 text-center"
         >
-          <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+          <p
+            class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1"
+          >
             Páginas
           </p>
           <p class="text-2xl font-black text-slate-900 dark:text-white">
@@ -61,7 +63,9 @@
         <div
           class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 text-center"
         >
-          <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+          <p
+            class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1"
+          >
             Anexos
           </p>
           <p class="text-2xl font-black text-slate-900 dark:text-white">
@@ -86,14 +90,18 @@
 
           <!-- Section name -->
           <div class="flex-1 min-w-0">
-            <p class="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">
+            <p
+              class="text-sm font-bold text-slate-800 dark:text-slate-200 truncate"
+            >
               {{ seccion.nombre }}
             </p>
           </div>
 
           <!-- Pages -->
           <div class="text-right">
-            <p class="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+            <p
+              class="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest"
+            >
               {{ seccion.paginas }}
             </p>
           </div>
@@ -101,28 +109,38 @@
       </div>
 
       <!-- Risk legend -->
-      <div class="flex flex-wrap gap-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+      <div
+        class="flex flex-wrap gap-4 pt-4 border-t border-slate-200 dark:border-slate-700"
+      >
         <div class="flex items-center gap-2">
           <div class="w-3 h-3 rounded-full bg-risk-high" />
-          <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+          <span
+            class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest"
+          >
             Alto Riesgo
           </span>
         </div>
         <div class="flex items-center gap-2">
           <div class="w-3 h-3 rounded-full bg-risk-medium" />
-          <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+          <span
+            class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest"
+          >
             Riesgo Medio
           </span>
         </div>
         <div class="flex items-center gap-2">
           <div class="w-3 h-3 rounded-full bg-risk-low" />
-          <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+          <span
+            class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest"
+          >
             Favorable
           </span>
         </div>
         <div class="flex items-center gap-2">
           <div class="w-3 h-3 rounded-full bg-slate-400" />
-          <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+          <span
+            class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest"
+          >
             Neutro
           </span>
         </div>
@@ -132,37 +150,40 @@
 </template>
 
 <script setup lang="ts">
-import { DocumentChartBarIcon, ChevronDownIcon } from '@heroicons/vue/24/outline'
+import {
+  DocumentChartBarIcon,
+  ChevronDownIcon,
+} from "@heroicons/vue/24/outline";
 
 export interface SeccionEstructural {
-  nombre: string
-  paginas: string
-  riesgo: 'rojo' | 'amarillo' | 'verde' | 'gris'
+  nombre: string;
+  paginas: string;
+  riesgo: "rojo" | "amarillo" | "verde" | "gris";
 }
 
 export interface MapaEstructural {
-  total_secciones: number
-  total_anexos: number
-  total_paginas: number
-  secciones: SeccionEstructural[]
+  total_secciones: number;
+  total_anexos: number;
+  total_paginas: number;
+  secciones: SeccionEstructural[];
 }
 
 defineProps<{
-  mapa: MapaEstructural
-}>()
+  mapa: MapaEstructural;
+}>();
 
-const isExpanded = ref(true)
+const isExpanded = ref(true);
 
 const getRiskClass = (riesgo: string) => {
   switch (riesgo) {
-    case 'rojo':
-      return 'bg-risk-high shadow-lg shadow-risk-high/40'
-    case 'amarillo':
-      return 'bg-risk-medium shadow-lg shadow-risk-medium/40'
-    case 'verde':
-      return 'bg-risk-low shadow-lg shadow-risk-low/40'
+    case "rojo":
+      return "bg-risk-high shadow-lg shadow-risk-high/40";
+    case "amarillo":
+      return "bg-risk-medium shadow-lg shadow-risk-medium/40";
+    case "verde":
+      return "bg-risk-low shadow-lg shadow-risk-low/40";
     default:
-      return 'bg-slate-400'
+      return "bg-slate-400";
   }
-}
+};
 </script>
