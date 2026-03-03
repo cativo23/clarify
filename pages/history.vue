@@ -66,7 +66,10 @@
           <!-- Date Range Filters -->
           <div class="flex gap-2 items-center">
             <div class="flex flex-col">
-              <label class="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1">Desde</label>
+              <label
+                class="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1"
+                >Desde</label
+              >
               <input
                 v-model="dateFrom"
                 type="date"
@@ -74,7 +77,10 @@
               />
             </div>
             <div class="flex flex-col">
-              <label class="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1">Hasta</label>
+              <label
+                class="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1"
+                >Hasta</label
+              >
               <input
                 v-model="dateTo"
                 type="date"
@@ -406,17 +412,21 @@ const filteredAnalyses = computed(() => {
       (activeFilter.value === "failed"
         ? a.status === "failed"
         : a.risk_level === activeFilter.value);
-    const matchesDateFrom = !dateFrom.value || new Date(a.created_at) >= new Date(dateFrom.value);
-    const matchesDateTo = !dateTo.value || new Date(a.created_at) <= new Date(dateTo.value);
+    const matchesDateFrom =
+      !dateFrom.value || new Date(a.created_at) >= new Date(dateFrom.value);
+    const matchesDateTo =
+      !dateTo.value || new Date(a.created_at) <= new Date(dateTo.value);
     return matchesSearch && matchesFilter && matchesDateFrom && matchesDateTo;
   });
 });
 
 const hasActiveFilters = computed(() => {
-  return searchQuery.value !== "" ||
+  return (
+    searchQuery.value !== "" ||
     activeFilter.value !== "all" ||
     dateFrom.value !== "" ||
-    dateTo.value !== "";
+    dateTo.value !== ""
+  );
 });
 
 const getStatusLabel = (analysis: Analysis) => {

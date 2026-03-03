@@ -20,60 +20,60 @@ import {
   getStatusBgClass,
   getStatusTextClass,
   isActiveStatus,
-} from '~/composables/useAnalysisStatus'
+} from "~/composables/useAnalysisStatus";
 
-type SizeVariant = 'sm' | 'md' | 'lg'
+type SizeVariant = "sm" | "md" | "lg";
 
 const props = withDefaults(
   defineProps<{
-    status: string
-    size?: SizeVariant
-    showPulse?: boolean
+    status: string;
+    size?: SizeVariant;
+    showPulse?: boolean;
   }>(),
   {
-    size: 'md',
+    size: "md",
     showPulse: true,
   },
-)
+);
 
 // Compute status values
-const statusLabel = computed(() => getStatusLabel(props.status))
-const statusColorClass = computed(() => getStatusColor(props.status))
-const statusBgClass = computed(() => getStatusBgClass(props.status))
-const statusTextClass = computed(() => getStatusTextClass(props.status))
+const statusLabel = computed(() => getStatusLabel(props.status));
+const statusColorClass = computed(() => getStatusColor(props.status));
+const statusBgClass = computed(() => getStatusBgClass(props.status));
+const statusTextClass = computed(() => getStatusTextClass(props.status));
 
 // Size variants
 const sizeClasses = computed(() => {
   switch (props.size) {
-    case 'sm':
-      return 'px-2 py-0.5 text-[9px]'
-    case 'md':
-      return 'px-3 py-1.5 text-[10px]'
-    case 'lg':
-      return 'px-4 py-2 text-xs'
+    case "sm":
+      return "px-2 py-0.5 text-[9px]";
+    case "md":
+      return "px-3 py-1.5 text-[10px]";
+    case "lg":
+      return "px-4 py-2 text-xs";
     default:
-      return 'px-3 py-1.5 text-[10px]'
+      return "px-3 py-1.5 text-[10px]";
   }
-})
+});
 
 const dotSizeClass = computed(() => {
   switch (props.size) {
-    case 'sm':
-      return 'w-1.5 h-1.5'
-    case 'md':
-      return 'w-2 h-2'
-    case 'lg':
-      return 'w-2.5 h-2.5'
+    case "sm":
+      return "w-1.5 h-1.5";
+    case "md":
+      return "w-2 h-2";
+    case "lg":
+      return "w-2.5 h-2.5";
     default:
-      return 'w-2 h-2'
+      return "w-2 h-2";
   }
-})
+});
 
 // Pulse animation for active states
 const pulseClass = computed(() => {
-  if (!props.showPulse) return ''
-  return isActiveStatus(props.status) ? 'animate-pulse' : ''
-})
+  if (!props.showPulse) return "";
+  return isActiveStatus(props.status) ? "animate-pulse" : "";
+});
 </script>
 
 <style scoped>

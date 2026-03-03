@@ -74,13 +74,11 @@
           claro: ¿firmar o renegociar?
         </p>
 
-        <div
-          class="mb-4 px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg"
-        >
+        <div class="mb-4 px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg">
           <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">
             Límite de tokens
           </p>
-          <TokenTooltip tokenExplanation="8K tokens ≈ 2-3 páginas">
+          <TokenTooltip token-explanation="8K tokens ≈ 2-3 páginas">
             <span
               class="text-sm font-bold text-slate-700 dark:text-slate-300 underline decoration-dashed decoration-secondary/50 cursor-help"
               >~8K tokens</span
@@ -206,13 +204,11 @@
           una estrategia concreta de negociación.
         </p>
 
-        <div
-          class="mb-4 px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg"
-        >
+        <div class="mb-4 px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg">
           <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">
             Límite de tokens
           </p>
-          <TokenTooltip tokenExplanation="35K tokens ≈ 8-10 páginas">
+          <TokenTooltip token-explanation="35K tokens ≈ 8-10 páginas">
             <span
               class="text-sm font-bold text-secondary underline decoration-dashed decoration-secondary/50 cursor-help"
               >~35K tokens</span
@@ -338,18 +334,17 @@
         <p
           class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-4"
         >
-          El análisis más exhaustivo disponible. Nuestra IA examina cada palabra,
-          detecta inconsistencias entre cláusulas, omisiones críticas y te
-          proporciona lenguaje contractual sugerido para proteger tus intereses.
+          El análisis más exhaustivo disponible. Nuestra IA examina cada
+          palabra, detecta inconsistencias entre cláusulas, omisiones críticas y
+          te proporciona lenguaje contractual sugerido para proteger tus
+          intereses.
         </p>
 
-        <div
-          class="mb-4 px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg"
-        >
+        <div class="mb-4 px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg">
           <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">
             Límite de tokens
           </p>
-          <TokenTooltip tokenExplanation="120K tokens ≈ 25-30 páginas">
+          <TokenTooltip token-explanation="120K tokens ≈ 25-30 páginas">
             <span
               class="text-sm font-bold text-slate-700 dark:text-slate-300 underline decoration-dashed decoration-secondary/50 cursor-help"
               >~120K tokens</span
@@ -392,7 +387,7 @@
 
   <!-- Comparison Modal -->
   <TierComparisonModal
-    v-model:isOpen="isComparisonModalOpen"
+    v-model:is-open="isComparisonModalOpen"
     :selected-tiers="selectedTiers"
   />
 
@@ -411,8 +406,8 @@
         class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50"
       >
         <button
-          @click="openComparisonModal"
           class="px-8 py-4 bg-secondary text-white rounded-full font-bold text-sm shadow-glow hover:scale-105 active:scale-95 transition-all flex items-center gap-3"
+          @click="openComparisonModal"
         >
           <svg
             class="w-5 h-5"

@@ -4,9 +4,9 @@
   >
     <!-- Header with collapsible toggle -->
     <button
-      @click="isExpanded = !isExpanded"
       class="w-full flex items-center gap-3 mb-4 group"
       :aria-expanded="isExpanded"
+      @click="isExpanded = !isExpanded"
     >
       <div
         class="w-10 h-10 rounded-xl bg-accent-indigo/10 dark:bg-accent-indigo/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform"
@@ -19,10 +19,9 @@
         >
           Análisis Cruzado de Cláusulas
         </h3>
-        <p
-          class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1"
-        >
-          {{ analisisCruzado.length }} inconsistencias detectadas entre cláusulas
+        <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1">
+          {{ analisisCruzado.length }} inconsistencias detectadas entre
+          cláusulas
         </p>
       </div>
       <ChevronDownIcon
@@ -32,10 +31,7 @@
     </button>
 
     <!-- Collapsible content -->
-    <div
-      v-show="isExpanded"
-      class="space-y-4 animate-fade-in pl-14"
-    >
+    <div v-show="isExpanded" class="space-y-4 animate-fade-in pl-14">
       <div
         v-for="(item, idx) in analisisCruzado"
         :key="item.inconsistencia_id || idx"
@@ -69,7 +65,9 @@
           <div
             class="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-700"
           >
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+            <p
+              class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1"
+            >
               Inconsistencia
             </p>
             <p class="text-sm font-medium text-slate-700 dark:text-slate-300">
@@ -81,20 +79,28 @@
             <div
               class="p-3 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-100 dark:border-amber-800/30"
             >
-              <p class="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-1">
+              <p
+                class="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-1"
+              >
                 Texto Original
               </p>
-              <p class="text-xs font-medium text-amber-900 dark:text-amber-300 italic">
+              <p
+                class="text-xs font-medium text-amber-900 dark:text-amber-300 italic"
+              >
                 "{{ item.texto_origen }}"
               </p>
             </div>
             <div
               class="p-3 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-100 dark:border-amber-800/30"
             >
-              <p class="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-1">
+              <p
+                class="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-1"
+              >
                 Texto Destino
               </p>
-              <p class="text-xs font-medium text-amber-900 dark:text-amber-300 italic">
+              <p
+                class="text-xs font-medium text-amber-900 dark:text-amber-300 italic"
+              >
                 "{{ item.texto_destino }}"
               </p>
             </div>
@@ -103,7 +109,9 @@
           <div
             class="p-3 bg-risk-high/5 dark:bg-risk-high/10 rounded-lg border border-risk-high/20"
           >
-            <p class="text-[10px] font-black text-risk-high uppercase tracking-widest mb-1">
+            <p
+              class="text-[10px] font-black text-risk-high uppercase tracking-widest mb-1"
+            >
               Impacto
             </p>
             <p class="text-sm font-bold text-slate-800 dark:text-slate-200">
@@ -114,7 +122,9 @@
           <div
             class="p-3 bg-secondary/5 dark:bg-secondary/10 rounded-lg border border-secondary/20"
           >
-            <p class="text-[10px] font-black text-secondary uppercase tracking-widest mb-1">
+            <p
+              class="text-[10px] font-black text-secondary uppercase tracking-widest mb-1"
+            >
               Recomendación
             </p>
             <p class="text-sm font-medium text-slate-700 dark:text-slate-300">
@@ -128,36 +138,34 @@
 </template>
 
 <script setup lang="ts">
-import { ShieldCheckIcon, ChevronDownIcon } from '@heroicons/vue/24/outline'
+import { ShieldCheckIcon, ChevronDownIcon } from "@heroicons/vue/24/outline";
 
 export interface AnalisisCruzadoItem {
-  inconsistencia_id: string
-  tipo: string
-  clausula_origen: string
-  clausula_destino: string
-  texto_origen: string
-  texto_destino: string
-  inconsistencia: string
-  impacto: string
-  recomendacion: string
-  severidad: 'rojo' | 'amarillo'
+  inconsistencia_id: string;
+  tipo: string;
+  clausula_origen: string;
+  clausula_destino: string;
+  texto_origen: string;
+  texto_destino: string;
+  inconsistencia: string;
+  impacto: string;
+  recomendacion: string;
+  severidad: "rojo" | "amarillo";
 }
 
 defineProps<{
-  analisisCruzado: AnalisisCruzadoItem[]
-}>()
+  analisisCruzado: AnalisisCruzadoItem[];
+}>();
 
-const isExpanded = ref(true)
+const isExpanded = ref(true);
 
 const getBorderClass = (severidad: string) => {
-  return severidad === 'rojo'
-    ? 'border-risk-high'
-    : 'border-risk-medium'
-}
+  return severidad === "rojo" ? "border-risk-high" : "border-risk-medium";
+};
 
 const getBadgeClass = (severidad: string) => {
-  return severidad === 'rojo'
-    ? 'bg-risk-high/10 text-risk-high ring-1 ring-inset ring-risk-high/30'
-    : 'bg-risk-medium/10 text-risk-medium ring-1 ring-inset ring-risk-medium/30'
-}
+  return severidad === "rojo"
+    ? "bg-risk-high/10 text-risk-high ring-1 ring-inset ring-risk-high/30"
+    : "bg-risk-medium/10 text-risk-medium ring-1 ring-inset ring-risk-medium/30";
+};
 </script>

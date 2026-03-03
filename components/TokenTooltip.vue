@@ -5,7 +5,9 @@
     @mouseleave="isOpen = false"
   >
     <slot name="trigger">
-      <span class="underline decoration-dashed decoration-secondary/50 cursor-help">
+      <span
+        class="underline decoration-dashed decoration-secondary/50 cursor-help"
+      >
         <slot />
       </span>
     </slot>

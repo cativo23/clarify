@@ -1,7 +1,10 @@
 <template>
   <Teleport to="body">
     <Transition name="modal">
-      <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div
+        v-if="isOpen"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4"
+      >
         <!-- Backdrop -->
         <div
           class="absolute inset-0 bg-black/50 backdrop-blur-sm"
@@ -19,12 +22,15 @@
                 Comparar Niveles de Análisis
               </h2>
               <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                {{ selectedTiers.length }} nivel{{ selectedTiers.length !== 1 ? 'es' : '' }} seleccionado{{ selectedTiers.length !== 1 ? 's' : '' }}
+                {{ selectedTiers.length }} nivel{{
+                  selectedTiers.length !== 1 ? "es" : ""
+                }}
+                seleccionado{{ selectedTiers.length !== 1 ? "s" : "" }}
               </p>
             </div>
             <button
-              @click="close"
               class="w-10 h-10 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center justify-center"
+              @click="close"
             >
               <XIcon class="w-6 h-6 text-slate-500" />
             </button>
@@ -45,7 +51,8 @@
                     :key="tier"
                     class="text-center p-4 min-w-[140px]"
                     :class="{
-                      'bg-secondary/5 border-x border-secondary/20': tier === 'premium',
+                      'bg-secondary/5 border-x border-secondary/20':
+                        tier === 'premium',
                     }"
                   >
                     <span
@@ -62,9 +69,7 @@
               </thead>
               <tbody>
                 <!-- Token Limit Row -->
-                <tr
-                  class="border-b border-slate-100 dark:border-slate-800"
-                >
+                <tr class="border-b border-slate-100 dark:border-slate-800">
                   <td
                     class="p-4 text-sm font-bold text-slate-700 dark:text-slate-300"
                   >
@@ -75,10 +80,13 @@
                     :key="tier"
                     class="text-center p-4"
                     :class="{
-                      'bg-secondary/5 border-x border-secondary/20': tier === 'premium',
+                      'bg-secondary/5 border-x border-secondary/20':
+                        tier === 'premium',
                     }"
                   >
-                    <TokenTooltip :tokenExplanation="getTokenExplanation(tier)">
+                    <TokenTooltip
+                      :token-explanation="getTokenExplanation(tier)"
+                    >
                       <span
                         v-if="tier === 'premium'"
                         class="text-secondary font-bold"
@@ -93,9 +101,7 @@
                 </tr>
 
                 <!-- Coverage Row -->
-                <tr
-                  class="border-b border-slate-100 dark:border-slate-800"
-                >
+                <tr class="border-b border-slate-100 dark:border-slate-800">
                   <td
                     class="p-4 text-sm font-bold text-slate-700 dark:text-slate-300"
                   >
@@ -106,7 +112,8 @@
                     :key="tier"
                     class="text-center p-4"
                     :class="{
-                      'bg-secondary/5 border-x border-secondary/20': tier === 'premium',
+                      'bg-secondary/5 border-x border-secondary/20':
+                        tier === 'premium',
                     }"
                   >
                     <span
@@ -125,9 +132,7 @@
                 </tr>
 
                 <!-- Speed Row -->
-                <tr
-                  class="border-b border-slate-100 dark:border-slate-800"
-                >
+                <tr class="border-b border-slate-100 dark:border-slate-800">
                   <td
                     class="p-4 text-sm font-bold text-slate-700 dark:text-slate-300"
                   >
@@ -138,7 +143,8 @@
                     :key="tier"
                     class="text-center p-4"
                     :class="{
-                      'bg-secondary/5 border-x border-secondary/20': tier === 'premium',
+                      'bg-secondary/5 border-x border-secondary/20':
+                        tier === 'premium',
                     }"
                   >
                     <span
@@ -168,7 +174,8 @@
                     :key="tier"
                     class="text-center p-4"
                     :class="{
-                      'bg-secondary/5 border-x border-secondary/20': tier === 'premium',
+                      'bg-secondary/5 border-x border-secondary/20':
+                        tier === 'premium',
                     }"
                   >
                     <span
@@ -230,9 +237,7 @@
                 >
                   <SearchIcon class="w-5 h-5" />
                 </div>
-                <h4
-                  class="text-sm font-black text-secondary uppercase mb-2"
-                >
+                <h4 class="text-sm font-black text-secondary uppercase mb-2">
                   Mejor para Premium
                 </h4>
                 <p

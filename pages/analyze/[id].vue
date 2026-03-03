@@ -680,8 +680,8 @@
         >
           <button
             class="w-full sm:w-auto px-10 py-4 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-900 transition-all shadow-soft disabled:opacity-50 disabled:cursor-not-allowed"
-            @click="downloadPDF"
             :disabled="downloading"
+            @click="downloadPDF"
           >
             {{ downloading ? "Generando PDF..." : "Descargar Reporte (PDF)" }}
           </button>
@@ -735,18 +735,32 @@ const summary = computed<AnalysisSummary>(() => {
   );
 });
 
-const isForensic = computed(() => analysis.value?.analysis_type === 'forensic')
+const isForensic = computed(() => analysis.value?.analysis_type === "forensic");
 
 // Debug logging for Forensic sections
 watchEffect(() => {
   if (analysis.value) {
-    console.log('[Forensic Debug] analysis_type:', analysis.value.analysis_type)
-    console.log('[Forensic Debug] isForensic:', isForensic.value)
-    console.log('[Forensic Debug] analisis_cruzado:', analysis.value.summary_json?.analisis_cruzado?.length || 0, 'items')
-    console.log('[Forensic Debug] omisiones:', analysis.value.summary_json?.omisiones?.length || 0, 'items')
-    console.log('[Forensic Debug] mapa_estructural:', analysis.value.summary_json?.mapa_estructural ? 'present' : 'missing')
+    console.log(
+      "[Forensic Debug] analysis_type:",
+      analysis.value.analysis_type,
+    );
+    console.log("[Forensic Debug] isForensic:", isForensic.value);
+    console.log(
+      "[Forensic Debug] analisis_cruzado:",
+      analysis.value.summary_json?.analisis_cruzado?.length || 0,
+      "items",
+    );
+    console.log(
+      "[Forensic Debug] omisiones:",
+      analysis.value.summary_json?.omisiones?.length || 0,
+      "items",
+    );
+    console.log(
+      "[Forensic Debug] mapa_estructural:",
+      analysis.value.summary_json?.mapa_estructural ? "present" : "missing",
+    );
   }
-})
+});
 
 const fetchAnalysis = async () => {
   const id = route.params.id as string;
@@ -780,23 +794,29 @@ const downloadPDF = async () => {
 
   try {
     // Call PDF export endpoint
-    const response = await $fetch(`/api/analyses/${analysis.value.id}/export-pdf`);
+    const response = await $fetch(
+      `/api/analyses/${analysis.value.id}/export-pdf`,
+    );
 
     if (response.success && response.url) {
       // Create temporary download link
       const link = document.createElement("a");
       link.href = response.url;
-      link.download = response.filename || `clarify-${analysis.value.contract_name}.pdf`;
+      link.download =
+        response.filename || `clarify-${analysis.value.contract_name}.pdf`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
 
       // Show success feedback
-      alert(`Reporte PDF generado exitosamente. ${response.cached ? "(caché)" : ""}`);
+      alert(
+        `Reporte PDF generado exitosamente. ${response.cached ? "(caché)" : ""}`,
+      );
     }
   } catch (error: any) {
     console.error("PDF download failed:", error);
-    const message = error.data?.message || error.message || "Error al generar el PDF";
+    const message =
+      error.data?.message || error.message || "Error al generar el PDF";
     alert(`Error: ${message}`);
   } finally {
     downloading.value = false;

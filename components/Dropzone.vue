@@ -142,9 +142,9 @@
                   getStepClass(step.key),
                 ]"
               >
-                <span class="text-[9px] font-black uppercase"
-                  >{{ index + 1 }}</span
-                >
+                <span class="text-[9px] font-black uppercase">{{
+                  index + 1
+                }}</span>
               </div>
               <!-- Step Label -->
               <span
@@ -196,7 +196,10 @@
         </div>
 
         <!-- Cancel Button -->
-        <div v-if="isUploading && uploadProgress < 100" class="flex justify-end">
+        <div
+          v-if="isUploading && uploadProgress < 100"
+          class="flex justify-end"
+        >
           <button
             class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-risk-high hover:text-white transition-all flex items-center justify-center"
             title="Cancelar subida"
