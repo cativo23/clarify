@@ -16,21 +16,21 @@ export const CREDIT_PACKAGES = [
     id: "pack_5",
     credits: 5,
     price: 4.99,
-    priceId: "price_5credits", // Replace with actual Stripe Price ID
+    priceId: process.env.STRIPE_PRICE_ID_5_CREDITS || "price_5credits", // Fallback for development
     popular: false,
   },
   {
     id: "pack_10",
     credits: 10,
     price: 8.99,
-    priceId: "price_10credits",
+    priceId: process.env.STRIPE_PRICE_ID_10_CREDITS || "price_10credits", // Fallback for development
     popular: true,
   },
   {
     id: "pack_25",
     credits: 25,
     price: 19.99,
-    priceId: "price_25credits",
+    priceId: process.env.STRIPE_PRICE_ID_25_CREDITS || "price_25credits", // Fallback for development
     popular: false,
   },
 ];
