@@ -35,14 +35,26 @@ In your Stripe Dashboard, you need to create individual prices for each credit p
 - Price: $19.99 USD
 - Save the resulting Price ID (format: `price_XXXXXXXXXXXXXXX`)
 
-### 1.2 Alternative: Use Existing Product IDs
+### 1.2 Using Your Existing Product IDs
 
-If you already have products created with the IDs you provided:
+Based on the product IDs you provided:
 - 5 credits: `prod_U5Cnr6Ap3EEMRi`
 - 10 credits: `prod_U5CoJApTkeFoaZ`
 - 25 credits: `prod_U5CoyWM9uTAemH`
 
-You'll need to create individual prices for these products and get the corresponding Price IDs.
+You'll need to check if these products already have prices associated with them. If so, you'll need to find the corresponding Price IDs in your Stripe Dashboard:
+
+1. Go to Products in your Stripe Dashboard
+2. Find each of your products
+3. Look for the associated Prices under each product
+4. Copy the Price ID (starts with `price_`) for each credit package
+
+You already have the prices created with these IDs:
+- 5 credits: `price_1T72OFBSsmi2pAzgSUOz2R9j`
+- 10 credits: `price_1T72OcBSsmi2pAzgTwyIdfA2`
+- 25 credits: `price_1T72OwBSsmi2pAzgQ0838mN0`
+
+These are the Price IDs you need to use in your environment variables.
 
 ## Step 2: Configure Environment Variables
 
