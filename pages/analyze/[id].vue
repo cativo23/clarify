@@ -714,12 +714,12 @@ const loading = ref(true);
 const retrying = ref(false);
 const downloading = ref(false);
 
-const summary = computed<AnalysisSummary | null>(() => {
+const summary = computed<AnalysisSummary>(() => {
   return (
-    analysis.value?.summary_json || null
-  );
-});
-        justificacion: "",
+    analysis.value?.summary_json || {
+      resumen_ejecutivo: {
+        veredicto: "No disponible",
+        justificacion: "El reporte aún no está listo.",
         clausulas_criticas_totales: 0,
         mayor_riesgo_identificado: "",
       },

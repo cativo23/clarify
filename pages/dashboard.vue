@@ -787,7 +787,6 @@ import type { RealtimeChannel } from "@supabase/supabase-js";
 import { ShieldCheckIcon } from "@heroicons/vue/24/outline";
 import { timeAgo } from "~/composables/useTimeAgo";
 import {
-  useAnalysisStatus,
   normalizeStatus,
 } from "~/composables/useAnalysisStatus";
 import AnalysisStatusBadge from "~/components/AnalysisStatusBadge.vue";
