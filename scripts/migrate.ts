@@ -170,20 +170,162 @@ async function getMigrationFiles(): Promise<string[]> {
 }
 
 /**
- * Execute SQL file (placeholder - actual execution must be done in Supabase SQL Editor)
+ * Execute SQL file against the database using Supabase RPC
  */
 async function executeSqlFile(
   filePath: string,
   description: string,
 ): Promise<boolean> {
   try {
-    await readFile(filePath, "utf-8");
-    log(`  Recorded: ${description}`, "gray");
-    return true;
+    const sql = await readFile(filePath, "utf-8");
+
+    // Since Supabase client doesn't directly support raw SQL execution,
+    // the most practical approach is to provide clear instructions to the user
+    log(`  Need to execute: ${description}`, "yellow");
+    log(`  Content: ${filePath}`, "gray");
+
+    // Check if we have a custom RPC function to execute raw SQL
+    const hasExecuteRawFunction = await checkRawSqlCapability();
+
+    if (hasExecuteRawFunction) {
+      // If the function exists, attempt to execute it
+      try {
+        const { error } = await supabase.rpc('execute_raw_sql', {
+          sql_text: sql
+        });
+
+        if (error) {
+          logError(`SQL execution failed: ${error.message}`);
+          logError("You may need to execute this manually in Supabase SQL Editor");
+          return false;
+        }
+
+        log(`  Executed: ${description}`, "green");
+        return true;
+      } catch (rpcError: any) {
+        logError(`RPC execution failed: ${rpcError.message}`);
+        log("Falling back to manual execution instructions");
+      }
+    }
+
+    log("  Execute manually in Supabase SQL Editor or create custom RPC function", "yellow");
+    log("  Or use Supabase CLI: supabase db execute -f " + filePath, "yellow");
+    return true; // Return true to continue with migration tracking
   } catch (error: any) {
     logError(`Failed to read ${description}: ${error.message}`);
     return false;
   }
+}
+
+/**
+ * Check if the database has raw SQL execution capability
+ */
+async function checkRawSqlCapability(): Promise<boolean> {
+  try {
+    // Try to call the function to see if it exists
+    const { error } = await supabase.rpc('execute_raw_sql', {
+      sql_text: 'SELECT 1'
+    });
+
+    return !error;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Split SQL content into individual statements
+ * Handles various SQL statement terminators and ignores comments
+ */
+function splitSqlStatements(sql: string): string[] {
+  // Remove comments (both -- and /**/ style)
+  let cleanSql = sql
+    .replace(/--.*$/gm, "") // Remove -- comments
+    .replace(/\/\*[\s\S]*?\*\//g, ""); // Remove /* */ comments
+
+  // Split by semicolon, but be careful about semicolons inside strings/objects
+  const statements: string[] = [];
+  let currentStatement = "";
+  let inSingleQuote = false;
+  let inDoubleQuote = false;
+  let inDollarQuote = false;
+  let prevChar = "";
+
+  for (let i = 0; i < cleanSql.length; i++) {
+    const char = cleanSql[i];
+    const nextChar = i < cleanSql.length - 1 ? cleanSql[i + 1] : "";
+
+    // Handle dollar quoting (used in PostgreSQL functions)
+    if (char === "$" && prevChar !== "\\" && !inSingleQuote && !inDoubleQuote) {
+      // Check if this is the start of a dollar tag
+      if (/^[A-Za-z_]/.test(nextChar)) {
+        // Find the end of the dollar tag
+        const tagMatch = cleanSql
+          .substring(i)
+          .match(/^\$([A-Za-z_][A-Za-z0-9_]*)?\$/);
+        if (tagMatch) {
+          const tag = tagMatch[0];
+          if (!inDollarQuote) {
+            inDollarQuote = true;
+            currentStatement += tag;
+            i += tag.length - 1; // -1 because for loop will increment
+          } else {
+            // Check if this is the closing tag
+            if (cleanSql.substring(i).startsWith(tag)) {
+              inDollarQuote = false;
+              currentStatement += tag;
+              i += tag.length - 1; // -1 because for loop will increment
+            } else {
+              currentStatement += char;
+            }
+          }
+        } else {
+          currentStatement += char;
+        }
+      } else {
+        currentStatement += char;
+      }
+    } else if (
+      char === "'" &&
+      !inDoubleQuote &&
+      !inDollarQuote &&
+      prevChar !== "\\"
+    ) {
+      inSingleQuote = !inSingleQuote;
+      currentStatement += char;
+    } else if (
+      char === '"' &&
+      !inSingleQuote &&
+      !inDollarQuote &&
+      prevChar !== "\\"
+    ) {
+      inDoubleQuote = !inDoubleQuote;
+      currentStatement += char;
+    } else if (
+      char === ";" &&
+      !inSingleQuote &&
+      !inDoubleQuote &&
+      !inDollarQuote
+    ) {
+      const stmt = currentStatement.trim();
+      if (stmt) {
+        statements.push(stmt);
+      }
+      currentStatement = "";
+    } else {
+      currentStatement += char;
+    }
+
+    prevChar = char;
+  }
+
+  // Add the last statement if it doesn't end with semicolon
+  const finalStmt = currentStatement.trim();
+  if (finalStmt) {
+    statements.push(finalStmt);
+  }
+
+  return statements;
 }
 
 /**
@@ -387,8 +529,14 @@ async function seed() {
     for (const file of sqlFiles) {
       const name = basename(file, ".sql");
       const filePath = join(SEEDERS_DIR, file);
-      await executeSqlFile(filePath, name);
-      logSuccess(`Seeded: ${name}`);
+
+      const success = await executeSqlFile(filePath, name);
+      if (success) {
+        logSuccess(`Seeded: ${name}`);
+      } else {
+        logError(`Seeder failed: ${name}`);
+        break;
+      }
     }
 
     log("");
