@@ -23,6 +23,26 @@ export interface Analysis {
   error_message?: string;
   analysis_type?: "basic" | "premium" | "forensic";
   created_at: string;
+  risk_items?: RiskItem[];
+  key_clauses?: KeyClause[];
+  pdf_available?: boolean;
+  tokens_used?: number;
+}
+
+export interface RiskItem {
+  id: string;
+  clause_text: string;
+  risk_level: RiskLevel;
+  category: string;
+  severity: number;
+  recommendation: string;
+}
+
+export interface KeyClause {
+  id: string;
+  title: string;
+  text: string;
+  importance: string;
 }
 
 export interface AnalysisSummary {
@@ -40,6 +60,12 @@ export interface AnalysisSummary {
     porcentaje_clausulas_analizadas: string;
   };
   hallazgos: Hallazgo[];
+
+  // Fields used in demo and for compatibility with simulated results
+  executive_summary?: string;
+  risk_score?: number;
+  key_findings?: string[];
+  recommendations?: string[];
 
   clausulas_no_clasificadas?: {
     clausula: string;

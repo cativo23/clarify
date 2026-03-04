@@ -168,7 +168,7 @@
 </template>
 
 <script setup lang="ts">
-import type { AnalysisResult } from '~/types/analysis'
+import type { Analysis } from '~/types/index'
 
 interface SampleDocument {
   name: string;
@@ -179,7 +179,7 @@ interface SampleDocument {
 const contractName = ref('');
 const uploadProgress = ref(0);
 const isProcessing = ref(false);
-const results = ref<AnalysisResult | null>(null);
+const results = ref<Analysis | null>(null);
 
 const sampleDocuments: SampleDocument[] = [
   {
