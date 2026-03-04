@@ -9,8 +9,7 @@ Clarify is an AI-powered contract auditing platform (Micro-SaaS) that analyzes l
 **Phase Numbering:**
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
-
-Decimal phases appear between their surrounding integers in numeric order.
+- Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Core Analysis Foundation** - Complete 3-tier analysis backend with secure upload and async processing
 - [x] **Phase 2: Tier Selection & UX** - Users can select analysis tier and see progress during upload/analysis
@@ -98,12 +97,13 @@ Plans:
   2. User gets 1 free Basic analysis per month (regardless of credit balance)
   3. Homepage has interactive demo showing product value
   4. Email verification prevents free credit abuse
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 05-01: Implement free credits on signup with email verification
-- [ ] 05-02: Build monthly free Basic analysis logic
-- [ ] 05-03: Create homepage interactive demo
+- [ ] 05-00-PLAN.md — Create automated test suite for free credits and demo functionality
+- [ ] 05-01-PLAN.md — Implement free credits on signup with email verification
+- [ ] 05-02-PLAN.md — Build monthly free Basic analysis logic
+- [ ] 05-03-PLAN.md — Create homepage interactive demo
 
 ### Phase 6: Admin Analytics
 **Goal**: Operational visibility into revenue, costs, and user behavior
@@ -146,7 +146,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 2. Tier Selection & UX | 6/6 | Complete   | 2026-02-24 |
 | 3. PDF Export & History | 2/3 | Complete   | 2026-02-24 |
 | 4. Stripe & Monetization | 0/3 | Not started | - |
-| 5. Free Credits & Onboarding | 0/3 | Not started | - |
+| 5. Free Credits & Onboarding | 0/4 | Not started | - |
 | 6. Admin Analytics | 0/2 | Not started | - |
 | 7. Production Deployment | 0/2 | Not started | - |
 
@@ -183,5 +183,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 - Unmapped: 0 ✓
 
 ---
-*Roadmap updated: 2026-02-25 (Phase 4 planning complete - Stripe integration with 3 plans)*
+*Roadmap updated: 2026-03-03 (Phase 5 planning complete - Free credits & onboarding with 4 plans)*
 *Based on PROJECT.md and research/SUMMARY.md*
