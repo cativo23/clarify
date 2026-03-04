@@ -116,7 +116,7 @@ export const updateUserCreditsInDb = async (
     .insert({
       user_id: userId,
       amount: price, // Using the actual package price
-      credits: credits,
+      credits_purchased: credits,
       type: "purchase",
       description: `Purchase of ${credits} credits via Stripe`,
     });
