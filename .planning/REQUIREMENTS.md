@@ -40,7 +40,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **CREDIT-01**: Free Credits System — 10 credits on signup
 - [ ] **CREDIT-02**: Monthly Free Analysis — 1 free Basic analysis per user per month
-- [ ] **DEMO-01**: Homepage Demo — Interactive element to show product value
+- [x] **DEMO-01**: Homepage Demo — Interactive element to show product value
 
 ### Admin
 
@@ -104,7 +104,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | STRIPE-03 | Phase 4 | Complete |
 | CREDIT-01 | Phase 5 | Pending |
 | CREDIT-02 | Phase 5 | Pending |
-| DEMO-01 | Phase 5 | Pending |
+| DEMO-01 | Phase 5 | Complete |
 | ADMIN-01 | Phase 6 | Pending |
 | ADMIN-02 | Phase 6 | Pending |
 | ADMIN-03 | Phase 6 | Pending |
