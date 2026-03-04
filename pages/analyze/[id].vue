@@ -349,22 +349,23 @@
                   >Veredicto Legal</span
                 >
                 <span
+                  v-if="summary"
                   :class="[
                     'px-4 py-1 rounded-full text-xs font-bold ring-1 ring-inset',
-                    summary.resumen_ejecutivo.veredicto?.includes('Rechazar') ||
-                    summary.resumen_ejecutivo.veredicto?.includes('No')
+                    summary.resumen_ejecutivo?.veredicto?.includes('Rechazar') ||
+                    summary.resumen_ejecutivo?.veredicto?.includes('No')
                       ? 'bg-risk-high/10 text-risk-high ring-risk-high/30'
-                      : summary.resumen_ejecutivo.veredicto?.includes(
+                      : summary.resumen_ejecutivo?.veredicto?.includes(
                             'Negociar',
                           ) ||
-                          summary.resumen_ejecutivo.veredicto?.includes(
+                          summary.resumen_ejecutivo?.veredicto?.includes(
                             'Precaución',
                           )
                         ? 'bg-risk-medium/10 text-risk-medium ring-risk-medium/30'
                         : 'bg-risk-low/10 text-risk-low ring-risk-low/30',
                   ]"
                 >
-                  {{ summary.resumen_ejecutivo.veredicto }}
+                  {{ summary.resumen_ejecutivo?.veredicto }}
                 </span>
               </div>
               <h2
@@ -547,22 +548,22 @@
         </div>
 
         <!-- Forensic-specific sections -->
-        <div v-if="isForensic">
+        <div v-if="isForensic && analysis.summary_json">
           <!-- Análisis Cruzado -->
           <CrossClauseAnalysis
-            v-if="analysis.summary_json.analisis_cruzado?.length"
+            v-if="analysis.summary_json?.analisis_cruzado?.length"
             :analisis-cruzado="analysis.summary_json.analisis_cruzado"
           />
 
           <!-- Omisiones Críticas -->
           <CriticalOmissions
-            v-if="analysis.summary_json.omisiones?.length"
+            v-if="analysis.summary_json?.omisiones?.length"
             :omisiones="analysis.summary_json.omisiones"
           />
 
           <!-- Mapa Estructural -->
           <StructuralMap
-            v-if="analysis.summary_json.mapa_estructural"
+            v-if="analysis.summary_json?.mapa_estructural"
             :mapa="analysis.summary_json.mapa_estructural"
           />
         </div>
@@ -713,11 +714,11 @@ const loading = ref(true);
 const retrying = ref(false);
 const downloading = ref(false);
 
-const summary = computed<AnalysisSummary>(() => {
+const summary = computed<AnalysisSummary | null>(() => {
   return (
-    analysis.value?.summary_json || {
-      resumen_ejecutivo: {
-        veredicto: "Bajo análisis",
+    analysis.value?.summary_json || null
+  );
+});
         justificacion: "",
         clausulas_criticas_totales: 0,
         mayor_riesgo_identificado: "",

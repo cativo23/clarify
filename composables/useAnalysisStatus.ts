@@ -160,7 +160,6 @@ export function isActiveStatus(status: string): boolean {
 export function subscribeToAnalysis(
   supabase: SupabaseClient,
   analysisId: string,
-  userId: string,
   callback: (analysis: Analysis) => void,
 ): () => void {
   const channelName = `analysis-${analysisId}`;
@@ -208,7 +207,6 @@ export function useAnalysisStatus() {
    */
   function subscribe(
     analysisId: string,
-    userId: string,
     callback: (analysis: Analysis) => void,
   ): () => void {
     // Unsubscribe if already subscribed to this analysis

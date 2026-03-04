@@ -127,7 +127,6 @@ export default defineNuxtConfig({
   // Nitro configuration for serverless functions
   nitro: {
     preset: "vercel",
-    bodyLimit: 10 * 1024 * 1024, // 10MB to match file validation limit
     // [SECURITY FIX L7] Enhanced security headers at server level
     routeRules: {
       "/**": {

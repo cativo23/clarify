@@ -252,29 +252,35 @@ const {
   resetProgress,
 } = useUploadProgress();
 
-const fileInput = ref<HTMLInputElement | null>(null);
-const isDragging = ref(false);
-const selectedFile = ref<File | null>(props.modelValue || null);
-const error = ref("");
+// Define the type for uploadSteps
+interface UploadStep {
+  key: string;
+  label: string;
+  threshold: number;
+}
 
-// Upload steps definition
-const uploadSteps = [
+const uploadSteps: UploadStep[] = [
   { key: "uploading", label: "Subiendo", threshold: 0 },
   { key: "validating", label: "Validando", threshold: 90 },
   { key: "complete", label: "Completado", threshold: 100 },
 ];
+
+const fileInput = ref<HTMLInputElement | null>(null);
+const isDragging = ref(false);
+const selectedFile = ref<File | null>(props.modelValue || null);
+const error = ref("");
 
 // Current step computed based on progress threshold
 const currentStep = computed(() => {
   const progress = uploadProgress.value;
   const reversedSteps = [...uploadSteps].reverse();
   const step = reversedSteps.find((s) => progress >= s.threshold);
-  return step || uploadSteps[0];
+  return step || uploadSteps[0]!; // Ensure uploadSteps[0] exists or return a default
 });
 
 // Current step label
 const currentStepLabel = computed(() => {
-  return currentStep.value.label;
+  return currentStep.value?.label || "";
 });
 
 // Check if a step is completed (progress has passed its threshold)
@@ -284,15 +290,16 @@ const isStepCompleted = (stepKey: string): boolean => {
   const progress = uploadProgress.value;
   // Step is completed if progress has passed the NEXT step's threshold
   const nextStepIndex = uploadSteps.findIndex((s) => s.key === stepKey) + 1;
-  if (nextStepIndex >= uploadSteps.length) {
+  const nextStep = uploadSteps[nextStepIndex];
+  if (!nextStep) {
     return progress >= step.threshold;
   }
-  return progress >= uploadSteps[nextStepIndex].threshold;
+  return progress >= nextStep.threshold;
 };
 
 // Check if a step is active (current threshold reached but not next)
 const isStepActive = (stepKey: string): boolean => {
-  return currentStep.value.key === stepKey;
+  return currentStep.value?.key === stepKey;
 };
 
 // Get step circle class

@@ -19,7 +19,7 @@ export interface Analysis {
   summary_json: AnalysisSummary | null;
   risk_level: RiskLevel | null;
   credits_used: number;
-  status: "pending" | "processing" | "completed" | "failed";
+  status: "pending" | "processing" | "completed" | "failed" | "queued" | "analyzing" | "finalizing";
   error_message?: string;
   analysis_type?: "basic" | "premium" | "forensic";
   created_at: string;
