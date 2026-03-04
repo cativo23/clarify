@@ -76,6 +76,7 @@ export const createCheckoutSession = async (
 export const updateUserCreditsInDb = async (
   userId: string,
   credits: number,
+  stripePaymentId?: string,
 ) => {
   const config = useRuntimeConfig();
   const { createClient } = await import("@supabase/supabase-js");
@@ -115,6 +116,7 @@ export const updateUserCreditsInDb = async (
     .from("transactions")
     .insert({
       user_id: userId,
+      stripe_payment_id: stripePaymentId, // Use payment intent ID for tracking
       amount: price, // Using the actual package price
       credits_purchased: credits,
       type: "purchase",
@@ -142,7 +144,11 @@ export const handleWebhookEvent = async (event: Stripe.Event) => {
       const credits = parseInt(session.metadata?.credits || "0");
 
       if (userId && credits > 0) {
-        await updateUserCreditsInDb(userId, credits);
+        const paymentIntentId =
+          typeof session.payment_intent === "string"
+            ? session.payment_intent
+            : session.payment_intent?.id;
+        await updateUserCreditsInDb(userId, credits, paymentIntentId);
       }
       break;
     }
