@@ -8,11 +8,10 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { readdir, readFile, writeFile } from "fs/promises";
-import { join, basename } from "path";
+import { join, basename, dirname } from "path";
 import { fileURLToPath } from "url";
-import { dirname } from "path";
 
-const __filename = fileURLToPath(import.meta.url);
+const __filename = fileURLToPath(new URL(import.meta.url));
 const __dirname = dirname(__filename);
 
 // Colors for console output
@@ -231,101 +230,6 @@ async function checkRawSqlCapability(): Promise<boolean> {
   } catch {
     return false;
   }
-}
-
-/**
- * Split SQL content into individual statements
- * Handles various SQL statement terminators and ignores comments
- */
-function splitSqlStatements(sql: string): string[] {
-  // Remove comments (both -- and /**/ style)
-  let cleanSql = sql
-    .replace(/--.*$/gm, "") // Remove -- comments
-    .replace(/\/\*[\s\S]*?\*\//g, ""); // Remove /* */ comments
-
-  // Split by semicolon, but be careful about semicolons inside strings/objects
-  const statements: string[] = [];
-  let currentStatement = "";
-  let inSingleQuote = false;
-  let inDoubleQuote = false;
-  let inDollarQuote = false;
-  let prevChar = "";
-
-  for (let i = 0; i < cleanSql.length; i++) {
-    const char = cleanSql[i];
-    const nextChar = i < cleanSql.length - 1 ? cleanSql[i + 1] : "";
-
-    // Handle dollar quoting (used in PostgreSQL functions)
-    if (char === "$" && prevChar !== "\\" && !inSingleQuote && !inDoubleQuote) {
-      // Check if this is the start of a dollar tag
-      if (/^[A-Za-z_]/.test(nextChar)) {
-        // Find the end of the dollar tag
-        const tagMatch = cleanSql
-          .substring(i)
-          .match(/^\$([A-Za-z_][A-Za-z0-9_]*)?\$/);
-        if (tagMatch) {
-          const tag = tagMatch[0];
-          if (!inDollarQuote) {
-            inDollarQuote = true;
-            currentStatement += tag;
-            i += tag.length - 1; // -1 because for loop will increment
-          } else {
-            // Check if this is the closing tag
-            if (cleanSql.substring(i).startsWith(tag)) {
-              inDollarQuote = false;
-              currentStatement += tag;
-              i += tag.length - 1; // -1 because for loop will increment
-            } else {
-              currentStatement += char;
-            }
-          }
-        } else {
-          currentStatement += char;
-        }
-      } else {
-        currentStatement += char;
-      }
-    } else if (
-      char === "'" &&
-      !inDoubleQuote &&
-      !inDollarQuote &&
-      prevChar !== "\\"
-    ) {
-      inSingleQuote = !inSingleQuote;
-      currentStatement += char;
-    } else if (
-      char === '"' &&
-      !inSingleQuote &&
-      !inDollarQuote &&
-      prevChar !== "\\"
-    ) {
-      inDoubleQuote = !inDoubleQuote;
-      currentStatement += char;
-    } else if (
-      char === ";" &&
-      !inSingleQuote &&
-      !inDoubleQuote &&
-      !inDollarQuote
-    ) {
-      const stmt = currentStatement.trim();
-      if (stmt) {
-        statements.push(stmt);
-      }
-      currentStatement = "";
-    } else {
-      currentStatement += char;
-    }
-
-    prevChar = char;
-  }
-
-  // Add the last statement if it doesn't end with semicolon
-  const finalStmt = currentStatement.trim();
-  if (finalStmt) {
-    statements.push(finalStmt);
-  }
-
-  return statements;
 }
 
 /**

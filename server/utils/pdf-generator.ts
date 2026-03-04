@@ -75,7 +75,8 @@ export async function generateAnalysisPDF(
       day: "numeric",
     },
   );
-  doc.text(`Analizado: ${analysisDate}`, 50, doc.y, { color: "#6b7280" });
+  doc.fillColor("#6b7280").text(`Analizado: ${analysisDate}`, 50, doc.y);
+doc.fillColor("black"); // Reset color
   doc.moveDown(1);
 
   // Separator line
@@ -109,18 +110,13 @@ export async function generateAnalysisPDF(
   const ejecutivo = summary.resumen_ejecutivo;
   if (ejecutivo) {
     // Verdict
-    doc.text(
-      [
-        { text: "Veredicto: ", bold: true },
-        ejecutivo.veredicto || "Sin veredicto",
-      ],
-      50,
-      doc.y,
-    );
+    doc.font("Helvetica-Bold").text("Veredicto: ", 50, doc.y, { continued: true });
+    doc.font("Helvetica").text(ejecutivo.veredicto || "Sin veredicto", doc.x, doc.y);
     doc.moveDown(0.5);
 
     // Justification
-    doc.text(ejecutivo.justificacion || "", 50, doc.y, { color: "#4b5563" });
+    doc.fillColor("#4b5563").text(ejecutivo.justificacion || "", 50, doc.y);
+    doc.fillColor("black"); // Reset color
     doc.moveDown(1);
 
     // Metrics
