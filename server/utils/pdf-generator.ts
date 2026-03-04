@@ -76,7 +76,7 @@ export async function generateAnalysisPDF(
     },
   );
   doc.fillColor("#6b7280").text(`Analizado: ${analysisDate}`, 50, doc.y);
-doc.fillColor("black"); // Reset color
+  doc.fillColor("black"); // Reset color
   doc.moveDown(1);
 
   // Separator line
@@ -145,9 +145,7 @@ doc.fillColor("black"); // Reset color
 
   const hallazgos = summary.hallazgos || [];
   if (hallazgos.length === 0) {
-    doc.text("No se encontraron hallazgos en este análisis.", 50, doc.y, {
-      color: "#9ca3af",
-    });
+    doc.fillColor("#9ca3af").text("No se encontraron hallazgos en este análisis.", 50, doc.y);
   } else {
     for (const hallazgo of hallazgos) {
       const color = hallazgo.color || "verde";
@@ -175,20 +173,17 @@ doc.fillColor("black"); // Reset color
       doc.font("Helvetica").fillColor("black").fontSize(10);
 
       if (hallazgo.explicacion) {
-        doc.text(hallazgo.explicacion, 60, doc.y, { color: "#4b5563" });
+        doc.fillColor("#4b5563").text(hallazgo.explicacion, 60, doc.y);
       }
 
       if (hallazgo.clausula) {
-        doc
-          .font("Helvetica-Oblique")
-          .text(`Cláusula: ${hallazgo.clausula}`, 60, doc.y, {
-            color: "#6b7280",
-          });
-        doc.font("Helvetica");
+        doc.fillColor("#6b7280").font("Helvetica-Oblique").text(`Cláusula: ${hallazgo.clausula}`, 60, doc.y);
+        doc.font("Helvetica").fillColor("black");
       }
 
       if (hallazgo.cita_textual) {
-        doc.text(`"${hallazgo.cita_textual}"`, 60, doc.y, { color: "#4b5563" });
+        doc.fillColor("#4b5563").text(`"${hallazgo.cita_textual}"`, 60, doc.y);
+        doc.fillColor("black");
       }
 
       if (hallazgo.riesgo_real) {
@@ -243,11 +238,9 @@ doc.fillColor("black"); // Reset color
         }
 
         const severityColor =
-          cruce.severidad === "alto"
-            ? RISK_COLORS.alto
-            : cruce.severidad === "medio"
-              ? RISK_COLORS.medio
-              : RISK_COLORS.bajo;
+          cruce.severidad === "rojo"
+            ? RISK_COLORS.rojo
+            : RISK_COLORS.amarillo;
 
         doc
           .fillColor(severityColor)
@@ -255,15 +248,14 @@ doc.fillColor("black"); // Reset color
           .text(cruce.tipo || "Relación", 50, doc.y);
         doc
           .font("Helvetica")
-          .fillColor("black")
-          .text(cruce.inconsistencia || "", 50, doc.y, { color: "#4b5563" });
-        doc.text(
+          .fillColor("#4b5563")
+          .text(cruce.inconsistencia || "", 50, doc.y);
+        doc.fillColor("#6b7280").text(
           `${cruce.clausula_origen} ↔ ${cruce.clausula_destino}`,
           50,
-          doc.y,
-          { color: "#6b7280" },
+          doc.y
         );
-        doc.text(cruce.recomendacion || "", 50, doc.y, { color: "#059669" });
+        doc.fillColor("#059669").text(cruce.recomendacion || "", 50, doc.y);
 
         doc.moveDown(1);
       }
@@ -301,26 +293,23 @@ doc.fillColor("black"); // Reset color
           .text(omision.que_falta, 50, doc.y);
         doc
           .font("Helvetica")
-          .fillColor("black")
+          .fillColor("#6b7280")
           .text(
             `Categoría: ${omision.categoria || "No especificada"}`,
             50,
-            doc.y,
-            { color: "#6b7280" },
+            doc.y
           );
-        doc.text(
+        doc.fillColor("#4b5563").text(
           `Riesgo: ${omision.riesgo_usuario || "No especificado"}`,
           50,
-          doc.y,
-          { color: "#4b5563" },
+          doc.y
         );
 
         if (omision.clausula_sugerida) {
           doc
             .font("Helvetica-Oblique")
-            .text(`Sugerencia: ${omision.clausula_sugerida}`, 50, doc.y, {
-              color: "#059669",
-            });
+            .fillColor("#059669")
+            .text(`Sugerencia: ${omision.clausula_sugerida}`, 50, doc.y);
           doc.font("Helvetica");
         }
 
@@ -346,11 +335,10 @@ doc.fillColor("black"); // Reset color
         .text("MAPA ESTRUCTURAL DEL DOCUMENTO", 50, doc.y);
       doc.font("Helvetica").fillColor("black").fontSize(10);
 
-      doc.text(
+      doc.fillColor("#4b5563").text(
         `Total secciones: ${mapa.total_secciones} | Anexos: ${mapa.total_anexos} | Páginas: ${mapa.total_paginas || "N/A"}`,
         50,
-        doc.y,
-        { color: "#4b5563" },
+        doc.y
       );
 
       if (mapa.secciones && mapa.secciones.length > 0) {
@@ -372,9 +360,7 @@ doc.fillColor("black"); // Reset color
           const riskColor =
             RISK_COLORS[seccion.riesgo as keyof typeof RISK_COLORS] ||
             RISK_COLORS.gris;
-          doc.text(`• ${seccion.nombre} (pág. ${seccion.paginas})`, 50, doc.y, {
-            color: riskColor,
-          });
+          doc.fillColor(riskColor).text(`• ${seccion.nombre} (pág. ${seccion.paginas})`, 50, doc.y);
         }
       }
     }
@@ -412,7 +398,7 @@ doc.fillColor("black"); // Reset color
  * Helper function to add footer to a page
  */
 function addFooterToPage(
-  doc: PDFDocument,
+  doc: any,
   pageHeight: number,
   footerHeight: number,
   currentPage: number,
