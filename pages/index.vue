@@ -1,4 +1,21 @@
 <template>
+  <!-- Demo Modal -->
+  <div v-if="showDemo" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="relative bg-white dark:bg-slate-900 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl">
+      <button
+        @click="showDemo = false"
+        class="absolute top-4 right-4 z-10 p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <div class="p-2 pt-8"> <!-- Extra padding to account for close button -->
+        <InteractiveDemo @close="showDemo = false" />
+      </div>
+    </div>
+  </div>
   <div
     class="min-h-screen bg-white dark:bg-slate-950 transition-colors duration-500"
   >
@@ -80,9 +97,10 @@
               >
             </NuxtLink>
             <button
+              @click="showDemo = true"
               class="px-8 py-4 bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-800 rounded-2xl font-bold text-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-300"
             >
-              Ver Demo
+              Probar Demo
             </button>
           </div>
 
@@ -508,7 +526,10 @@
 </template>
 
 <script setup lang="ts">
+import InteractiveDemo from '~/components/demo/InteractiveDemo.vue';
+
 const user = useSupabaseUser();
+const showDemo = ref(false);
 
 useHead({
   title: "Inicio",
