@@ -50,7 +50,7 @@ export function useUploadProgress() {
               success: true,
               file_url: response.file_url,
             });
-          } catch (parseError) {
+          } catch {
             const errorMsg = "Error al procesar la respuesta del servidor";
             uploadError.value = errorMsg;
             isUploading.value = false;
