@@ -99,11 +99,17 @@ npm install
 npm run dev
 ```
 
-**Note:** When using Docker, run npm commands inside the container:
+**Critical for AI Agents:** All commands must be executed inside the Docker container to avoid host environment conflicts.
 
+```bash
+docker compose exec app <command>
+```
+
+Example usage:
 ```bash
 docker compose exec app npm install
 docker compose exec app npm run dev
+docker compose exec app npm run db:migrate
 ```
 
 ### 4️⃣ Database Setup
@@ -197,7 +203,7 @@ Learn more about our AI strategy in [3-Tier Strategy](docs/3_TIER_STRATEGY.md).
 
 This project follows [GitFlow](https://nvie.com/posts/a-successful-git-branching-model/) with [Conventional Commits](https://www.conventionalcommits.org/) and [Gitmoji](https://gitmoji.dev/).
 
-Commit format: `<type>(<scope>): <gitmoji> <description>`
+Commit format: `<gitmoji> <type>(<scope>): <description>`
 
 Types: `feat`, `fix`, `docs`, `refactor`, `chore`, `security`, `cleanup`, `perf`, `style`, `test`
 
