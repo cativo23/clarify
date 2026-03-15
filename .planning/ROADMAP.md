@@ -101,9 +101,9 @@ Plans:
 
 Plans:
 - [ ] 05-00-PLAN.md — Create automated test suite for free credits and demo functionality
-- [ ] 05-01-PLAN.md — Implement free credits on signup with email verification
-- [ ] 05-02-PLAN.md — Build monthly free Basic analysis logic
-- [ ] 05-03-PLAN.md — Create homepage interactive demo
+- [x] 05-01-PLAN.md — Implement free credits on signup with email verification
+- [x] 05-02-PLAN.md — Build monthly free Basic analysis logic
+- [x] 05-03-PLAN.md — Create homepage interactive demo
 
 ### Phase 6: Admin Analytics
 **Goal**: Operational visibility into revenue, costs, and user behavior
@@ -144,9 +144,9 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 |-------|----------------|--------|-----------|
 | 1. Core Analysis Foundation | 4/4 | Complete   | 2026-02-23 |
 | 2. Tier Selection & UX | 6/6 | Complete   | 2026-02-24 |
-| 3. PDF Export & History | 2/3 | Complete   | 2026-02-24 |
-| 4. Stripe & Monetization | 0/3 | Not started | - |
-| 5. Free Credits & Onboarding | 0/4 | Not started | - |
+| 3. PDF Export & History | 3/3 | Complete   | 2026-02-24 |
+| 4. Stripe & Monetization | 4/4 | Complete   | 2026-03-03 |
+| 5. Free Credits & Onboarding | 3/4 | In Progress | - |
 | 6. Admin Analytics | 0/2 | Not started | - |
 | 7. Production Deployment | 0/2 | Not started | - |
 
