@@ -3,9 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Completed Phase 5 (Free Credits & Onboarding)
-last_updated: "2026-03-15T22:05:00Z"
-last_activity: 2026-03-15 — Phase 05 COMPLETE (4/4 plans: tests, email trigger, monthly free analysis, demo)
+stopped_at: Milestone v1.0 complete (5/5 phases)
+last_updated: "2026-03-15T22:10:00Z"
 progress:
   total_phases: 7
   completed_phases: 5
@@ -34,9 +33,9 @@ Progress: █████████████████████ 100%
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 19
+- Total plans completed: 22
 - Average duration: ~5 min
-- Total execution time: ~95 min
+- Total execution time: ~110 min
 
 **By Phase:**
 
@@ -44,18 +43,26 @@ Progress: █████████████████████ 100%
 |-------|-------|-------|----------|
 | 1 | 4 | 17 min | 4 min |
 | 2 | 6 | 25 min | 4 min |
-| 3 | 2 | 15 min | 7 min |
-| 4 | 1 | 5 min | 5 min |
-| 5 | 1 | 15 min | 15 min |
+| 3 | 3 | 20 min | 7 min |
+| 4 | 4 | 20 min | 5 min |
+| 5 | 4 | 25 min | 6 min |
 
 **Recent Trend:**
-- Last 6 plans: 04-01 (~5 min), 03-02 (~15 min), 03-01 (~5 min), 02-06 (~10 min), 02-05 (~5 min), 02-04 (~5 min)
+- Last 6 plans: 05-00 (~10 min), 05-02 (~15 min), 05-01 (~5 min), 05-03 (~15 min), 04-05-GAP (~5 min), 04-04 (~10 min)
 - Trend: On track
 
-**Phase 4 Plans:**
-- [x] 04-01: Stripe Integration (atomic credit updates via webhook) - COMPLETE
-| Phase 04 P01 | 900 | 3 tasks | 4 files |
-| Phase 05-free-credits-onboarding P03 | 1200 | 3 tasks | 5 files |
+**Phase 5 Deliverables (COMPLETE):**
+- [x] 05-00: Test suite (24 test cases: free credits, monthly analysis, demo flow)
+- [x] 05-01: Free credit fields + email verification trigger (10 credits on signup)
+- [x] 05-02: Monthly free Basic analysis with atomic RPC (`process_analysis_transaction_with_free_check`)
+- [x] 05-03: Interactive homepage demo with simulation API
+
+**Phase 5 Implementation Details:**
+- Migration 20260303000002: Email verification trigger with FOR UPDATE lock
+- Migration 20260304000001: RPC function for atomic free analysis processing
+- analyze.post.ts: Integrated `processAnalysisWithFreeCheck` helper
+- InteractiveDemo.vue: Demo component with rate limiting (10 req/hour)
+- Test coverage: 24 tests (8 integration free credits, 10 integration monthly analysis, 6 E2E demo)
 
 ## Accumulated Context
 
