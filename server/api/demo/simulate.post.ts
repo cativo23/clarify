@@ -15,19 +15,19 @@ export default defineEventHandler(async (event: H3Event) => {
     const body = await readBody(event);
     const { contract_name, analysis_type } = bodySchema.parse(body);
 
-    // IP-based rate limiting (10 requests per hour)
+    // IP-based rate limiting (5 requests per day)
     const clientIP = getRequestIP(event) || 'unknown';
     const now = Date.now();
-    const hour = 60 * 60 * 1000; // 1 hour in ms
+    const day = 24 * 60 * 60 * 1000; // 1 day in ms
 
     const stored = rateLimitStore.get(clientIP);
-    if (!stored || now - stored.timestamp > hour) {
+    if (!stored || now - stored.timestamp > day) {
       rateLimitStore.set(clientIP, { count: 1, timestamp: now });
     } else {
-      if (stored.count >= 10) {
+      if (stored.count >= 5) {
         throw createError({
           statusCode: 429,
-          message: 'Rate limit exceeded. Please try again later.'
+          message: 'Límite diario alcanzado. Por favor intente mañana.'
         });
       }
       rateLimitStore.set(clientIP, { count: stored.count + 1, timestamp: stored.timestamp });
