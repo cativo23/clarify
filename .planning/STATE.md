@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: completed
-stopped_at: Completed 05-01 (Add free credit fields)
-last_updated: "2026-03-04T05:04:57.108Z"
-last_activity: 2026-03-04 — Phase 05 executed (05-03 implementation)
+status: in_progress
+stopped_at: Completed 05-02 (Email verification trigger + monthly free analysis)
+last_updated: "2026-03-15T21:35:00Z"
+last_activity: 2026-03-15 — Phase 05 Plan 02 executed (email verification + monthly free Basic analysis)
 progress:
   total_phases: 7
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 22
-  completed_plans: 20
-  percent: 85
+  completed_plans: 21
+  percent: 91
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-02-21)
 ## Current Position
 
 Phase: 5 of 6 (Free Credits Onboarding) — ACTIVE
-Plan: 3 of 4 in current phase
-Status: Completed Plan 03 (Interactive demo implementation)
-Last activity: 2026-03-04 — Phase 05 executed (05-03 implementation)
+Plan: 4 of 4 in current phase
+Status: Completed Plan 05-02 (Email verification trigger + monthly free analysis)
+Last activity: 2026-03-15 — Phase 05 Plan 02 executed
 
-Progress: ██████████████████ 85%
+Progress: █████████████████████ 91%
 
 ## Performance Metrics
 
@@ -115,9 +115,9 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-03 — Phase 5 Plan 01 COMPLETE
-Stopped at: Completed 05-01 (Add free credit fields)
-Next: Continue with Phase 5 Plan 02
+Last session: 2026-03-15 — Phase 5 Plan 02 COMPLETE
+Stopped at: Completed 05-02 (Email verification trigger + monthly free Basic analysis)
+Next: Complete Phase 5 with Plan 05-00 (test suite) or proceed to Phase 6
 
 **Phase 4 Deliverables (COMPLETE):**
 - [x] Stripe integration with atomic credit updates (04-01)
@@ -158,3 +158,16 @@ Next: Continue with Phase 5 Plan 02
 - ✅ Tier cards expand independently
 - ✅ Files up to 10MB upload successfully
 - ✅ Status updates: Pendiente → Analizando → Completado
+
+**Phase 5 Deliverables (IN PROGRESS - 3/4 complete):**
+- [ ] 05-00: Test suite for free credits and demo functionality
+- [x] 05-01: Migration for free credit fields + email verification trigger
+- [x] 05-02: Monthly free Basic analysis with atomic RPC function
+- [x] 05-03: Interactive demo on homepage
+
+**Phase 5 Implementation Details:**
+- Migration 20260303000002: Email verification trigger awards 10 credits
+- Migration 20260304000001: RPC function `process_analysis_transaction_with_free_check` for atomic free analysis
+- analyze.post.ts: Integrated `processAnalysisWithFreeCheck` helper for monthly free Basic analysis
+- FOR UPDATE locks prevent race conditions in both credit award and free analysis
+- Interactive demo uses simulation API with rate limiting (10 requests/hour)
