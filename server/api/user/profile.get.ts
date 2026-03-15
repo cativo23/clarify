@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
       const newProfile = {
         id: user.id,
         email: user.email,
-        credits: 3, // Default starting credits
+        credits: 0, // Start with 0 credits, email verification trigger awards 10
       };
 
       // Use Service Role to bypass RLS during creation
