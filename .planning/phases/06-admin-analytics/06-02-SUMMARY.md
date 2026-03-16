@@ -186,12 +186,12 @@ Run these migrations in Supabase SQL Editor:
 
 ## Test Results
 
-**All 35 tests passing:**
+**All 43 tests passing:**
 ```
 ✓ tests/unit/admin/costs.test.ts (14 tests) - Cost analysis logic
 ✓ tests/unit/admin/user-management.test.ts (16 tests) - User management logic
-✓ tests/unit/admin/revenue.test.ts (3 tests) - Revenue API (Plan 06-01)
-✓ tests/unit/admin/funnel.test.ts (2 tests) - Funnel API (Plan 06-01)
+✓ tests/unit/admin/revenue.test.ts (6 tests) - Revenue API (Plan 06-01)
+✓ tests/unit/admin/funnel.test.ts (7 tests) - Funnel API (Plan 06-01)
 ```
 
 **Test Coverage:**
