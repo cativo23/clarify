@@ -44,10 +44,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Admin
 
-- [ ] **ADMIN-01**: Admin Conversion Tracking — Signup → purchase funnel visualization
-- [ ] **ADMIN-02**: Admin Revenue Dashboard — Daily/weekly/monthly revenue charts
-- [ ] **ADMIN-03**: Admin Cost Analysis — Cost per analysis vs profit margin
-- [ ] **ADMIN-04**: Admin User Management — Add credits, suspend users, view history
+- [x] **ADMIN-01**: Admin Conversion Tracking — Signup → purchase funnel visualization
+- [x] **ADMIN-02**: Admin Revenue Dashboard — Daily/weekly/monthly revenue charts
+- [x] **ADMIN-03**: Admin Cost Analysis — Cost per analysis vs profit margin
+- [x] **ADMIN-04**: Admin User Management — Add credits, suspend users, view history
 
 ### Deployment
 
