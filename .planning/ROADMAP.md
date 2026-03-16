@@ -11,8 +11,8 @@
 
 **Phase 6: Admin Analytics**
 - [x] 06-00: Test infrastructure stubs
-- [ ] 06-01: Admin revenue dashboard + conversion funnel (ADMIN-01, ADMIN-02)
-- [ ] 06-02: Cost analysis + user management UI (ADMIN-03, ADMIN-04)
+- [x] 06-01: Admin revenue dashboard + conversion funnel (ADMIN-01, ADMIN-02)
+- [x] 06-02: Cost analysis + user management UI (ADMIN-03, ADMIN-04)
 
 **Phase 7: Production Deployment**
 - [ ] 07-01: Deploy BullMQ workers to Railway/Render (not Vercel)
