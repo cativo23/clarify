@@ -19,12 +19,14 @@ Implement admin analytics dashboard for operational visibility into revenue, cos
 
 ### Revenue Dashboard
 - Time ranges: Day, Week, Month, Quarter + Custom date range picker
+- Chart library: **Nuxt Charts** (native Nuxt integration, reactive animations, pixel-perfect design)
 - Chart type: Line chart (recommended for time-series trends)
 - Metrics: Gross revenue, Net revenue (after refunds/adjustments), Revenue by package (5/10/25 credit packages)
 - Updates: Refresh on page load + Manual refresh button (admin controls updates)
 
 ### Conversion Funnel
 - Visualization: Classic funnel chart (wide-to-narrow showing drop-off)
+- **Interactivity:** Hover para ver detalles por etapa, click para filtrar/desglosar datos
 - Stages tracked (4 stages for complete visibility):
   1. Signup → Email verified (onboarding completion)
   2. Email verified → First analysis (activation)
@@ -47,7 +49,9 @@ Implement admin analytics dashboard for operational visibility into revenue, cos
   - Suspend/unsuspend account (mandatory reason field for audit trail)
   - View full analysis history
   - View transaction history
+- **Suspension behavior:** Bloqueo parcial — usuario puede ver su dashboard pero no crear nuevos análisis (mientras está suspendido)
 - Credit adjustments: Logged to `transactions` table as type='adjustment' (maintains consistent audit trail)
+- Credit limits: **Sin límites** — admin puede ajustar cualquier cantidad
 - User data visible:
   - Email and ID
   - Sign-up date
