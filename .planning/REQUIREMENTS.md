@@ -44,8 +44,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Admin
 
-- [x] **ADMIN-01**: Admin Conversion Tracking — Signup → purchase funnel visualization
-- [x] **ADMIN-02**: Admin Revenue Dashboard — Daily/weekly/monthly revenue charts
+- [x] **ADMIN-01**: Admin Conversion Tracking — Signup → purchase funnel visualization (4-stage funnel: Signups → Email Verified → First Analysis → First Purchase)
+- [x] **ADMIN-02**: Admin Revenue Dashboard — Daily/weekly/monthly/quarterly revenue charts with gross/net comparison and package breakdown
 - [x] **ADMIN-03**: Admin Cost Analysis — Cost per analysis vs profit margin
 - [x] **ADMIN-04**: Admin User Management — Add credits, suspend users, view history
 
@@ -105,8 +105,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CREDIT-01 | Phase 5 | ✅ Complete |
 | CREDIT-02 | Phase 5 | ✅ Complete |
 | DEMO-01 | Phase 5 | ✅ Complete |
-| ADMIN-01 | Phase 6 | ⏳ Pending |
-| ADMIN-02 | Phase 6 | ⏳ Pending |
+| ADMIN-01 | Phase 6 Plan 01 | ✅ Complete |
+| ADMIN-02 | Phase 6 Plan 01 | ✅ Complete |
 | ADMIN-03 | Phase 6 | ⏳ Pending |
 | ADMIN-04 | Phase 6 | ⏳ Pending |
 | DEPLOY-01 | Phase 7 | ⏳ Pending |
