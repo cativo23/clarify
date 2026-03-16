@@ -78,11 +78,9 @@ const loadRevenueData = async () => {
   revenueLoading.value = true;
   try {
     const res = await $fetch(`/api/admin/revenue?range=${revenueRange.value}`);
-    console.log("[Revenue API] Response:", res);
     revenueData.value = res;
-    console.log("[Revenue] Data set, calling render");
     await nextTick();
-    renderRevenueChart();
+    // Chart will be rendered by watcher when revenueData changes
   } catch (e: any) {
     console.error("Failed to load revenue data", e);
   } finally {
@@ -94,11 +92,9 @@ const loadFunnelData = async () => {
   funnelLoading.value = true;
   try {
     const res = await $fetch(`/api/admin/funnel?range=${funnelRange.value}`);
-    console.log("[Funnel API] Response:", res);
     funnelData.value = res;
-    console.log("[Funnel] Data set, calling render");
     await nextTick();
-    renderFunnelChart();
+    // Chart will be rendered by watcher when funnelData changes
   } catch (e: any) {
     console.error("Failed to load funnel data", e);
   } finally {
@@ -112,6 +108,19 @@ onMounted(() => {
   loadRevenueData();
   loadFunnelData();
 });
+
+// Watch for data changes and render charts when canvas is available
+watch([revenueData, revenueChartRef], async () => {
+  if (revenueData.value && revenueChartRef.value) {
+    await renderRevenueChart();
+  }
+}, { immediate: true });
+
+watch([funnelData, funnelChartRef], async () => {
+  if (funnelData.value && funnelChartRef.value) {
+    await renderFunnelChart();
+  }
+}, { immediate: true });
 
 const renderChart = async () => {
   if (!chartRef.value) return;
@@ -155,7 +164,12 @@ const renderChart = async () => {
 };
 
 const renderRevenueChart = async () => {
-  if (!revenueChartRef.value || !revenueData.value) return;
+  console.log("[Revenue Chart] revenueChartRef:", revenueChartRef.value);
+  console.log("[Revenue Chart] revenueData:", revenueData.value);
+  if (!revenueChartRef.value || !revenueData.value) {
+    console.warn("[Revenue Chart] Skipping render - no ref or data");
+    return;
+  }
   try {
     console.log("[Revenue Chart] Starting render, data:", revenueData.value);
     const Chart = (await import("chart.js/auto")).default;
@@ -249,7 +263,12 @@ const renderRevenueChart = async () => {
 };
 
 const renderFunnelChart = async () => {
-  if (!funnelChartRef.value || !funnelData.value) return;
+  console.log("[Funnel Chart] funnelChartRef:", funnelChartRef.value);
+  console.log("[Funnel Chart] funnelData:", funnelData.value);
+  if (!funnelChartRef.value || !funnelData.value) {
+    console.warn("[Funnel Chart] Skipping render - no ref or data");
+    return;
+  }
   try {
     console.log("[Funnel Chart] Starting render, data:", funnelData.value);
     const Chart = (await import("chart.js/auto")).default;
