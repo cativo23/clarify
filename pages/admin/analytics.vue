@@ -46,8 +46,6 @@ const loadData = async () => {
     ])) as [any, any];
     users.value = uRes.users || [];
     pricing.value = pRes.pricing || [];
-    await nextTick();
-    renderChart();
   } catch (e: any) {
     console.error("Failed to load admin data", e);
     error.value = e.message || "Failed to load admin data";
