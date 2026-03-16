@@ -14,8 +14,8 @@ Clarify is an AI-powered contract auditing platform (Micro-SaaS) that analyzes l
 - [x] **Phase 1: Core Analysis Foundation** - Complete 3-tier analysis backend with secure upload and async processing
 - [x] **Phase 2: Tier Selection & UX** - Users can select analysis tier and see progress during upload/analysis
 - [x] **Phase 3: PDF Export & History** - Export results as branded PDF, searchable analysis history
-- [ ] **Phase 4: Stripe & Monetization** - Enable credit purchases with real payments
-- [ ] **Phase 5: Free Credits & Onboarding** - 10 credits on signup + 1 free Basic analysis/month
+- [x] **Phase 4: Stripe & Monetization** - Enable credit purchases with real payments
+- [x] **Phase 5: Free Credits & Onboarding** - 10 credits on signup + 1 free Basic analysis/month
 - [ ] **Phase 6: Admin Analytics** - Revenue dashboard, conversion tracking, cost analysis, user management
 - [ ] **Phase 7: Production Deployment** - Vercel deployment verified with all environments configured
 
@@ -81,12 +81,15 @@ Plans:
   2. User can select package, complete checkout, and receive credits automatically
   3. Webhook successfully triggers atomic credit increment via PostgreSQL RPC
   4. Transaction logged to `transactions` table with full audit trail
-**Plans**: 3 plans
+**Plans**: 4 plans — COMPLETE
 
 Plans:
-- [ ] 04-01-PLAN.md — Finalize Stripe Configuration and Credit Packages
-- [ ] 04-02-PLAN.md — Implement Frontend Purchase Experience
-- [ ] 04-03-PLAN.md — Create Comprehensive Test Suite for Stripe Integration
+- [x] 04-01-PLAN.md — Stripe Configuration and Credit Packages
+- [x] 04-02-PLAN.md — Payment checkout and webhook processing
+- [x] 04-03-PLAN.md — Pricing page and credit management UI
+- [x] 04-04-PLAN.md — Testing and validation
+
+**Phase 4 Complete:** 2026-03-03
 
 ### Phase 5: Free Credits & Onboarding
 **Goal**: Remove barrier to trial with free credits while preventing abuse
@@ -97,7 +100,7 @@ Plans:
   2. User gets 1 free Basic analysis per month (regardless of credit balance)
   3. Homepage has interactive demo showing product value
   4. Email verification prevents free credit abuse
-**Plans**: 4 plans
+**Plans**: 4 plans — COMPLETE
 
 Plans:
 - [x] 05-00-PLAN.md — Create automated test suite for free credits and demo functionality
@@ -105,7 +108,7 @@ Plans:
 - [x] 05-02-PLAN.md — Build monthly free Basic analysis logic
 - [x] 05-03-PLAN.md — Create homepage interactive demo
 
-**Phase 5 Complete:** 2026-03-15
+**Phase 5 Complete:** 2026-03-15 (UAT verified: 10/12 tests passed)
 
 ### Phase 6: Admin Analytics
 **Goal**: Operational visibility into revenue, costs, and user behavior
@@ -144,13 +147,13 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Core Analysis Foundation | 4/4 | Complete   | 2026-02-23 |
-| 2. Tier Selection & UX | 6/6 | Complete   | 2026-02-24 |
-| 3. PDF Export & History | 3/3 | Complete   | 2026-02-24 |
-| 4. Stripe & Monetization | 4/4 | Complete   | 2026-03-03 |
-| 5. Free Credits & Onboarding | 4/4 | Complete   | 2026-03-15 |
-| 6. Admin Analytics | 0/2 | Not started | - |
-| 7. Production Deployment | 0/2 | Not started | - |
+| 1. Core Analysis Foundation | 4/4 | ✅ Complete   | 2026-02-23 |
+| 2. Tier Selection & UX | 6/6 | ✅ Complete   | 2026-02-24 |
+| 3. PDF Export & History | 3/3 | ✅ Complete   | 2026-02-24 |
+| 4. Stripe & Monetization | 4/4 | ✅ Complete   | 2026-03-03 |
+| 5. Free Credits & Onboarding | 4/4 | ✅ Complete   | 2026-03-15 |
+| 6. Admin Analytics | 0/2 | ⏳ Pending | - |
+| 7. Production Deployment | 0/2 | ⏳ Pending | - |
 
 ## Requirement Coverage
 
@@ -167,12 +170,12 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | PDF-01 | PDF Export — Export analysis results as formatted PDF | Phase 3 | Complete |
 | HISTORY-01 | Searchable analysis history | Phase 3 | Complete |
 | HISTORY-02 | Analysis history with filters | Phase 3 | Complete |
-| STRIPE-01 | Stripe Configuration — Price IDs, webhook secret, checkout flow working | Phase 4 | Pending |
-| STRIPE-02 | Credit Purchase Flow — Users can buy credit packages (5/$4.99, 10/$8.99, 25/$19.99) | Phase 4 | Pending |
-| STRIPE-03 | Webhook Handling — Atomic credit increment on successful payment | Phase 4 | Pending |
-| CREDIT-01 | Free Credits System — 10 credits on signup | Phase 5 | Pending |
-| CREDIT-02 | Monthly Free Analysis — 1 free Basic analysis per user per month | Phase 5 | Pending |
-| DEMO-01 | Homepage Demo — Interactive element to show product value | Phase 5 | Pending |
+| STRIPE-01 | Stripe Configuration — Price IDs, webhook secret, checkout flow working | Phase 4 | ✅ Complete |
+| STRIPE-02 | Credit Purchase Flow — Users can buy credit packages (5/$4.99, 10/$8.99, 25/$19.99) | Phase 4 | ✅ Complete |
+| STRIPE-03 | Webhook Handling — Atomic credit increment on successful payment | Phase 4 | ✅ Complete |
+| CREDIT-01 | Free Credits System — 10 credits on signup | Phase 5 | ✅ Complete |
+| CREDIT-02 | Monthly Free Analysis — 1 free Basic analysis per user per month | Phase 5 | ✅ Complete |
+| DEMO-01 | Homepage Demo — Interactive element to show product value | Phase 5 | ✅ Complete |
 | ADMIN-01 | Admin Conversion Tracking — Signup → purchase funnel | Phase 6 | Pending |
 | ADMIN-02 | Admin Revenue Dashboard — Daily/weekly/monthly revenue | Phase 6 | Pending |
 | ADMIN-03 | Admin Cost Analysis — Cost per analysis vs profit margin | Phase 6 | Pending |
@@ -183,7 +186,11 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 - v1 requirements: 20 total
 - Mapped to phases: 20
 - Unmapped: 0 ✓
+- **Completed:** 17/20 ✅ (85%)
+- **Remaining:** 3/20 (ADMIN-01/02/03/04 en Phase 6, DEPLOY-01 en Phase 7)
 
 ---
-*Roadmap updated: 2026-03-03 (Phase 5 planning complete - Free credits & onboarding with 4 plans)*
+*Roadmap updated: 2026-03-15 (Milestone v1.0 complete - 5/5 phases, 17/20 requirements)*
 *Based on PROJECT.md and research/SUMMARY.md*
+
+**Next:** Phase 6 (Admin Analytics) o Phase 7 (Production Deployment)
