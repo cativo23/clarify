@@ -22,10 +22,19 @@ Clarify is an AI-powered contract auditing platform (Micro-SaaS) that analyzes l
 
 </details>
 
-### 📋 v1.1 Admin & Deploy (Planned)
+### 📋 v1.1 Admin & Deploy (In Progress)
 
-- [ ] Phase 6: Admin Analytics (2 plans) — Revenue dashboard, conversion tracking, cost analysis
-- [ ] Phase 7: Production Deployment (2 plans) — Vercel deployment, environment configuration
+**Phase 6: Admin Analytics**
+- [ ] 06-01: Admin revenue dashboard (daily/weekly/monthly charts)
+- [ ] 06-02: Conversion funnel (signup → purchase visualization)
+- [ ] 06-03: Cost analysis per tier (token usage vs profit margin)
+- [ ] 06-04: User management UI (add credits, suspend, view history)
+
+**Phase 7: Production Deployment**
+- [ ] 07-01: Deploy BullMQ workers to Railway/Render (not Vercel)
+- [ ] 07-02: Configure production environment variables (Supabase, Stripe, OpenAI, Redis)
+- [ ] 07-03: Verify production URL accessible and functional
+- [ ] 07-04: Production readiness checklist (RLS, rate limiting, error handling)
 
 ## Phase Details
 
@@ -160,8 +169,8 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 3. PDF Export & History | 3/3 | ✅ Complete   | 2026-02-24 |
 | 4. Stripe & Monetization | 4/4 | ✅ Complete   | 2026-03-03 |
 | 5. Free Credits & Onboarding | 4/4 | ✅ Complete   | 2026-03-15 |
-| 6. Admin Analytics | 0/2 | ⏳ Pending | - |
-| 7. Production Deployment | 0/2 | ⏳ Pending | - |
+| 6. Admin Analytics | 0/4 | ⏳ In Progress | - |
+| 7. Production Deployment | 0/4 | ⏳ Pending | - |
 
 ## Requirement Coverage
 
