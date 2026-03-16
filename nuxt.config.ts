@@ -11,6 +11,7 @@ export default defineNuxtConfig({
     "@nuxtjs/supabase",
     "@nuxtjs/color-mode",
     "nuxt-security",
+    "nuxt-charts",
   ],
 
   // [SECURITY FIX #6] Tighten CSP using nuxt-security with environment awareness

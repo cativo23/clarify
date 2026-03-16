@@ -20,12 +20,6 @@ const funnelData = ref<any>(null);
 const funnelLoading = ref(false);
 const funnelRange = ref<"7d" | "30d" | "90d" | "custom">("30d");
 
-const chartRef = ref<HTMLCanvasElement | null>(null);
-const revenueChartRef = ref<HTMLCanvasElement | null>(null);
-const funnelChartRef = ref<HTMLCanvasElement | null>(null);
-let chartInstance: any = null;
-let revenueChartInstance: any = null;
-let funnelChartInstance: any = null;
 
 // Computed metrics
 const totalUsers = computed(() => users.value.length);
@@ -109,245 +103,6 @@ onMounted(() => {
   loadFunnelData();
 });
 
-// Watch for data changes and render charts when canvas is available
-watch([revenueData, revenueChartRef], async () => {
-  if (revenueData.value && revenueChartRef.value) {
-    await renderRevenueChart();
-  }
-}, { immediate: true });
-
-watch([funnelData, funnelChartRef], async () => {
-  if (funnelData.value && funnelChartRef.value) {
-    await renderFunnelChart();
-  }
-}, { immediate: true });
-
-const renderChart = async () => {
-  if (!chartRef.value) return;
-  try {
-    const Chart = (await import("chart.js/auto")).default;
-    if (chartInstance) {
-      chartInstance.destroy();
-    }
-    const ctx = chartRef.value.getContext("2d");
-    if (!ctx) return;
-    chartInstance = new Chart(ctx, {
-      type: "bar",
-      data: {
-        labels: users.value.map((u) => u.email?.split("@")[0] || "User"),
-        datasets: [
-          {
-            label: "Analyses Count",
-            data: users.value.map((u) => u.analyses_count || 0),
-            backgroundColor: "#f59e0b",
-            borderRadius: 8,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { precision: 0 },
-          },
-        },
-      },
-    });
-  } catch (err) {
-    console.warn("Chart.js not available; skip chart render", err);
-  }
-};
-
-const renderRevenueChart = async () => {
-  console.log("[Revenue Chart] revenueChartRef:", revenueChartRef.value);
-  console.log("[Revenue Chart] revenueData:", revenueData.value);
-  if (!revenueChartRef.value || !revenueData.value) {
-    console.warn("[Revenue Chart] Skipping render - no ref or data");
-    return;
-  }
-  try {
-    console.log("[Revenue Chart] Starting render, data:", revenueData.value);
-    const Chart = (await import("chart.js/auto")).default;
-    console.log("[Revenue Chart] Chart.js loaded:", Chart);
-    if (revenueChartInstance) {
-      revenueChartInstance.destroy();
-    }
-    const ctx = revenueChartRef.value.getContext("2d");
-    console.log("[Revenue Chart] Canvas context:", ctx);
-    if (!ctx) return;
-
-    // Sort by date and extract labels and data
-    const sortedRevenue = [...revenueData.value.revenue].sort((a, b) => a.date.localeCompare(b.date));
-    const labels = sortedRevenue.map(r => r.date);
-    const grossRevenue = sortedRevenue.map(r => r.gross_revenue);
-    const netRevenue = sortedRevenue.map(r => r.net_revenue);
-    console.log("[Revenue Chart] Labels:", labels);
-    console.log("[Revenue Chart] Gross:", grossRevenue);
-    console.log("[Revenue Chart] Net:", netRevenue);
-
-    revenueChartInstance = new Chart(ctx, {
-      type: "line",
-      data: {
-        labels,
-        datasets: [
-          {
-            label: "Gross Revenue",
-            data: grossRevenue,
-            borderColor: "#10b981",
-            backgroundColor: "rgba(16, 185, 129, 0.1)",
-            borderWidth: 3,
-            fill: true,
-            tension: 0.4,
-            pointRadius: 4,
-            pointHoverRadius: 6,
-          },
-          {
-            label: "Net Revenue",
-            data: netRevenue,
-            borderColor: "#3b82f6",
-            backgroundColor: "rgba(59, 130, 246, 0.1)",
-            borderWidth: 3,
-            borderDash: [5, 5],
-            fill: false,
-            tension: 0.4,
-            pointRadius: 4,
-            pointHoverRadius: 6,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: true,
-            position: "top",
-            labels: {
-              usePointStyle: true,
-              font: { size: 12, weight: "bold" },
-            },
-          },
-          tooltip: {
-            mode: "index",
-            intersect: false,
-            callbacks: {
-              label: (context: any) => {
-                const value = context.parsed.y;
-                return `${context.dataset.label}: $${value.toFixed(2)}`;
-              },
-            },
-          },
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              callback: (value: number) => `$${value.toFixed(2)}`,
-              font: { size: 11 },
-            },
-          },
-          x: {
-            ticks: { font: { size: 11 } },
-          },
-        },
-      },
-    });
-  } catch (err) {
-    console.warn("Revenue chart render failed", err);
-  }
-};
-
-const renderFunnelChart = async () => {
-  console.log("[Funnel Chart] funnelChartRef:", funnelChartRef.value);
-  console.log("[Funnel Chart] funnelData:", funnelData.value);
-  if (!funnelChartRef.value || !funnelData.value) {
-    console.warn("[Funnel Chart] Skipping render - no ref or data");
-    return;
-  }
-  try {
-    console.log("[Funnel Chart] Starting render, data:", funnelData.value);
-    const Chart = (await import("chart.js/auto")).default;
-    console.log("[Funnel Chart] Chart.js loaded:", Chart);
-    if (funnelChartInstance) {
-      funnelChartInstance.destroy();
-    }
-    const ctx = funnelChartRef.value.getContext("2d");
-    console.log("[Funnel Chart] Canvas context:", ctx);
-    if (!ctx) return;
-
-    const funnel = funnelData.value.funnel;
-    const labels = funnel.map((f: any) => f.stage);
-    const counts = funnel.map((f: any) => f.count);
-    const rates = funnel.map((f: any) => f.rate);
-    console.log("[Funnel Chart] Labels:", labels);
-    console.log("[Funnel Chart] Counts:", counts);
-
-    // Funnel gradient colors (wide to narrow visually represented)
-    const backgroundColors = [
-      "rgba(99, 102, 241, 0.8)", // accent-indigo
-      "rgba(99, 102, 241, 0.7)",
-      "rgba(99, 102, 241, 0.6)",
-      "rgba(99, 102, 241, 0.5)",
-    ];
-
-    funnelChartInstance = new Chart(ctx, {
-      type: "bar",
-      data: {
-        labels,
-        datasets: [
-          {
-            label: "Users",
-            data: counts,
-            backgroundColor: backgroundColors,
-            borderRadius: 8,
-            barPercentage: 0.7,
-          },
-        ],
-      },
-      options: {
-        indexAxis: "y", // Horizontal bar chart for funnel effect
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: (context: any) => {
-                const count = context.parsed.x;
-                const rate = rates[context.dataIndex];
-                return `${count} users (${rate.toFixed(1)}% retention)`;
-              },
-            },
-          },
-        },
-        scales: {
-          x: {
-            beginAtZero: true,
-            ticks: {
-              callback: (value: number) => value.toLocaleString(),
-              font: { size: 11 },
-            },
-            title: {
-              display: true,
-              text: "Users",
-              font: { size: 12, weight: "bold" },
-            },
-          },
-          y: {
-            ticks: { font: { size: 12, weight: "bold" } },
-          },
-        },
-      },
-    });
-  } catch (err) {
-    console.warn("Funnel chart render failed", err);
-  }
-};
 
 const estimateUserCost = async (userId: string) => {
   if (estimates.value[userId] !== undefined) return;
@@ -614,7 +369,7 @@ const formatDate = (dateString: string | null) => {
         <div v-else-if="revenueData" class="space-y-6">
           <!-- Revenue Chart -->
           <div class="h-72">
-            <canvas ref="revenueChartRef"></canvas>
+            <AdminRevenueChart :data="revenueData" />
           </div>
 
           <!-- Summary Cards -->
@@ -733,7 +488,7 @@ const formatDate = (dateString: string | null) => {
         <div v-else-if="funnelData" class="space-y-6">
           <!-- Funnel Chart -->
           <div class="h-64">
-            <canvas ref="funnelChartRef"></canvas>
+            <AdminFunnelChart :data="funnelData" />
           </div>
 
           <!-- Funnel Stats Grid -->
@@ -788,7 +543,7 @@ const formatDate = (dateString: string | null) => {
             Distribution of contract analyses across all users
           </p>
           <div class="h-64">
-            <canvas ref="chartRef"></canvas>
+            <AdminAnalysesChart :users="users" />
           </div>
         </div>
 
