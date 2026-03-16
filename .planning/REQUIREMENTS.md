@@ -112,12 +112,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DEPLOY-01 | Phase 7 | ⏳ Pending |
 
 **Coverage:**
-- v1 requirements: 20 total
-- Mapped to phases: 20
-- Unmapped: 0 ✓
-- **v1.0 Complete:** 17/20 (85%) — Phases 1-5
-- **Remaining:** 3/20 — Phase 6 (Admin) + Phase 7 (Deploy)
+- v1.1 requirements: 5 total (ADMIN-01/02/03/04, DEPLOY-01)
+- Mapped to phases: 0 (pending roadmap)
+- Unmapped: 5 ⚠️
 
 ---
 *Requirements defined: 2026-02-21*
-*Last updated: 2026-03-15 — v1.0 MVP complete (17/20 requirements)*
+*Last updated: 2026-03-15 — v1.0 MVP complete (17/20), v1.1 Admin & Deploy in progress*
