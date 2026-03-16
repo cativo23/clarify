@@ -2,8 +2,11 @@
 -- Date: 2026-03-16
 -- Description: Add suspension fields to admin users summary view
 
+-- Drop existing view first (cannot change column structure with OR REPLACE)
+DROP VIEW IF EXISTS admin_users_summary CASCADE;
+
 -- Recreate view with suspension fields
-CREATE OR REPLACE VIEW admin_users_summary AS
+CREATE VIEW admin_users_summary AS
 SELECT
   u.id,
   u.email,
