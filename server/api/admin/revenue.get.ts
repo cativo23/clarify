@@ -1,5 +1,6 @@
 import { requireAdmin } from "../../utils/auth";
 import { getAdminSupabaseClient } from "../../utils/admin-supabase";
+import { createClient } from "@supabase/supabase-js";
 
 export default defineEventHandler(async (event) => {
   // Require admin authentication
@@ -45,14 +46,13 @@ export default defineEventHandler(async (event) => {
   }
 
   const admin = getAdminSupabaseClient();
-  const supabase = await admin.getConfig().then(() => {
-    // Get raw supabase client for direct SQL queries
-    const { createClient } = require("@supabase/supabase-js");
-    return createClient(
-      process.env.SUPABASE_URL || "",
-      process.env.SUPABASE_SERVICE_KEY || ""
-    );
-  });
+  await admin.getConfig();
+
+  // Create Supabase client directly using service key
+  const supabase = createClient(
+    process.env.SUPABASE_URL || "",
+    process.env.SUPABASE_SERVICE_KEY || ""
+  );
 
   // Query transactions with date filtering
   const { data: transactions, error } = await supabase
