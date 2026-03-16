@@ -78,7 +78,9 @@ const loadRevenueData = async () => {
   revenueLoading.value = true;
   try {
     const res = await $fetch(`/api/admin/revenue?range=${revenueRange.value}`);
+    console.log("[Revenue API] Response:", res);
     revenueData.value = res;
+    console.log("[Revenue] Data set, calling render");
     await nextTick();
     renderRevenueChart();
   } catch (e: any) {
@@ -92,7 +94,9 @@ const loadFunnelData = async () => {
   funnelLoading.value = true;
   try {
     const res = await $fetch(`/api/admin/funnel?range=${funnelRange.value}`);
+    console.log("[Funnel API] Response:", res);
     funnelData.value = res;
+    console.log("[Funnel] Data set, calling render");
     await nextTick();
     renderFunnelChart();
   } catch (e: any) {
@@ -153,11 +157,14 @@ const renderChart = async () => {
 const renderRevenueChart = async () => {
   if (!revenueChartRef.value || !revenueData.value) return;
   try {
+    console.log("[Revenue Chart] Starting render, data:", revenueData.value);
     const Chart = (await import("chart.js/auto")).default;
+    console.log("[Revenue Chart] Chart.js loaded:", Chart);
     if (revenueChartInstance) {
       revenueChartInstance.destroy();
     }
     const ctx = revenueChartRef.value.getContext("2d");
+    console.log("[Revenue Chart] Canvas context:", ctx);
     if (!ctx) return;
 
     // Sort by date and extract labels and data
@@ -165,6 +172,9 @@ const renderRevenueChart = async () => {
     const labels = sortedRevenue.map(r => r.date);
     const grossRevenue = sortedRevenue.map(r => r.gross_revenue);
     const netRevenue = sortedRevenue.map(r => r.net_revenue);
+    console.log("[Revenue Chart] Labels:", labels);
+    console.log("[Revenue Chart] Gross:", grossRevenue);
+    console.log("[Revenue Chart] Net:", netRevenue);
 
     revenueChartInstance = new Chart(ctx, {
       type: "line",
@@ -241,17 +251,22 @@ const renderRevenueChart = async () => {
 const renderFunnelChart = async () => {
   if (!funnelChartRef.value || !funnelData.value) return;
   try {
+    console.log("[Funnel Chart] Starting render, data:", funnelData.value);
     const Chart = (await import("chart.js/auto")).default;
+    console.log("[Funnel Chart] Chart.js loaded:", Chart);
     if (funnelChartInstance) {
       funnelChartInstance.destroy();
     }
     const ctx = funnelChartRef.value.getContext("2d");
+    console.log("[Funnel Chart] Canvas context:", ctx);
     if (!ctx) return;
 
     const funnel = funnelData.value.funnel;
     const labels = funnel.map((f: any) => f.stage);
     const counts = funnel.map((f: any) => f.count);
     const rates = funnel.map((f: any) => f.rate);
+    console.log("[Funnel Chart] Labels:", labels);
+    console.log("[Funnel Chart] Counts:", counts);
 
     // Funnel gradient colors (wide to narrow visually represented)
     const backgroundColors = [
