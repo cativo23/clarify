@@ -1,10 +1,10 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: completed
-stopped_at: Milestone v1.0 complete (5/5 phases)
-last_updated: "2026-03-15T23:00:00Z"
+milestone: v1.1
+milestone_name: admin_and_deploy
+status: planning
+stopped_at: v1.0 MVP archived, ready for v1.1 planning
+last_updated: "2026-03-15T23:30:00Z"
 progress:
   total_phases: 7
   completed_phases: 5
@@ -17,16 +17,16 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-21)
+See: .planning/PROJECT.md (updated 2026-03-15 after v1.0 MVP)
 
 **Core value:** Democratizing legal advice by making contract analysis accessible and affordable for non-lawyers.
-**Current focus:** Phase 1 - Core Analysis Foundation
+**Current focus:** Planning v1.1 Admin & Deploy (Phase 6-7)
 
 ## Current Position
 
-**Milestone v1.0: COMPLETE** ✓
+**Milestone v1.0: ARCHIVED** ✓
 
-All 5 phases completed. Ready for Phase 6 (Admin Analytics) or Phase 7 (Production Deployment).
+All 5 phases completed and archived. Ready for v1.1 Admin & Deploy.
 
 Progress: █████████████████████ 100%
 
@@ -177,21 +177,11 @@ Next: Begin Phase 6 (Admin Analytics) or Phase 7 (Production Deployment)
 - ✅ Files up to 10MB upload successfully
 - ✅ Status updates: Pendiente → Analizando → Completado
 
-**Phase 5 Deliverables (COMPLETE):**
-- [x] 05-00: Test suite (24 test cases: free credits, monthly analysis, demo flow)
-- [x] 05-01: Free credit fields + email verification with RPC function
-- [x] 05-02: Monthly free Basic analysis with atomic RPC function
-- [x] 05-03: Interactive homepage demo
+**v1.0 MVP Summary (ARCHIVED):**
+- 5 phases completed across 21 days (2026-02-23 → 2026-03-15)
+- 22 plans executed, 95+ tests, 17/20 requirements complete
+- All artifacts archived to `.planning/milestones/v1.0-mvp-ROADMAP.md`
 
-**Phase 5 Implementation Details:**
-- Migration 20260315000001: `award_free_credits(uuid)` RPC function for atomic credit awards
-- Migration 20260304000001: `process_analysis_transaction_with_free_check` RPC for atomic free analysis
-- profile.get.ts: Calls `award_free_credits` when email verified and not yet awarded
-- analyze.post.ts: Integrated `processAnalysisWithFreeCheck` helper for monthly free Basic analysis
-- FOR UPDATE locks prevent race conditions in both credit award and free analysis
-- Interactive demo uses simulation API with rate limiting (5 requests/day per IP)
-
-**Phase 5 UAT Results:**
-- 10/12 tests passed
-- 2 tests skipped (monthly reset, race condition - technical/deferred)
-- 2 issues found and resolved (credits: 3→0, rate limit 10/hour→5/day)
+**Next: v1.1 Admin & Deploy**
+- Phase 6: Admin Analytics (revenue dashboard, conversion tracking, cost analysis)
+- Phase 7: Production Deployment (Vercel + Railway/Render for workers)
