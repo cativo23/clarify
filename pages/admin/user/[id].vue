@@ -10,6 +10,16 @@ const profile = ref<User | null>(null);
 const analyses = ref<Analysis[]>([]);
 const loading = ref(true);
 const error = ref("");
+const actionLoading = ref(false);
+const successMessage = ref("");
+
+// Credit adjustment form
+const creditAction = ref<"add_credits" | "remove_credits">("add_credits");
+const creditAmount = ref<number | null>(null);
+const creditReason = ref("");
+
+// Suspension form
+const suspensionReason = ref("");
 
 // Computed stats
 const totalAnalyses = computed(() => analyses.value.length);
@@ -26,7 +36,15 @@ const lowRiskCount = computed(
   () => analyses.value.filter((a) => a.risk_level === "low").length,
 );
 
+const isSuspended = computed(() => profile.value?.is_suspended === true);
+
 onMounted(async () => {
+  await loadUserData();
+});
+
+const loadUserData = async () => {
+  loading.value = true;
+  error.value = "";
   try {
     const res = await $fetch<{ profile: User; analyses: Analysis[] }>(
       `/api/admin/user/${id.value}`,
@@ -39,7 +57,71 @@ onMounted(async () => {
   } finally {
     loading.value = false;
   }
-});
+};
+
+const handleCreditAdjustment = async () => {
+  if (!creditAmount.value || creditAmount.value <= 0) {
+    error.value = "Please enter a valid amount";
+    return;
+  }
+  if (!creditReason.value.trim()) {
+    error.value = "Reason is required";
+    return;
+  }
+
+  actionLoading.value = true;
+  error.value = "";
+  successMessage.value = "";
+
+  try {
+    await $fetch(`/api/admin/users/${id.value}`, {
+      method: "PATCH",
+      body: {
+        action: creditAction.value,
+        amount: creditAmount.value,
+        reason: creditReason.value,
+      },
+    });
+    successMessage.value = `Successfully ${creditAction.value === "add_credits" ? "added" : "removed"} ${creditAmount.value} credits`;
+    creditAmount.value = null;
+    creditReason.value = "";
+    await loadUserData();
+  } catch (e: unknown) {
+    console.error(e);
+    error.value = e instanceof Error ? e.message : "Failed to adjust credits";
+  } finally {
+    actionLoading.value = false;
+  }
+};
+
+const handleSuspension = async () => {
+  if (!suspensionReason.value.trim()) {
+    error.value = "Reason is required for suspension";
+    return;
+  }
+
+  actionLoading.value = true;
+  error.value = "";
+  successMessage.value = "";
+
+  try {
+    await $fetch(`/api/admin/users/${id.value}`, {
+      method: "PATCH",
+      body: {
+        action: isSuspended.value ? "unsuspend" : "suspend",
+        reason: suspensionReason.value,
+      },
+    });
+    successMessage.value = `Successfully ${isSuspended.value ? "unsuspended" : "suspended"} user`;
+    suspensionReason.value = "";
+    await loadUserData();
+  } catch (e: unknown) {
+    console.error(e);
+    error.value = e instanceof Error ? e.message : "Failed to update suspension status";
+  } finally {
+    actionLoading.value = false;
+  }
+};
 
 const formatDate = (dateString: string) => {
   if (!dateString) return "-";
@@ -318,6 +400,157 @@ const backToAnalytics = () => {
             <p class="text-3xl font-black text-amber-500">
               {{ mediumRiskCount }}
             </p>
+          </div>
+        </div>
+
+        <!-- Success/Error Messages -->
+        <div v-if="successMessage" class="p-4 bg-success/10 border border-success rounded-2xl">
+          <p class="text-success font-bold">{{ successMessage }}</p>
+        </div>
+
+        <!-- Actions Section -->
+        <div class="grid md:grid-cols-2 gap-6">
+          <!-- Credit Adjustment Form -->
+          <div
+            class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-premium"
+          >
+            <h3 class="text-xl font-black text-slate-900 dark:text-white mb-2">
+              Credit Adjustment
+            </h3>
+            <p class="text-sm font-bold text-slate-500 dark:text-slate-400 mb-6">
+              Add or remove credits from this user's account
+            </p>
+
+            <div class="space-y-4">
+              <!-- Action Type -->
+              <div class="flex gap-4">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input
+                    v-model="creditAction"
+                    type="radio"
+                    value="add_credits"
+                    class="w-4 h-4 text-secondary focus:ring-secondary"
+                  />
+                  <span class="text-sm font-bold text-slate-700 dark:text-slate-300">Add Credits</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input
+                    v-model="creditAction"
+                    type="radio"
+                    value="remove_credits"
+                    class="w-4 h-4 text-risk-high focus:ring-risk-high"
+                  />
+                  <span class="text-sm font-bold text-slate-700 dark:text-slate-300">Remove Credits</span>
+                </label>
+              </div>
+
+              <!-- Amount Input -->
+              <div>
+                <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">
+                  Amount
+                </label>
+                <input
+                  v-model.number="creditAmount"
+                  type="number"
+                  min="1"
+                  placeholder="Enter amount"
+                  class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-secondary transition-all"
+                />
+              </div>
+
+              <!-- Reason Input -->
+              <div>
+                <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">
+                  Reason <span class="text-risk-high">*</span>
+                </label>
+                <input
+                  v-model="creditReason"
+                  type="text"
+                  placeholder="Required for audit trail"
+                  class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-secondary transition-all"
+                />
+              </div>
+
+              <!-- Submit Button -->
+              <button
+                :disabled="actionLoading || !creditAmount || !creditReason"
+                class="w-full py-3 px-6 bg-secondary text-white rounded-xl font-black text-sm uppercase tracking-widest hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                @click="handleCreditAdjustment"
+              >
+                {{ actionLoading ? "Processing..." : "Apply Adjustment" }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Suspension Form -->
+          <div
+            class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-premium"
+          >
+            <h3 class="text-xl font-black text-slate-900 dark:text-white mb-2">
+              Account Suspension
+            </h3>
+            <p class="text-sm font-bold text-slate-500 dark:text-slate-400 mb-6">
+              {{ isSuspended ? "User is currently suspended" : "User account is active" }}
+            </p>
+
+            <!-- Suspension Status Badge -->
+            <div class="mb-6">
+              <span
+                :class="[
+                  'inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-black uppercase tracking-widest',
+                  isSuspended
+                    ? 'bg-risk-high/10 text-risk-high'
+                    : 'bg-success/10 text-success'
+                ]"
+              >
+                <span
+                  class="w-2 h-2 rounded-full"
+                  :class="isSuspended ? 'bg-risk-high' : 'bg-success'"
+                ></span>
+                {{ isSuspended ? "Suspended" : "Active" }}
+              </span>
+            </div>
+
+            <!-- Reason Input -->
+            <div class="mb-4">
+              <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">
+                Reason <span class="text-risk-high">*</span>
+              </label>
+              <textarea
+                v-model="suspensionReason"
+                :placeholder="isSuspended ? 'Optional note for unsuspension' : 'Required for suspension (audit trail)'"
+                rows="3"
+                class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-secondary transition-all resize-none"
+              ></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <button
+              :disabled="actionLoading || (!isSuspended && !suspensionReason)"
+              :class="[
+                'w-full py-3 px-6 rounded-xl font-black text-sm uppercase tracking-widest transition-all',
+                isSuspended
+                  ? 'bg-success text-white hover:opacity-90'
+                  : 'bg-risk-high text-white hover:opacity-90',
+                'disabled:opacity-50 disabled:cursor-not-allowed'
+              ]"
+              @click="handleSuspension"
+            >
+              {{ actionLoading ? "Processing..." : (isSuspended ? "Unsuspend Account" : "Suspend Account") }}
+            </button>
+
+            <!-- Suspension Details (if suspended) -->
+            <div v-if="isSuspended && profile?.suspended_at" class="mt-6 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+              <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">
+                Suspension Details
+              </p>
+              <p class="text-sm text-slate-600 dark:text-slate-400 mb-1">
+                <span class="font-bold">Since:</span> {{ formatDate(profile.suspended_at) }}
+              </p>
+              <p class="text-sm text-slate-600 dark:text-slate-400" v-if="profile.suspension_reason">
+                <span class="font-bold">Reason:</span> {{ profile.suspension_reason }}
+              </p>
+            </div>
           </div>
         </div>
 
