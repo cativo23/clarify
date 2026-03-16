@@ -107,14 +107,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DEMO-01 | Phase 5 | ✅ Complete |
 | ADMIN-01 | Phase 6 Plan 01 | ✅ Complete |
 | ADMIN-02 | Phase 6 Plan 01 | ✅ Complete |
-| ADMIN-03 | Phase 6 | ⏳ Pending |
-| ADMIN-04 | Phase 6 | ⏳ Pending |
+| ADMIN-03 | Phase 6 Plan 02 | ✅ Complete |
+| ADMIN-04 | Phase 6 Plan 02 | ✅ Complete |
 | DEPLOY-01 | Phase 7 | ⏳ Pending |
 
 **Coverage:**
 - v1.1 requirements: 5 total (ADMIN-01/02/03/04, DEPLOY-01)
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 5 ⚠️
+- Complete: 4 (ADMIN-01/02/03/04)
+- Pending: 1 (DEPLOY-01)
 
 ---
 *Requirements defined: 2026-02-21*
