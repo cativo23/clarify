@@ -141,9 +141,12 @@ export default defineEventHandler(async (event) => {
     const revenue = (analysis.credits_used || 1) * CREDIT_PRICE;
 
     // Aggregate by tier
-    tierData[tier].analyses += 1;
-    tierData[tier].revenue += revenue;
-    tierData[tier].aiCost += aiCost;
+    const tierEntry = tierData[tier as keyof typeof tierData];
+    if (tierEntry) {
+      tierEntry.analyses += 1;
+      tierEntry.revenue += revenue;
+      tierEntry.aiCost += aiCost;
+    }
   }
 
   // Build response by tier

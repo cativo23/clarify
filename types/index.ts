@@ -7,6 +7,10 @@ export interface User {
   email: string;
   credits: number;
   is_admin?: boolean;
+  is_suspended?: boolean;
+  suspension_reason?: string | null;
+  suspended_at?: string | null;
+  email_confirmed_at?: string | null;
   created_at: string;
   updated_at: string;
 }
