@@ -25,10 +25,8 @@ Clarify is an AI-powered contract auditing platform (Micro-SaaS) that analyzes l
 ### 📋 v1.1 Admin & Deploy (In Progress)
 
 **Phase 6: Admin Analytics**
-- [ ] 06-01: Admin revenue dashboard (daily/weekly/monthly charts)
-- [ ] 06-02: Conversion funnel (signup → purchase visualization)
-- [ ] 06-03: Cost analysis per tier (token usage vs profit margin)
-- [ ] 06-04: User management UI (add credits, suspend, view history)
+- [ ] 06-01: Admin revenue dashboard + conversion funnel (ADMIN-01, ADMIN-02)
+- [ ] 06-02: Cost analysis + user management UI (ADMIN-03, ADMIN-04)
 
 **Phase 7: Production Deployment**
 - [ ] 07-01: Deploy BullMQ workers to Railway/Render (not Vercel)
@@ -136,11 +134,11 @@ Plans:
   2. Admin sees revenue dashboard (daily/weekly/monthly)
   3. Admin sees cost per analysis vs profit margin
   4. Admin can add credits, suspend users, view history
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 06-01: Fix admin charts (currently not rendering)
-- [ ] 06-02: Add cost analysis per tier using token usage data
+- [ ] 06-01-PLAN.md — Revenue dashboard + conversion funnel (ADMIN-01, ADMIN-02)
+- [ ] 06-02-PLAN.md — Cost analysis + user management UI (ADMIN-03, ADMIN-04)
 
 ### Phase 7: Production Deployment
 **Goal**: Verified production deployment on Vercel with all environments configured
@@ -169,7 +167,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 3. PDF Export & History | 3/3 | ✅ Complete   | 2026-02-24 |
 | 4. Stripe & Monetization | 4/4 | ✅ Complete   | 2026-03-03 |
 | 5. Free Credits & Onboarding | 4/4 | ✅ Complete   | 2026-03-15 |
-| 6. Admin Analytics | 0/4 | ⏳ In Progress | - |
+| 6. Admin Analytics | 0/2 | ⏳ In Progress | - |
 | 7. Production Deployment | 0/4 | ⏳ Pending | - |
 
 ## Requirement Coverage
