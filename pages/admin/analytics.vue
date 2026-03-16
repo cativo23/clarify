@@ -5,10 +5,27 @@ const users = ref<any[]>([]);
 const loading = ref(true);
 const pricing = ref<any[]>([]);
 const estimates = ref<Record<string, number>>({});
+const costData = ref<any>(null);
+const costLoading = ref(false);
+const costRange = ref<"7d" | "30d" | "90d" | "all">("30d");
 const error = ref("");
 
+// Revenue dashboard state
+const revenueData = ref<any>(null);
+const revenueLoading = ref(false);
+const revenueRange = ref<"day" | "week" | "month" | "quarter" | "custom">("month");
+
+// Funnel state
+const funnelData = ref<any>(null);
+const funnelLoading = ref(false);
+const funnelRange = ref<"7d" | "30d" | "90d" | "custom">("30d");
+
 const chartRef = ref<HTMLCanvasElement | null>(null);
+const revenueChartRef = ref<HTMLCanvasElement | null>(null);
+const funnelChartRef = ref<HTMLCanvasElement | null>(null);
 let chartInstance: any = null;
+let revenueChartInstance: any = null;
+let funnelChartInstance: any = null;
 
 // Computed metrics
 const totalUsers = computed(() => users.value.length);
@@ -45,8 +62,51 @@ const loadData = async () => {
   }
 };
 
+const loadCostData = async () => {
+  costLoading.value = true;
+  try {
+    const res = await $fetch(`/api/admin/costs?range=${costRange.value}`);
+    costData.value = res;
+  } catch (e: any) {
+    console.error("Failed to load cost data", e);
+  } finally {
+    costLoading.value = false;
+  }
+};
+
+const loadRevenueData = async () => {
+  revenueLoading.value = true;
+  try {
+    const res = await $fetch(`/api/admin/revenue?range=${revenueRange.value}`);
+    revenueData.value = res;
+    await nextTick();
+    renderRevenueChart();
+  } catch (e: any) {
+    console.error("Failed to load revenue data", e);
+  } finally {
+    revenueLoading.value = false;
+  }
+};
+
+const loadFunnelData = async () => {
+  funnelLoading.value = true;
+  try {
+    const res = await $fetch(`/api/admin/funnel?range=${funnelRange.value}`);
+    funnelData.value = res;
+    await nextTick();
+    renderFunnelChart();
+  } catch (e: any) {
+    console.error("Failed to load funnel data", e);
+  } finally {
+    funnelLoading.value = false;
+  }
+};
+
 onMounted(() => {
   loadData();
+  loadCostData();
+  loadRevenueData();
+  loadFunnelData();
 });
 
 const renderChart = async () => {
@@ -87,6 +147,171 @@ const renderChart = async () => {
     });
   } catch (err) {
     console.warn("Chart.js not available; skip chart render", err);
+  }
+};
+
+const renderRevenueChart = async () => {
+  if (!revenueChartRef.value || !revenueData.value) return;
+  try {
+    const Chart = (await import("chart.js/auto")).default;
+    if (revenueChartInstance) {
+      revenueChartInstance.destroy();
+    }
+    const ctx = revenueChartRef.value.getContext("2d");
+    if (!ctx) return;
+
+    // Sort by date and extract labels and data
+    const sortedRevenue = [...revenueData.value.revenue].sort((a, b) => a.date.localeCompare(b.date));
+    const labels = sortedRevenue.map(r => r.date);
+    const grossRevenue = sortedRevenue.map(r => r.gross_revenue);
+    const netRevenue = sortedRevenue.map(r => r.net_revenue);
+
+    revenueChartInstance = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels,
+        datasets: [
+          {
+            label: "Gross Revenue",
+            data: grossRevenue,
+            borderColor: "#10b981",
+            backgroundColor: "rgba(16, 185, 129, 0.1)",
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+          },
+          {
+            label: "Net Revenue",
+            data: netRevenue,
+            borderColor: "#3b82f6",
+            backgroundColor: "rgba(59, 130, 246, 0.1)",
+            borderWidth: 3,
+            borderDash: [5, 5],
+            fill: false,
+            tension: 0.4,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: "top",
+            labels: {
+              usePointStyle: true,
+              font: { size: 12, weight: "bold" },
+            },
+          },
+          tooltip: {
+            mode: "index",
+            intersect: false,
+            callbacks: {
+              label: (context: any) => {
+                const value = context.parsed.y;
+                return `${context.dataset.label}: $${value.toFixed(2)}`;
+              },
+            },
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: (value: number) => `$${value.toFixed(2)}`,
+              font: { size: 11 },
+            },
+          },
+          x: {
+            ticks: { font: { size: 11 } },
+          },
+        },
+      },
+    });
+  } catch (err) {
+    console.warn("Revenue chart render failed", err);
+  }
+};
+
+const renderFunnelChart = async () => {
+  if (!funnelChartRef.value || !funnelData.value) return;
+  try {
+    const Chart = (await import("chart.js/auto")).default;
+    if (funnelChartInstance) {
+      funnelChartInstance.destroy();
+    }
+    const ctx = funnelChartRef.value.getContext("2d");
+    if (!ctx) return;
+
+    const funnel = funnelData.value.funnel;
+    const labels = funnel.map((f: any) => f.stage);
+    const counts = funnel.map((f: any) => f.count);
+    const rates = funnel.map((f: any) => f.rate);
+
+    // Funnel gradient colors (wide to narrow visually represented)
+    const backgroundColors = [
+      "rgba(99, 102, 241, 0.8)", // accent-indigo
+      "rgba(99, 102, 241, 0.7)",
+      "rgba(99, 102, 241, 0.6)",
+      "rgba(99, 102, 241, 0.5)",
+    ];
+
+    funnelChartInstance = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels,
+        datasets: [
+          {
+            label: "Users",
+            data: counts,
+            backgroundColor: backgroundColors,
+            borderRadius: 8,
+            barPercentage: 0.7,
+          },
+        ],
+      },
+      options: {
+        indexAxis: "y", // Horizontal bar chart for funnel effect
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (context: any) => {
+                const count = context.parsed.x;
+                const rate = rates[context.dataIndex];
+                return `${count} users (${rate.toFixed(1)}% retention)`;
+              },
+            },
+          },
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            ticks: {
+              callback: (value: number) => value.toLocaleString(),
+              font: { size: 11 },
+            },
+            title: {
+              display: true,
+              text: "Users",
+              font: { size: 12, weight: "bold" },
+            },
+          },
+          y: {
+            ticks: { font: { size: 12, weight: "bold" } },
+          },
+        },
+      },
+    });
+  } catch (err) {
+    console.warn("Funnel chart render failed", err);
   }
 };
 
@@ -312,7 +537,211 @@ const formatDate = (dateString: string | null) => {
         </div>
       </div>
 
-      <!-- Charts Section -->
+      <!-- Revenue Dashboard Section -->
+      <div
+        class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-premium mb-8"
+      >
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-xl font-black text-slate-900 dark:text-white">
+              Revenue Dashboard
+            </h2>
+            <p class="text-sm font-bold text-slate-500 dark:text-slate-400">
+              Time-series revenue tracking and package breakdown
+            </p>
+          </div>
+          <!-- Time Range Selector -->
+          <div class="flex items-center gap-2">
+            <button
+              v-for="range in ['day', 'week', 'month', 'quarter']"
+              :key="range"
+              :class="[
+                'px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all',
+                revenueRange === range
+                  ? 'bg-secondary text-white'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+              ]"
+              @click="revenueRange = range as any; loadRevenueData()"
+            >
+              {{ range }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div v-if="revenueLoading" class="py-12 text-center">
+          <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-secondary"></div>
+          <p class="mt-4 text-slate-400 font-bold uppercase tracking-widest text-[10px]">
+            Loading revenue data...
+          </p>
+        </div>
+
+        <!-- Revenue Content -->
+        <div v-else-if="revenueData" class="space-y-6">
+          <!-- Revenue Chart -->
+          <div class="h-72">
+            <canvas ref="revenueChartRef"></canvas>
+          </div>
+
+          <!-- Summary Cards -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700">
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                Total Revenue
+              </p>
+              <p class="text-2xl font-black text-slate-900 dark:text-white">
+                ${{ revenueData.summary.total_revenue.toFixed(2) }}
+              </p>
+            </div>
+            <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700">
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                Net Revenue
+              </p>
+              <p class="text-2xl font-black text-success">
+                ${{ revenueData.summary.total_net_revenue.toFixed(2) }}
+              </p>
+            </div>
+            <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700">
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                Transactions
+              </p>
+              <p class="text-2xl font-black text-slate-900 dark:text-white">
+                {{ revenueData.summary.total_transactions }}
+              </p>
+            </div>
+            <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700">
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                Credits Sold
+              </p>
+              <p class="text-2xl font-black text-slate-900 dark:text-white">
+                {{ revenueData.summary.total_credits_sold }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Package Breakdown -->
+          <div v-if="revenueData.by_package && revenueData.by_package.length > 0">
+            <h3 class="text-sm font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-3">
+              Revenue by Package
+            </h3>
+            <div class="grid md:grid-cols-3 gap-4">
+              <div
+                v-for="pkg in revenueData.by_package"
+                :key="pkg.package"
+                class="p-4 bg-gradient-to-br from-secondary/10 to-accent-indigo/10 rounded-xl border border-secondary/20"
+              >
+                <p class="text-sm font-black text-slate-900 dark:text-white mb-2">
+                  {{ pkg.package }}
+                </p>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-bold text-slate-500">Revenue:</span>
+                  <span class="font-mono font-black text-slate-900 dark:text-white">
+                    ${{ pkg.revenue.toFixed(2) }}
+                  </span>
+                </div>
+                <div class="flex items-center justify-between text-xs mt-1">
+                  <span class="font-bold text-slate-500">Sales:</span>
+                  <span class="font-mono font-black text-slate-900 dark:text-white">
+                    {{ pkg.count }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- No Data State -->
+        <div v-else class="text-center py-12">
+          <p class="text-slate-400 font-bold">No revenue data available</p>
+        </div>
+      </div>
+
+      <!-- Conversion Funnel Section -->
+      <div
+        class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-premium mb-8"
+      >
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-xl font-black text-slate-900 dark:text-white">
+              Conversion Funnel
+            </h2>
+            <p class="text-sm font-bold text-slate-500 dark:text-slate-400">
+              User onboarding journey from signup to first purchase
+            </p>
+          </div>
+          <!-- Time Range Selector -->
+          <div class="flex items-center gap-2">
+            <button
+              v-for="range in ['7d', '30d', '90d']"
+              :key="range"
+              :class="[
+                'px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all',
+                funnelRange === range
+                  ? 'bg-secondary text-white'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+              ]"
+              @click="funnelRange = range as any; loadFunnelData()"
+            >
+              {{ range }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div v-if="funnelLoading" class="py-12 text-center">
+          <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-secondary"></div>
+          <p class="mt-4 text-slate-400 font-bold uppercase tracking-widest text-[10px]">
+            Loading funnel data...
+          </p>
+        </div>
+
+        <!-- Funnel Content -->
+        <div v-else-if="funnelData" class="space-y-6">
+          <!-- Funnel Chart -->
+          <div class="h-64">
+            <canvas ref="funnelChartRef"></canvas>
+          </div>
+
+          <!-- Funnel Stats Grid -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div
+              v-for="(stage, idx) in funnelData.funnel"
+              :key="stage.stage"
+              class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700"
+            >
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                {{ stage.stage }}
+              </p>
+              <p class="text-2xl font-black text-slate-900 dark:text-white mb-1">
+                {{ formatNumber(stage.count) }}
+              </p>
+              <p
+                v-if="idx === 0"
+                class="text-xs font-black text-success"
+              >
+                Starting point
+              </p>
+              <p
+                v-else
+                :class="[
+                  'text-xs font-black',
+                  stage.rate >= 70 ? 'text-success' :
+                  stage.rate >= 50 ? 'text-amber-500' : 'text-risk-high'
+                ]"
+              >
+                {{ stage.rate.toFixed(1) }}% retention
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- No Data State -->
+        <div v-else class="text-center py-12">
+          <p class="text-slate-400 font-bold">No funnel data available</p>
+        </div>
+      </div>
+
+      <!-- Charts Section (Analyses + Pricing) -->
       <div class="grid lg:grid-cols-3 gap-6 mb-8">
         <!-- Analyses Chart -->
         <div
@@ -371,6 +800,176 @@ const formatDate = (dateString: string | null) => {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Cost Analysis Section -->
+      <div
+        class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-premium mb-8"
+      >
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-xl font-black text-slate-900 dark:text-white">
+              Cost Analysis & Profit Margins
+            </h2>
+            <p class="text-sm font-bold text-slate-500 dark:text-slate-400">
+              AI costs and profit margins by analysis tier
+            </p>
+          </div>
+          <!-- Time Range Selector -->
+          <div class="flex items-center gap-2">
+            <button
+              v-for="range in ['7d', '30d', '90d', 'all']"
+              :key="range"
+              :class="[
+                'px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all',
+                costRange === range
+                  ? 'bg-secondary text-white'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+              ]"
+              @click="costRange = range as any; loadCostData()"
+            >
+              {{ range }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div v-if="costLoading" class="py-12 text-center">
+          <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-secondary"></div>
+          <p class="mt-4 text-slate-400 font-bold uppercase tracking-widest text-[10px]">
+            Loading cost data...
+          </p>
+        </div>
+
+        <!-- Cost Data Content -->
+        <div v-else-if="costData" class="space-y-6">
+          <!-- Tier Cards -->
+          <div class="grid md:grid-cols-3 gap-4">
+            <div
+              v-for="tier in costData.by_tier"
+              :key="tier.tier"
+              class="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700"
+            >
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-black text-slate-900 dark:text-white">
+                  {{ tier.tier }}
+                </h3>
+                <span
+                  class="px-2 py-1 bg-accent-indigo/10 text-accent-indigo rounded-md text-[10px] font-black uppercase tracking-widest"
+                >
+                  {{ tier.analyses }} analyses
+                </span>
+              </div>
+
+              <div class="space-y-3">
+                <div class="flex items-center justify-between text-sm">
+                  <span class="font-bold text-slate-500">Revenue:</span>
+                  <span class="font-mono font-black text-slate-900 dark:text-white">
+                    ${{ tier.revenue.toFixed(2) }}
+                  </span>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                  <span class="font-bold text-slate-500">AI Cost:</span>
+                  <span class="font-mono font-black text-risk-high">
+                    ${{ tier.ai_cost.toFixed(4) }}
+                  </span>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                  <span class="font-bold text-slate-500">Gross Margin:</span>
+                  <span
+                    :class="[
+                      'font-mono font-black',
+                      tier.margin_percent >= 80 ? 'text-success' :
+                      tier.margin_percent >= 60 ? 'text-amber-500' : 'text-risk-high'
+                    ]"
+                  >
+                    ${{ tier.gross_margin.toFixed(2) }}
+                  </span>
+                </div>
+                <div class="pt-3 border-t border-slate-200 dark:border-slate-700">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-400">Margin %:</span>
+                    <span
+                      :class="[
+                        'px-2 py-1 rounded-md text-xs font-black',
+                        tier.margin_percent >= 80 ? 'bg-success/10 text-success' :
+                        tier.margin_percent >= 60 ? 'bg-amber-500/10 text-amber-500' : 'bg-risk-high/10 text-risk-high'
+                      ]"
+                    >
+                      {{ tier.margin_percent.toFixed(1) }}%
+                    </span>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-bold text-slate-400">Avg Cost/Analysis:</span>
+                  <span class="font-mono font-black text-slate-600 dark:text-slate-400">
+                    ${{ tier.avg_cost_per_analysis.toFixed(4) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Summary Card -->
+          <div class="p-6 bg-gradient-to-r from-accent-indigo/10 to-secondary/10 rounded-2xl border border-accent-indigo/20">
+            <h4 class="text-sm font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-4">
+              Overall Summary
+            </h4>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                  Total Revenue
+                </p>
+                <p class="text-2xl font-black text-slate-900 dark:text-white">
+                  ${{ costData.summary.total_revenue.toFixed(2) }}
+                </p>
+              </div>
+              <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                  Total AI Cost
+                </p>
+                <p class="text-2xl font-black text-risk-high">
+                  ${{ costData.summary.total_ai_cost.toFixed(4) }}
+                </p>
+              </div>
+              <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                  Total Margin
+                </p>
+                <p class="text-2xl font-black text-success">
+                  ${{ costData.summary.total_margin.toFixed(2) }}
+                </p>
+              </div>
+              <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                  Overall Margin %
+                </p>
+                <p
+                  :class="[
+                    'text-2xl font-black',
+                    costData.summary.overall_margin_percent >= 80 ? 'text-success' :
+                    costData.summary.overall_margin_percent >= 60 ? 'text-amber-500' : 'text-risk-high'
+                  ]"
+                >
+                  {{ costData.summary.overall_margin_percent.toFixed(1) }}%
+                </p>
+              </div>
+            </div>
+            <div class="mt-4 pt-4 border-t border-accent-indigo/20">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-400">Blended Cost per Analysis:</span>
+                <span class="font-mono font-black text-slate-600 dark:text-slate-400">
+                  ${{ costData.summary.blended_cost_per_analysis.toFixed(4) }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- No Data State -->
+        <div v-else class="text-center py-12">
+          <p class="text-slate-400 font-bold">No cost data available</p>
         </div>
       </div>
 
