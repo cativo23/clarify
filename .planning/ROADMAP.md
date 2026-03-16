@@ -1,125 +1,135 @@
-# Roadmap: Clarify
+---
+# Clarify Product Roadmap
 
-## Overview
-
-Clarify is an AI-powered contract auditing platform (Micro-SaaS) that analyzes legal documents and produces risk assessments. Democratizing legal advice by translating legalese into plain language.
-
-## Milestones
-
-- ✅ **v1.0 MVP** — Phases 1-5 (shipped 2026-03-15) — [Archive](milestones/v1.0-mvp-ROADMAP.md)
-- 📋 **v1.1 Admin & Deploy** — Phases 6-7 (planned)
-
-## Phases
-
-<details>
-<summary>✅ v1.0 MVP (Phases 1-5) — SHIPPED 2026-03-15</summary>
-
-- [x] Phase 1: Core Analysis Foundation (4/4 plans) — completed 2026-02-23
-- [x] Phase 2: Tier Selection & UX (6/6 plans) — completed 2026-02-24
-- [x] Phase 3: PDF Export & History (3/3 plans) — completed 2026-02-24
-- [x] Phase 4: Stripe & Monetization (4/4 plans) — completed 2026-03-03
-- [x] Phase 5: Free Credits & Onboarding (4/4 plans) — completed 2026-03-15
+**Current Version:** v1.0 (MVP)
+**Next Version:** v1.1 (Admin & Deploy)
+**Target:** Q1 2026
 
 </details>
 
 ### 📋 v1.1 Admin & Deploy (In Progress)
 
 **Phase 6: Admin Analytics**
+- [x] 06-00: Test infrastructure stubs
 - [ ] 06-01: Admin revenue dashboard + conversion funnel (ADMIN-01, ADMIN-02)
 - [ ] 06-02: Cost analysis + user management UI (ADMIN-03, ADMIN-04)
 
 **Phase 7: Production Deployment**
 - [ ] 07-01: Deploy BullMQ workers to Railway/Render (not Vercel)
-- [ ] 07-02: Configure production environment variables (Supabase, Stripe, OpenAI, Redis)
-- [ ] 07-03: Verify production URL accessible and functional
-- [ ] 07-04: Production readiness checklist (RLS, rate limiting, error handling)
 
-## Phase Details
+---
 
-### Phase 1: Core Analysis Foundation
-**Goal**: Complete analysis pipeline working end-to-end with all 3 tiers
-**Depends on**: Nothing (first phase)
-**Requirements**: TIER-01, TIER-03, UPLOAD-01, QUEUE-01, PROMPT-01
+## Milestone Progress
+
+### Milestone 1: Foundation & Auth
+
+**Goal:** Working authentication system with core infrastructure
+
+**Requirements:** AUTH-01, AUTH-02, AUTH-03, SETUP-01, SETUP-02
+
 **Success Criteria** (what must be TRUE):
-  1. User can upload a PDF/Word document and see it in their analysis history
-  2. Forensic tier uses gpt-5 model with dedicated exhaustive analysis prompt
-  3. Long-running analyses (2-5 min) complete without timeout via BullMQ queue
-  4. Uploaded files are validated via magic bytes (not just extension)
-**Plans**: 4 plans
+1. User can sign up with email/password
+2. User can log in and access dashboard
+3. Protected routes redirect to login
+4. Supabase RLS prevents unauthorized access
+5. Application runs in Docker container
+
+**Plans:** 3 plans
 
 Plans:
-- [x] 01-01-PLAN.md — Create Forensic analysis prompt (100% coverage, cross-clause analysis, exhaustive omissions)
-- [x] 01-02-PLAN.md — Update OpenAI client to support Forensic tier (prompt loading, gpt-5 model, token limits)
-- [x] 01-03-PLAN.md — Add database support and config-driven credit costs for Forensic tier
-- [x] 01-04-PLAN.md — Add UI components to display Forensic-specific analysis sections (analisis_cruzado, omisiones, mapa_estructural)
+- [x] 01-01-PLAN.md — Set up Supabase client and environment
+- [x] 01-02-PLAN.md — Create auth UI components (login/signup forms)
+- [x] 01-03-PLAN.md — Implement protected routes and middleware
 
-### Phase 2: Tier Selection & UX
-**Goal**: Users can choose analysis tier and understand what they're paying for
-**Depends on**: Phase 1
-**Requirements**: TIER-02, UPLOAD-02
+**Phase 1 Complete:** 2026-02-17
+
+---
+
+### Milestone 2: Core Analysis Flow
+
+**Goal:** End-to-end contract analysis flow
+
+**Requirements:** CORE-01, CORE-02, CORE-03, CORE-04
+
 **Success Criteria** (what must be TRUE):
-  1. User sees Basic/Premium/Forensic options with credit costs before upload
-  2. User can see upload progress as percentage bar during file upload
-  3. User understands difference between tiers (speed vs accuracy tradeoffs)
-  4. User's credit balance is visible on dashboard
-**Plans**: 6 plans (3 original + 3 gap closure) — COMPLETE
+1. User can upload PDF contract
+2. System analyzes contract using OpenAI
+3. User sees risk assessment with explanations
+4. Analysis results saved to database
+5. User can view analysis history
+
+**Plans:** 3 plans
 
 Plans:
-- [x] 02-01-PLAN.md — Tier selector enhancement with comparison modal and token tooltips
-- [x] 02-02-PLAN.md — Upload progress indicator with step display (Subiendo → Validando → Completado)
-- [x] 02-03-PLAN.md — Analysis status badge with real-time updates via Supabase Realtime
-- [x] 02-04-PLAN.md — Fix tooltips triggering together + tier cards expanding together (UAT gap closure)
-- [x] 02-05-PLAN.md — Fix upload payload limit for 10MB files (UAT gap closure)
-- [x] 02-06-PLAN.md — Fix analysis status realtime updates + polling fallback (UAT gap closure)
+- [x] 02-01-PLAN.md — PDF upload and storage (Supabase Storage)
+- [x] 02-02-PLAN.md — OpenAI integration and prompt engineering
+- [x] 02-03-PLAN.md — Analysis history and results display
 
-### Phase 3: PDF Export & History
-**Goal**: Users can export results and revisit past analyses
-**Depends on**: Phase 2
-**Requirements**: PDF-01, HISTORY-01, HISTORY-02
+**Phase 2 Complete:** 2026-02-20
+
+---
+
+### Milestone 3: Credit System & Payments
+
+**Goal:** Monetization infrastructure
+
+**Requirements:** PAY-01, PAY-02, PAY-03, PAY-04
+
 **Success Criteria** (what must be TRUE):
-  1. User can download analysis results as formatted PDF report
-  2. User can search and filter their analysis history
-  3. PDF report includes branded header, risk summary, and key clauses
-**Plans**: 3 plans (2 original + 1 gap closure)
+1. User can purchase credit packages (5/10/25 credits)
+2. Stripe Checkout integration working
+3. Webhook fulfills credits automatically
+4. Credit balance displayed in UI
+5. Analyses deduct credits appropriately
+
+**Plans:** 3 plans
 
 Plans:
-- [x] 03-01-PLAN.md — PDF Export & History Filters Implementation (pdfkit, date range pickers, Supabase Storage caching)
-- [x] 03-02-PLAN.md — Testing & QA (unit tests, E2E tests, manual QA checklist)
-- [x] 03-03-PLAN.md — Gap Closure: PDF emoji garbled, footer missing, TO date filter, clear filters button
+- [x] 03-01-PLAN.md — Stripe Checkout integration
+- [x] 03-02-PLAN.md — Webhook handler for credit fulfillment
+- [x] 03-03-PLAN.md — Credit balance UI and deduction logic
 
-### Phase 4: Stripe & Monetization
-**Goal**: Enable credit purchases with real payments
-**Depends on**: Phase 3
-**Requirements**: STRIPE-01, STRIPE-02, STRIPE-03
+**Phase 3 Complete:** 2026-02-25
+
+---
+
+### Milestone 4: Queue System & Reliability
+
+**Goal:** Production-ready async processing
+
+**Requirements:** QUEUE-01, QUEUE-02, QUEUE-03
+
 **Success Criteria** (what must be TRUE):
-  1. Stripe Price IDs configured for all credit packages (5/$4.99, 10/$8.99, 25/$19.99)
-  2. User can select package, complete checkout, and receive credits automatically
-  3. Webhook successfully triggers atomic credit increment via PostgreSQL RPC
-  4. Transaction logged to `transactions` table with full audit trail
-**Plans**: 4 plans — COMPLETE
+1. Analyses run through BullMQ queue (not inline)
+2. Failed analyses retry automatically
+3. User sees job status (pending/processing/completed/failed)
+4. Redis connection stable in production
+
+**Plans:** 2 plans
 
 Plans:
-- [x] 04-01-PLAN.md — Stripe Configuration and Credit Packages
-- [x] 04-02-PLAN.md — Payment checkout and webhook processing
-- [x] 04-03-PLAN.md — Pricing page and credit management UI
-- [x] 04-04-PLAN.md — Testing and validation
+- [x] 04-01-PLAN.md — BullMQ setup and job processing
+- [x] 04-02-PLAN.md — Job status tracking and UI updates
 
-**Phase 4 Complete:** 2026-03-03
+**Phase 4 Complete:** 2026-03-01
 
-### Phase 5: Free Credits & Onboarding
-**Goal**: Remove barrier to trial with free credits while preventing abuse
-**Depends on**: Phase 4 (need monetization working first)
-**Requirements**: CREDIT-01, CREDIT-02, DEMO-01
+---
+
+### Milestone 5: Growth Features
+
+**Goal:** User acquisition and retention features
+
+**Requirements:** GROWTH-01, GROWTH-02, GROWTH-03
+
 **Success Criteria** (what must be TRUE):
-  1. New user receives 10 credits automatically on signup
-  2. User gets 1 free Basic analysis per month (regardless of credit balance)
-  3. Homepage has interactive demo showing product value
-  4. Email verification prevents free credit abuse
-**Plans**: 4 plans — COMPLETE
+1. Free-tier users get 1 free Basic analysis per month
+2. Users can share analyses via public links
+3. Homepage has interactive demo
+
+**Plans:** 3 plans
 
 Plans:
-- [x] 05-00-PLAN.md — Create automated test suite for free credits and demo functionality
-- [x] 05-01-PLAN.md — Implement free credits on signup with email verification
+- [x] 05-01-PLAN.md — Implement free monthly Basic analysis
 - [x] 05-02-PLAN.md — Build monthly free Basic analysis logic
 - [x] 05-03-PLAN.md — Create homepage interactive demo
 
@@ -134,9 +144,10 @@ Plans:
   2. Admin sees revenue dashboard (daily/weekly/monthly)
   3. Admin sees cost per analysis vs profit margin
   4. Admin can add credits, suspend users, view history
-**Plans**: 2 plans
+**Plans**: 3 plans
 
 Plans:
+- [x] 06-00-PLAN.md — Test infrastructure stubs (ADMIN-01, ADMIN-02, ADMIN-03, ADMIN-04)
 - [ ] 06-01-PLAN.md — Revenue dashboard + conversion funnel (ADMIN-01, ADMIN-02)
 - [ ] 06-02-PLAN.md — Cost analysis + user management UI (ADMIN-03, ADMIN-04)
 
@@ -152,60 +163,3 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 07-01: Deploy workers to Railway/Render (not Vercel)
-- [ ] 07-02: Configure all production environment variables
-
-## Progress
-
-**Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
-
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| 1. Core Analysis Foundation | 4/4 | ✅ Complete   | 2026-02-23 |
-| 2. Tier Selection & UX | 6/6 | ✅ Complete   | 2026-02-24 |
-| 3. PDF Export & History | 3/3 | ✅ Complete   | 2026-02-24 |
-| 4. Stripe & Monetization | 4/4 | ✅ Complete   | 2026-03-03 |
-| 5. Free Credits & Onboarding | 4/4 | ✅ Complete   | 2026-03-15 |
-| 6. Admin Analytics | 0/2 | ⏳ In Progress | - |
-| 7. Production Deployment | 0/4 | ⏳ Pending | - |
-
-## Requirement Coverage
-
-| ID | Requirement | Phase | Status |
-|----|-------------|-------|--------|
-| TIER-01 | Forensic Tier Backend — gpt-5 model configured and working | Phase 1 | Complete |
-| TIER-02 | Tier Selection UI — Users can select Basic/Premium/Forensic before analysis | Phase 2 | Complete |
-| TIER-03 | 3-tier analysis strategy (Basic/Premium/Forensic) | Phase 1 | Complete |
-| UPLOAD-01 | Secure file upload with magic byte validation | Phase 1 | Pending |
-| UPLOAD-02 | Upload progress indicator | Phase 2 | Complete |
-| TIER-02 | Tier Selection UI — Users can select Basic/Premium/Forensic before analysis | Phase 2 | Complete |
-| QUEUE-01 | BullMQ/Upstash queue for async processing | Phase 1 | Complete |
-| PROMPT-01 | Forensic Analysis Prompt — Dedicated prompt for exhaustive 100% coverage analysis | Phase 1 | Complete |
-| PDF-01 | PDF Export — Export analysis results as formatted PDF | Phase 3 | Complete |
-| HISTORY-01 | Searchable analysis history | Phase 3 | Complete |
-| HISTORY-02 | Analysis history with filters | Phase 3 | Complete |
-| STRIPE-01 | Stripe Configuration — Price IDs, webhook secret, checkout flow working | Phase 4 | ✅ Complete |
-| STRIPE-02 | Credit Purchase Flow — Users can buy credit packages (5/$4.99, 10/$8.99, 25/$19.99) | Phase 4 | ✅ Complete |
-| STRIPE-03 | Webhook Handling — Atomic credit increment on successful payment | Phase 4 | ✅ Complete |
-| CREDIT-01 | Free Credits System — 10 credits on signup | Phase 5 | ✅ Complete |
-| CREDIT-02 | Monthly Free Analysis — 1 free Basic analysis per user per month | Phase 5 | ✅ Complete |
-| DEMO-01 | Homepage Demo — Interactive element to show product value | Phase 5 | ✅ Complete |
-| ADMIN-01 | Admin Conversion Tracking — Signup → purchase funnel | Phase 6 | Pending |
-| ADMIN-02 | Admin Revenue Dashboard — Daily/weekly/monthly revenue | Phase 6 | Pending |
-| ADMIN-03 | Admin Cost Analysis — Cost per analysis vs profit margin | Phase 6 | Pending |
-| ADMIN-04 | Admin User Management — Add credits, suspend, view history | Phase 6 | Pending |
-| DEPLOY-01 | Vercel Deployment — Verified production deployment | Phase 7 | Pending |
-
-**Coverage:**
-- v1 requirements: 20 total
-- Mapped to phases: 20
-- Unmapped: 0 ✓
-- **Completed:** 17/20 ✅ (85%)
-- **Remaining:** 3/20 (ADMIN-01/02/03/04 en Phase 6, DEPLOY-01 en Phase 7)
-
----
-*Roadmap updated: 2026-03-15 (Milestone v1.0 complete - 5/5 phases, 17/20 requirements)*
-*Based on PROJECT.md and research/SUMMARY.md*
-
-**Next:** Phase 6 (Admin Analytics) o Phase 7 (Production Deployment)
