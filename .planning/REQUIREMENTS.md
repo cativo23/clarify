@@ -10,7 +10,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Analysis Tiers
 
-- [ ] **TIER-01**: Forensic Tier Backend — gpt-5 model configured and working
+- [x] **TIER-01**: Forensic Tier Backend — gpt-5 model configured and working
 - [x] **TIER-02**: Tier Selection UI — Users can select Basic/Premium/Forensic before analysis
 - [x] **TIER-03**: 3-tier analysis strategy with clear credit costs (1/3/10 credits)
 
@@ -20,15 +20,15 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Upload & Queue
 
-- [ ] **UPLOAD-01**: Secure file upload with magic byte validation (not just extension)
-- [ ] **UPLOAD-02**: Upload progress indicator showing percentage during file transfer
+- [x] **UPLOAD-01**: Secure file upload with magic byte validation (not just extension)
+- [x] **UPLOAD-02**: Upload progress indicator showing percentage during file transfer
 - [x] **QUEUE-01**: BullMQ/Upstash queue for async processing of long-running analyses
 
 ### PDF & History
 
-- [ ] **PDF-01**: PDF Export — Export analysis results as formatted PDF report
-- [ ] **HISTORY-01**: Searchable analysis history with full-text search
-- [ ] **HISTORY-02**: Analysis history with filters (date range, tier, risk level)
+- [x] **PDF-01**: PDF Export — Export analysis results as formatted PDF report
+- [x] **HISTORY-01**: Searchable analysis history with full-text search
+- [x] **HISTORY-02**: Analysis history with filters (date range, tier, risk level)
 
 ### Stripe & Payments
 
@@ -89,33 +89,35 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TIER-01 | Phase 1 | In Progress |
-| TIER-02 | Phase 2 | Complete |
-| TIER-03 | Phase 1 | In Progress |
-| PROMPT-01 | Phase 1 | Complete |
-| UPLOAD-01 | Phase 1 | Pending |
-| UPLOAD-02 | Phase 2 | Pending |
-| QUEUE-01 | Phase 1 | Complete |
-| PDF-01 | Phase 3 | Pending |
-| HISTORY-01 | Phase 3 | Pending |
-| HISTORY-02 | Phase 3 | Pending |
-| STRIPE-01 | Phase 4 | Complete |
-| STRIPE-02 | Phase 4 | Complete |
-| STRIPE-03 | Phase 4 | Complete |
-| CREDIT-01 | Phase 5 | Complete |
-| CREDIT-02 | Phase 5 | Complete |
-| DEMO-01 | Phase 5 | Complete |
-| ADMIN-01 | Phase 6 | Pending |
-| ADMIN-02 | Phase 6 | Pending |
-| ADMIN-03 | Phase 6 | Pending |
-| ADMIN-04 | Phase 6 | Pending |
-| DEPLOY-01 | Phase 7 | Pending |
+| TIER-01 | Phase 1 | ✅ Complete |
+| TIER-02 | Phase 2 | ✅ Complete |
+| TIER-03 | Phase 1 | ✅ Complete |
+| PROMPT-01 | Phase 1 | ✅ Complete |
+| UPLOAD-01 | Phase 1 | ✅ Complete |
+| UPLOAD-02 | Phase 2 | ✅ Complete |
+| QUEUE-01 | Phase 1 | ✅ Complete |
+| PDF-01 | Phase 3 | ✅ Complete |
+| HISTORY-01 | Phase 3 | ✅ Complete |
+| HISTORY-02 | Phase 3 | ✅ Complete |
+| STRIPE-01 | Phase 4 | ✅ Complete |
+| STRIPE-02 | Phase 4 | ✅ Complete |
+| STRIPE-03 | Phase 4 | ✅ Complete |
+| CREDIT-01 | Phase 5 | ✅ Complete |
+| CREDIT-02 | Phase 5 | ✅ Complete |
+| DEMO-01 | Phase 5 | ✅ Complete |
+| ADMIN-01 | Phase 6 | ⏳ Pending |
+| ADMIN-02 | Phase 6 | ⏳ Pending |
+| ADMIN-03 | Phase 6 | ⏳ Pending |
+| ADMIN-04 | Phase 6 | ⏳ Pending |
+| DEPLOY-01 | Phase 7 | ⏳ Pending |
 
 **Coverage:**
 - v1 requirements: 20 total
 - Mapped to phases: 20
 - Unmapped: 0 ✓
+- **v1.0 Complete:** 17/20 (85%) — Phases 1-5
+- **Remaining:** 3/20 — Phase 6 (Admin) + Phase 7 (Deploy)
 
 ---
 *Requirements defined: 2026-02-21*
-*Last updated: 2026-02-22 after roadmap adjustment*
+*Last updated: 2026-03-15 — v1.0 MVP complete (17/20 requirements)*

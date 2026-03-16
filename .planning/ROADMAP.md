@@ -4,20 +4,28 @@
 
 Clarify is an AI-powered contract auditing platform (Micro-SaaS) that analyzes legal documents and produces risk assessments. Democratizing legal advice by translating legalese into plain language.
 
+## Milestones
+
+- ✅ **v1.0 MVP** — Phases 1-5 (shipped 2026-03-15) — [Archive](milestones/v1.0-mvp-ROADMAP.md)
+- 📋 **v1.1 Admin & Deploy** — Phases 6-7 (planned)
+
 ## Phases
 
-**Phase Numbering:**
-- Integer phases (1, 2, 3): Planned milestone work
-- Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
-- Decimal phases appear between their surrounding integers in numeric order.
+<details>
+<summary>✅ v1.0 MVP (Phases 1-5) — SHIPPED 2026-03-15</summary>
 
-- [x] **Phase 1: Core Analysis Foundation** - Complete 3-tier analysis backend with secure upload and async processing
-- [x] **Phase 2: Tier Selection & UX** - Users can select analysis tier and see progress during upload/analysis
-- [x] **Phase 3: PDF Export & History** - Export results as branded PDF, searchable analysis history
-- [x] **Phase 4: Stripe & Monetization** - Enable credit purchases with real payments
-- [x] **Phase 5: Free Credits & Onboarding** - 10 credits on signup + 1 free Basic analysis/month
-- [ ] **Phase 6: Admin Analytics** - Revenue dashboard, conversion tracking, cost analysis, user management
-- [ ] **Phase 7: Production Deployment** - Vercel deployment verified with all environments configured
+- [x] Phase 1: Core Analysis Foundation (4/4 plans) — completed 2026-02-23
+- [x] Phase 2: Tier Selection & UX (6/6 plans) — completed 2026-02-24
+- [x] Phase 3: PDF Export & History (3/3 plans) — completed 2026-02-24
+- [x] Phase 4: Stripe & Monetization (4/4 plans) — completed 2026-03-03
+- [x] Phase 5: Free Credits & Onboarding (4/4 plans) — completed 2026-03-15
+
+</details>
+
+### 📋 v1.1 Admin & Deploy (Planned)
+
+- [ ] Phase 6: Admin Analytics (2 plans) — Revenue dashboard, conversion tracking, cost analysis
+- [ ] Phase 7: Production Deployment (2 plans) — Vercel deployment, environment configuration
 
 ## Phase Details
 
