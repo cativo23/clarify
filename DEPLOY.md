@@ -41,8 +41,25 @@ Clarify uses GitHub Actions for automated deployments. When you create a release
 
 Go to `Settings → Secrets and variables → Actions` and add:
 
+#### 1. Create RELEASE_PAT (Required for auto-deploy)
+
+The `RELEASE_PAT` is a Personal Access Token that allows the auto-release workflow to trigger the deploy workflow. Without it, releases created by Actions won't trigger downstream workflows.
+
+```bash
+# Go to https://github.com/settings/tokens/new
+# Scope: repo (full control of private repositories)
+# Token name: clarify-release-pat
+# Expiration: No expiration (or set as needed)
+
+# Copy the token and add as secret:
+gh secret set RELEASE_PAT <<< "ghp_your-token-here"
+```
+
+#### 2. Docker Hub & SSH Secrets
+
 | Secret | Description | Example |
 |--------|-------------|---------|
+| `RELEASE_PAT` | Personal Access Token with `repo` scope (triggers deploy workflow) | `ghp_xxx` |
 | `DOCKER_USERNAME` | Docker Hub username | `cativo23` |
 | `DOCKER_PASSWORD` | Docker Hub token (not password) | `dckr_pat_xxx` |
 | `SSH_HOST` | Your server IP/hostname | `cativo.dev` |
