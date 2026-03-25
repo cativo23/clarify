@@ -17,6 +17,12 @@ function prepareSummaryForStorage(summary: any): any {
 }
 
 export default defineNitroPlugin((_nitroApp) => {
+  // Skip worker initialization if disabled via env (e.g., HTTP-only containers)
+  if (process.env.DISABLE_WORKER === "true") {
+    console.log("[Worker] Worker disabled via DISABLE_WORKER=true — HTTP-only mode");
+    return;
+  }
+
   const worker = new Worker(
     "analysis-queue",
     async (job) => {
@@ -141,7 +147,7 @@ export default defineNitroPlugin((_nitroApp) => {
     },
     {
       connection: getRedisConnection() as any, // Cast to any to resolve ioredis version mismatch
-      concurrency: 2, // Process up to 2 jobs at the same time
+      concurrency: parseInt(process.env.BULLMQ_CONCURRENCY || '2', 10),
       defaultJobOptions: {
         attempts: 3,
         backoff: {

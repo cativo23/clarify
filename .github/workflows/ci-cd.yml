@@ -1,16 +1,18 @@
 name: CI/CD Pipeline
 
 on:
-  push:
-    branches: [ main, develop ]
   pull_request:
-    branches: [ main ]
+    branches: [ develop ]
+
+  release:
+    types: [published]
 
 jobs:
   lint-and-typecheck:
     name: Lint & Type Check
     runs-on: ubuntu-latest
-    
+    if: github.event_name == 'pull_request'
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -33,67 +35,103 @@ jobs:
         continue-on-error: false
 
   build:
-    name: Build Application
     runs-on: ubuntu-latest
-    needs: lint-and-typecheck
-    
+    if: github.event_name == 'release'
+
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
         with:
-          node-version: '24'
-          cache: 'npm'
+          ref: ${{ github.event.release.tag_name }}
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Build application
-        run: npm run build
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
-          name: build-output
-          path: .output
-          retention-days: 7
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-  deploy-production:
-    name: Deploy to Vercel (Production)
-    runs-on: ubuntu-latest
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKER_USERNAME }}/clarify
+          tags: |
+            type=raw,value=${{ github.event.release.tag_name }}
+            type=raw,value=latest
+            type=sha
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/clarify:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/clarify:buildcache,mode=max
+
+  deploy:
+    name: Deploy to Home Server
     needs: build
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--prod'
-
-  deploy-preview:
-    name: Deploy to Vercel (Preview)
     runs-on: ubuntu-latest
-    needs: build
-    if: github.event_name == 'pull_request'
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    if: github.event_name == 'release'
 
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
+    env:
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+      SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      SSH_PORT: ${{ secrets.SSH_PORT }}
+      DEPLOY_DIR: /home/cativo23/deploy/clarify-deploy
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Copy compose file to server
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ env.SSH_HOST }}
+          username: ${{ env.SSH_USERNAME }}
+          key: ${{ env.SSH_KEY }}
+          port: ${{ env.SSH_PORT }}
+          source: "docker-compose.prod.yml"
+          target: ${{ env.DEPLOY_DIR }}
+
+      - name: Copy .env.example to server
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ env.SSH_HOST }}
+          username: ${{ env.SSH_USERNAME }}
+          key: ${{ env.SSH_KEY }}
+          port: ${{ env.SSH_PORT }}
+          source: ".env.example"
+          target: ${{ env.DEPLOY_DIR }}
+
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ env.SSH_HOST }}
+          username: ${{ env.SSH_USERNAME }}
+          key: ${{ env.SSH_KEY }}
+          port: ${{ env.SSH_PORT }}
+          script: |
+            set -e
+            cd ${{ env.DEPLOY_DIR }}
+
+            if [ ! -f .env ]; then
+              cp .env.example .env
+              echo "ERROR: Created .env from .env.example - you must update with real values!"
+              echo "SSH into server and edit .env file, then run: docker compose -f docker-compose.prod.yml up -d"
+              exit 1
+            fi
+
+            docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans
+            docker image prune -f --filter "until=24h"
+            docker compose -f docker-compose.prod.yml ps

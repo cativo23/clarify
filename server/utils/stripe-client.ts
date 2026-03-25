@@ -16,21 +16,29 @@ export const CREDIT_PACKAGES = [
     id: "pack_5",
     credits: 5,
     price: 4.99,
-    priceId: "price_5credits", // Replace with actual Stripe Price ID
+    priceId:
+      process.env.STRIPE_PRICE_ID_5_CREDITS || "price_1T72OFBSsmi2pAzgSUOz2R9j", // 5 credits package
+    productId: "prod_U5Cnr6Ap3EEMRi", // 5 credits product
     popular: false,
   },
   {
     id: "pack_10",
     credits: 10,
     price: 8.99,
-    priceId: "price_10credits",
+    priceId:
+      process.env.STRIPE_PRICE_ID_10_CREDITS ||
+      "price_1T72OcBSsmi2pAzgTwyIdfA2", // 10 credits package
+    productId: "prod_U5CoJApTkeFoaZ", // 10 credits product
     popular: true,
   },
   {
     id: "pack_25",
     credits: 25,
     price: 19.99,
-    priceId: "price_25credits",
+    priceId:
+      process.env.STRIPE_PRICE_ID_25_CREDITS ||
+      "price_1T72OwBSsmi2pAzgQ0838mN0", // 25 credits package
+    productId: "prod_U5CoyWM9uTAemH", // 25 credits product
     popular: false,
   },
 ];
@@ -73,6 +81,7 @@ export const createCheckoutSession = async (
 export const updateUserCreditsInDb = async (
   userId: string,
   credits: number,
+  stripePaymentId?: string,
 ) => {
   const config = useRuntimeConfig();
   const { createClient } = await import("@supabase/supabase-js");
@@ -102,14 +111,30 @@ export const updateUserCreditsInDb = async (
   console.log(
     `Successfully added ${credits} credits to user ${userId}. New balance: ${newCredits}`,
   );
-  // Log transaction
-  await supabaseAdmin.from("transactions").insert({
-    user_id: userId,
-    amount: 0, // We don't have the amount here easily available without more logic, typically price
-    credits: credits,
-    type: "purchase",
-    description: `Purchase of ${credits} credits via Stripe`,
-  });
+
+  // Find the package to get the price for transaction logging
+  const packageInfo = CREDIT_PACKAGES.find((pack) => pack.credits === credits);
+  const price = packageInfo ? packageInfo.price : 0;
+
+  // Log transaction - only if credits were successfully updated
+  const { error: transactionError } = await supabaseAdmin
+    .from("transactions")
+    .insert({
+      user_id: userId,
+      stripe_payment_id: stripePaymentId, // Use payment intent ID for tracking
+      amount: price, // Using the actual package price
+      credits_purchased: credits,
+      type: "purchase",
+      description: `Purchase of ${credits} credits via Stripe`,
+    });
+
+  if (transactionError) {
+    console.error(
+      `Error logging transaction for user ${userId}:`,
+      transactionError,
+    );
+    // Don't return false here as credits were updated successfully
+  }
 
   return true;
 };
@@ -124,7 +149,11 @@ export const handleWebhookEvent = async (event: Stripe.Event) => {
       const credits = parseInt(session.metadata?.credits || "0");
 
       if (userId && credits > 0) {
-        await updateUserCreditsInDb(userId, credits);
+        const paymentIntentId =
+          typeof session.payment_intent === "string"
+            ? session.payment_intent
+            : session.payment_intent?.id;
+        await updateUserCreditsInDb(userId, credits, paymentIntentId);
       }
       break;
     }

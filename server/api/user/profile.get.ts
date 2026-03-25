@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
       const newProfile = {
         id: user.id,
         email: user.email,
-        credits: 3, // Default starting credits
+        credits: 0, // Start with 0 credits, email verification trigger awards 10
       };
 
       // Use Service Role to bypass RLS during creation
@@ -79,6 +79,35 @@ export default defineEventHandler(async (event) => {
         });
       }
       profile = createdProfile;
+    }
+
+    // Award 10 free credits if email is verified and user hasn't received them yet
+    const supabaseAdmin = serverSupabaseServiceRole(event);
+
+    if (
+      user.email_confirmed_at &&
+      (!profile.free_credits_awarded || profile.free_credits_awarded === false)
+    ) {
+      console.log('Awarding 10 free credits to verified user:', user.id);
+
+      // Use atomic RPC to prevent race conditions
+      const { data: result, error: rpcError } = await supabaseAdmin.rpc(
+        'award_free_credits',
+        { user_id: user.id }
+      );
+
+      if (rpcError) {
+        console.error('Error awarding free credits:', rpcError);
+      } else {
+        console.log('Free credits awarded successfully:', result);
+        // Refresh profile to get updated credits
+        const { data: updatedProfile } = await client
+          .from('users')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+        profile = updatedProfile || profile;
+      }
     }
 
     const finalProfile = {

@@ -1,0 +1,131 @@
+name: Auto Release
+
+# Creates a GitHub Release when:
+# - A commit is pushed to main with conventional commit message
+# - Manually triggered via GitHub Actions UI
+#
+# This enables automated versioning and triggers the deploy workflow
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Version type (patch, minor, major)'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ steps.tag.outputs.new_version }}
+      tag: ${{ steps.tag.outputs.tag }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get current version
+        id: current
+        run: |
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "current_version=${LATEST_TAG#v}" >> $GITHUB_OUTPUT
+
+      - name: Calculate new version
+        id: tag
+        run: |
+          CURRENT="${{ steps.current.outputs.current_version }}"
+          VERSION_TYPE="${{ github.event.inputs.version_type || 'patch' }}"
+
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
+
+          case "$VERSION_TYPE" in
+            major)
+              MAJOR=$((MAJOR + 1))
+              MINOR=0
+              PATCH=0
+              ;;
+            minor)
+              MINOR=$((MINOR + 1))
+              PATCH=0
+              ;;
+            patch)
+              PATCH=$((PATCH + 1))
+              ;;
+          esac
+
+          NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          NEW_TAG="v${NEW_VERSION}"
+
+          echo "new_version=${NEW_VERSION}" >> $GITHUB_OUTPUT
+          echo "tag=${NEW_TAG}" >> $GITHUB_OUTPUT
+
+      - name: Check if release is needed
+        id: check
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+          if [ -z "$LAST_TAG" ]; then
+            echo "needs_release=true" >> $GITHUB_OUTPUT
+          else
+            COMMITS=$(git log --oneline ${LAST_TAG}..HEAD 2>/dev/null | wc -l)
+            if [ "$COMMITS" -gt 0 ]; then
+              echo "needs_release=true" >> $GITHUB_OUTPUT
+            else
+              echo "needs_release=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+      - name: Generate changelog
+        id: changelog
+        if: steps.check.outputs.needs_release == 'true'
+        env:
+          LAST_TAG: ${{ steps.check.outputs.last_tag }}
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+          if [ -z "$LAST_TAG" ]; then
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" HEAD)
+          else
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" "${LAST_TAG}"..HEAD)
+          fi
+
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        if: steps.check.outputs.needs_release == 'true'
+        uses: actions/create-release@v1
+        env:
+          # Must use PAT (not GITHUB_TOKEN) to trigger downstream workflows
+          # See: https://docs.github.com/en/actions/security-for-github-actions/security-guides/automatic-token-authentication#using-the-github_token-in-a-workflow
+          GITHUB_TOKEN: ${{ secrets.RELEASE_PAT }}
+          RELEASE_TAG: ${{ steps.tag.outputs.tag }}
+          CHANGELOG: ${{ steps.changelog.outputs.changelog }}
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          release_name: Release ${{ steps.tag.outputs.tag }}
+          body: |
+            ## Changes
+
+            ${{ env.CHANGELOG }}
+
+            ---
+            *This release was created automatically by the Auto Release workflow*
+          draft: false
+          prerelease: false
+
+      - name: Skip - no new commits
+        if: steps.check.outputs.needs_release != 'true'
+        run: |
+          echo "No new commits since last release. Skipping release creation."

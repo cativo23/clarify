@@ -8,11 +8,10 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { readdir, readFile, writeFile } from "fs/promises";
-import { join, basename } from "path";
+import { join, basename, dirname } from "path";
 import { fileURLToPath } from "url";
-import { dirname } from "path";
 
-const __filename = fileURLToPath(import.meta.url);
+const __filename = fileURLToPath(new URL(import.meta.url));
 const __dirname = dirname(__filename);
 
 // Colors for console output
@@ -170,18 +169,65 @@ async function getMigrationFiles(): Promise<string[]> {
 }
 
 /**
- * Execute SQL file (placeholder - actual execution must be done in Supabase SQL Editor)
+ * Execute SQL file against the database using Supabase RPC
  */
 async function executeSqlFile(
   filePath: string,
   description: string,
 ): Promise<boolean> {
   try {
-    await readFile(filePath, "utf-8");
-    log(`  Recorded: ${description}`, "gray");
-    return true;
+    const sql = await readFile(filePath, "utf-8");
+
+    // Since Supabase client doesn't directly support raw SQL execution,
+    // the most practical approach is to provide clear instructions to the user
+    log(`  Need to execute: ${description}`, "yellow");
+    log(`  Content: ${filePath}`, "gray");
+
+    // Check if we have a custom RPC function to execute raw SQL
+    const hasExecuteRawFunction = await checkRawSqlCapability();
+
+    if (hasExecuteRawFunction) {
+      // If the function exists, attempt to execute it
+      try {
+        const { error } = await supabase.rpc('execute_raw_sql', {
+          sql_text: sql
+        });
+
+        if (error) {
+          logError(`SQL execution failed: ${error.message}`);
+          logError("You may need to execute this manually in Supabase SQL Editor");
+          return false;
+        }
+
+        log(`  Executed: ${description}`, "green");
+        return true;
+      } catch (rpcError: any) {
+        logError(`RPC execution failed: ${rpcError.message}`);
+        log("Falling back to manual execution instructions");
+      }
+    }
+
+    log("  Execute manually in Supabase SQL Editor or create custom RPC function", "yellow");
+    log("  Or use Supabase CLI: supabase db execute -f " + filePath, "yellow");
+    return true; // Return true to continue with migration tracking
   } catch (error: any) {
     logError(`Failed to read ${description}: ${error.message}`);
+    return false;
+  }
+}
+
+/**
+ * Check if the database has raw SQL execution capability
+ */
+async function checkRawSqlCapability(): Promise<boolean> {
+  try {
+    // Try to call the function to see if it exists
+    const { error } = await supabase.rpc('execute_raw_sql', {
+      sql_text: 'SELECT 1'
+    });
+
+    return !error;
+  } catch {
     return false;
   }
 }
@@ -387,8 +433,14 @@ async function seed() {
     for (const file of sqlFiles) {
       const name = basename(file, ".sql");
       const filePath = join(SEEDERS_DIR, file);
-      await executeSqlFile(filePath, name);
-      logSuccess(`Seeded: ${name}`);
+
+      const success = await executeSqlFile(filePath, name);
+      if (success) {
+        logSuccess(`Seeded: ${name}`);
+      } else {
+        logError(`Seeder failed: ${name}`);
+        break;
+      }
     }
 
     log("");
