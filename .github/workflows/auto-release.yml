@@ -34,11 +34,19 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get current version
+      - name: Get version from branch name
         id: current
         run: |
-          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-          echo "current_version=${LATEST_TAG#v}" >> $GITHUB_OUTPUT
+          # Extract version from branch name (e.g., release/v1.0.0-alpha.15 → v1.0.0-alpha.15)
+          BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+          if [[ "$BRANCH_NAME" =~ ^release/(v.+) ]]; then
+            VERSION="${BASH_REMATCH[1]}"
+          else
+            # Fallback to latest tag
+            VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          fi
+          echo "current_version=${VERSION#v}" >> $GITHUB_OUTPUT
+          echo "Using version from branch: $VERSION"
 
       - name: Calculate new version
         id: tag
