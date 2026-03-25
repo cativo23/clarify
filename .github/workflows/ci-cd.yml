@@ -1,43 +1,13 @@
 name: CI/CD Pipeline
 
 on:
-  pull_request:
-    branches: [ develop ]
-
   release:
     types: [published]
 
 jobs:
-  lint-and-typecheck:
-    name: Lint & Type Check
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run ESLint
-        run: npm run lint
-        continue-on-error: true
-
-      - name: Run Type Check
-        run: npm run typecheck
-        continue-on-error: false
-
   build:
     runs-on: ubuntu-latest
-    if: github.event_name == 'release'
-
+    environment: prod
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -78,15 +48,10 @@ jobs:
     name: Deploy to Home Server
     needs: build
     runs-on: ubuntu-latest
-    if: github.event_name == 'release'
-
+    environment: prod
     env:
-      SSH_HOST: ${{ secrets.SSH_HOST }}
-      SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
-      SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      SSH_PORT: ${{ secrets.SSH_PORT }}
-      DEPLOY_DIR: /home/cativo23/deploy/clarify-deploy
-
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -96,42 +61,39 @@ jobs:
       - name: Copy compose file to server
         uses: appleboy/scp-action@v1
         with:
-          host: ${{ env.SSH_HOST }}
-          username: ${{ env.SSH_USERNAME }}
-          key: ${{ env.SSH_KEY }}
-          port: ${{ env.SSH_PORT }}
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
           source: "docker-compose.prod.yml"
-          target: ${{ env.DEPLOY_DIR }}
-
-      - name: Copy .env.example to server
-        uses: appleboy/scp-action@v1
-        with:
-          host: ${{ env.SSH_HOST }}
-          username: ${{ env.SSH_USERNAME }}
-          key: ${{ env.SSH_KEY }}
-          port: ${{ env.SSH_PORT }}
-          source: ".env.example"
-          target: ${{ env.DEPLOY_DIR }}
+          target: "/home/cativo23/deploy/clarify-deploy"
+          debug: true
+          timeout: 10m
+          command_timeout: 10m
+          proxy_timeout: 10m
+          tar_exec: tar
+          tar_dereference: true
 
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ env.SSH_HOST }}
-          username: ${{ env.SSH_USERNAME }}
-          key: ${{ env.SSH_KEY }}
-          port: ${{ env.SSH_PORT }}
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          envs: DOCKER_USERNAME,DOCKER_PASSWORD
           script: |
-            set -e
-            cd ${{ env.DEPLOY_DIR }}
+            cd /home/cativo23/deploy/clarify-deploy
 
-            if [ ! -f .env ]; then
-              cp .env.example .env
-              echo "ERROR: Created .env from .env.example - you must update with real values!"
-              echo "SSH into server and edit .env file, then run: docker compose -f docker-compose.prod.yml up -d"
-              exit 1
-            fi
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
             docker compose -f docker-compose.prod.yml pull
-            docker compose -f docker-compose.prod.yml up -d --remove-orphans
-            docker image prune -f --filter "until=24h"
-            docker compose -f docker-compose.prod.yml ps
+            docker compose -f docker-compose.prod.yml down || true
+            docker compose -f docker-compose.prod.yml up -d
+
+            sleep 10
+
+            docker image prune -f
+
+            echo "=== Deployment Logs ==="
+            docker compose -f docker-compose.prod.yml logs --tail=50
