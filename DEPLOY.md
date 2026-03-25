@@ -30,15 +30,130 @@
 └─────────────────────────────────────────────────────┘
 ```
 
-## Prerequisites
+## Automated Deployment (Recommended)
+
+Clarify uses GitHub Actions for automated deployments. When you create a release:
+
+1. **Auto-release workflow** creates versioned releases from commits to `main`
+2. **CI/CD workflow** builds Docker image and deploys to your home server
+
+### Setup GitHub Secrets
+
+Go to `Settings → Secrets and variables → Actions` and add:
+
+| Secret | Description | Example |
+|--------|-------------|---------|
+| `DOCKER_USERNAME` | Docker Hub username | `cativo23` |
+| `DOCKER_PASSWORD` | Docker Hub token (not password) | `dckr_pat_xxx` |
+| `SSH_HOST` | Your server IP/hostname | `cativo.dev` |
+| `SSH_USERNAME` | SSH username | `cativo23` |
+| `SSH_PRIVATE_KEY` | SSH private key for deployment | `-----BEGIN OPENSSH PRIVATE KEY-----...` |
+| `SSH_PORT` | SSH port | `22` |
+
+### Create Docker Hub Token
+
+```bash
+# Go to https://hub.docker.com/settings/security
+# Create access token with Read, Write, Delete permissions
+# Copy and save as DOCKER_PASSWORD secret
+```
+
+### Setup SSH Key for GitHub Actions
+
+```bash
+# Generate dedicated deploy key
+ssh-keygen -t ed25519 -f github-deploy -C "github-actions-deploy"
+
+# Copy public key to server
+ssh-copy-id -i github-deploy.pub cativo23@cativo.dev
+
+# Add private key as GitHub secret
+cat github-deploy | gh secret set SSH_PRIVATE_KEY
+
+# Cleanup
+rm github-deploy github-deploy.pub
+```
+
+### Configure GitHub Variables (optional)
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `DEPLOY_DIR` | Deployment directory on server | `/home/cativo23/deploy/clarify-deploy` |
+
+### First-Time Server Setup
+
+```bash
+# SSH into your server
+ssh cativo23@cativo.dev
+
+# Create deployment directory
+mkdir -p /home/cativo23/deploy/clarify-deploy
+cd /home/cativo23/deploy/clarify-deploy
+
+# Clone or copy docker-compose.prod.yml here
+# (The GitHub Actions workflow will copy this file automatically)
+
+# Create .env from template and fill in real values
+cp /path/to/clarify/.env.example .env
+nano .env  # Edit with production values
+```
+
+### Trigger a Deployment
+
+**Option 1: Auto-release on push to main**
+
+```bash
+# Make your changes
+git add .
+git commit -m "feat: add new feature"
+git push origin main
+
+# Auto-release workflow creates a patch release
+# CI/CD workflow deploys automatically
+```
+
+**Option 2: Manual release with version control**
+
+```bash
+# Go to GitHub Actions → Auto Release → Run workflow
+# Select version type: patch, minor, or major
+# This creates a release and triggers deployment
+```
+
+**Option 3: Manual GitHub Release**
+
+```bash
+# Go to GitHub → Releases → Create new release
+# Create a new tag (e.g., v1.0.0)
+# Publish release
+# CI/CD workflow triggers automatically
+```
+
+### Monitor Deployment
+
+```bash
+# In GitHub Actions, watch the CI/CD workflow run
+# Check "Deploy to Home Server" job output
+
+# On server, check deployment status
+ssh cativo23@cativo.dev
+docker compose -f /home/cativo23/deploy/clarify-deploy/docker-compose.prod.yml ps
+docker compose -f /home/cativo23/deploy/clarify-deploy/docker-compose.prod.yml logs -f
+```
+
+---
+
+## Manual Deployment (Alternative)
+
+### Prerequisites
 
 - Docker & Docker Compose installed
 - Traefik reverse proxy running with `space-server_web` network
 - SSL certificates configured (Let's Encrypt)
 
-## Deployment Steps
+### Deployment Steps
 
-### 1. Clone repository on server
+#### 1. Clone repository on server
 
 ```bash
 ssh cativo23@cativo.dev
@@ -47,12 +162,11 @@ git clone https://github.com/cativo23/clarify.git
 cd clarify
 ```
 
-### 2. Configure environment variables
+#### 2. Configure environment variables
 
 ```bash
 cp .env.example .env
-# Edit .env with production values
-nano .env
+nano .env  # Edit with production values
 ```
 
 Required variables:
@@ -62,13 +176,13 @@ Required variables:
 - `REDIS_HOST`, `REDIS_PORT`, `REDIS_TOKEN` (Upstash) or local Redis
 - `BASE_URL` (e.g., `https://clarify.cativo.dev`)
 
-### 3. Build and deploy
+#### 3. Build and deploy
 
 ```bash
 docker compose -f docker-compose.prod.yml up -d --build
 ```
 
-### 4. Verify deployment
+#### 4. Verify deployment
 
 ```bash
 # Check containers are running
@@ -82,14 +196,14 @@ docker compose -f docker-compose.prod.yml logs -f worker
 curl https://clarify.cativo.dev/api/health
 ```
 
-### 5. Scale workers (if needed)
-
-If queue processing is slow:
+#### 5. Scale workers (if needed)
 
 ```bash
 # Scale to 2 worker replicas
 docker compose -f docker-compose.prod.yml up -d --scale worker=2
 ```
+
+---
 
 ## Local Development
 
@@ -99,6 +213,8 @@ docker compose up
 
 # Access at http://localhost:3001
 ```
+
+---
 
 ## Troubleshooting
 
@@ -140,6 +256,20 @@ worker:
         memory: 1G  # Increase if Forensic tier OOM
 ```
 
+### Deployment fails with ".env not found"
+
+The GitHub Actions workflow copies `.env.example` to the server. On first deploy:
+
+```bash
+ssh cativo23@cativo.dev
+cd /home/cativo23/deploy/clarify-deploy
+cp .env.example .env
+nano .env  # Fill in real values
+docker compose -f docker-compose.prod.yml up -d
+```
+
+---
+
 ## Resource Allocation
 
 | Service | CPU Limit | Memory Limit | Purpose |
@@ -157,4 +287,3 @@ worker:
 | Slow queue processing | Scale `worker` to 2-3 replicas |
 | Forensic tier timeouts | Increase worker memory to 1GB |
 | Redis memory full | Increase redis maxmemory |
-
