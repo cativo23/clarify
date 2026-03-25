@@ -11,6 +11,7 @@ export default defineNuxtConfig({
     "@nuxtjs/supabase",
     "@nuxtjs/color-mode",
     "nuxt-security",
+    "nuxt-charts",
   ],
 
   // [SECURITY FIX #6] Tighten CSP using nuxt-security with environment awareness
@@ -41,6 +42,7 @@ export default defineNuxtConfig({
           "wss://*.supabase.co",
           "https://*.supabase.co",
           "https://api.openai.com",
+          // Stripe API for payment processing
           "https://api.stripe.com",
         ],
         "frame-ancestors": ["'none'"],
@@ -81,6 +83,7 @@ export default defineNuxtConfig({
     // Public keys (exposed to client)
     public: {
       baseUrl: process.env.BASE_URL || "http://localhost:3000",
+      // Stripe publishable key for client-side initialization
       stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY || "",
     },
   },

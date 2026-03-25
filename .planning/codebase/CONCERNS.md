@@ -109,15 +109,11 @@ const riskMapping: Record<string, string> = {
 
 ### PDF Export Not Implemented
 
-**Issue:** The PDF download button shows an alert instead of actually exporting the analysis.
+**Status:** RESOLVED in Phase 3 (2026-02-24)
 
-**Files:** `pages/analyze/[id].vue` (line 330)
+**Resolution:** PDF export implemented with pdfkit server-side generation and Supabase Storage caching.
 
-**Symptoms:** Users clicking "Descargar Reporte (PDF)" receive an alert: "Funcionalidad de descarga en desarrollo"
-
-**Trigger:** Clicking the download button on any analysis results page.
-
-**Fix approach:** Implement PDF generation using a library like `jspdf` or server-side PDF generation endpoint.
+**Files:** `server/utils/pdf-generator.ts`, `server/api/analyses/[id]/export-pdf.get.ts`
 
 ---
 

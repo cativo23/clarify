@@ -349,22 +349,23 @@
                   >Veredicto Legal</span
                 >
                 <span
+                  v-if="summary"
                   :class="[
                     'px-4 py-1 rounded-full text-xs font-bold ring-1 ring-inset',
-                    summary.resumen_ejecutivo.veredicto?.includes('Rechazar') ||
-                    summary.resumen_ejecutivo.veredicto?.includes('No')
+                    summary.resumen_ejecutivo?.veredicto?.includes('Rechazar') ||
+                    summary.resumen_ejecutivo?.veredicto?.includes('No')
                       ? 'bg-risk-high/10 text-risk-high ring-risk-high/30'
-                      : summary.resumen_ejecutivo.veredicto?.includes(
+                      : summary.resumen_ejecutivo?.veredicto?.includes(
                             'Negociar',
                           ) ||
-                          summary.resumen_ejecutivo.veredicto?.includes(
+                          summary.resumen_ejecutivo?.veredicto?.includes(
                             'Precaución',
                           )
                         ? 'bg-risk-medium/10 text-risk-medium ring-risk-medium/30'
                         : 'bg-risk-low/10 text-risk-low ring-risk-low/30',
                   ]"
                 >
-                  {{ summary.resumen_ejecutivo.veredicto }}
+                  {{ summary.resumen_ejecutivo?.veredicto }}
                 </span>
               </div>
               <h2
@@ -546,6 +547,27 @@
           </div>
         </div>
 
+        <!-- Forensic-specific sections -->
+        <div v-if="isForensic && analysis.summary_json">
+          <!-- Análisis Cruzado -->
+          <CrossClauseAnalysis
+            v-if="analysis.summary_json?.analisis_cruzado?.length"
+            :analisis-cruzado="analysis.summary_json.analisis_cruzado"
+          />
+
+          <!-- Omisiones Críticas -->
+          <CriticalOmissions
+            v-if="analysis.summary_json?.omisiones?.length"
+            :omisiones="analysis.summary_json.omisiones"
+          />
+
+          <!-- Mapa Estructural -->
+          <StructuralMap
+            v-if="analysis.summary_json?.mapa_estructural"
+            :mapa="analysis.summary_json.mapa_estructural"
+          />
+        </div>
+
         <!-- Cláusulas No Clasificadas -->
         <div
           v-if="summary.clausulas_no_clasificadas?.length"
@@ -658,10 +680,11 @@
           class="flex flex-col sm:flex-row gap-4 justify-center items-center py-10 border-t border-slate-100 dark:border-slate-800"
         >
           <button
-            class="w-full sm:w-auto px-10 py-4 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-900 transition-all shadow-soft"
+            class="w-full sm:w-auto px-10 py-4 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-900 transition-all shadow-soft disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="downloading"
             @click="downloadPDF"
           >
-            Descargar Reporte (PDF)
+            {{ downloading ? "Generando PDF..." : "Descargar Reporte (PDF)" }}
           </button>
           <NuxtLink
             to="/dashboard"
@@ -677,6 +700,9 @@
 
 <script setup lang="ts">
 import type { Analysis, AnalysisSummary } from "~/types";
+import CrossClauseAnalysis from "~/components/analysis/CrossClauseAnalysis.vue";
+import CriticalOmissions from "~/components/analysis/CriticalOmissions.vue";
+import StructuralMap from "~/components/analysis/StructuralMap.vue";
 
 definePageMeta({
   middleware: "auth",
@@ -686,13 +712,14 @@ const route = useRoute();
 const analysis = ref<Analysis | null>(null);
 const loading = ref(true);
 const retrying = ref(false);
+const downloading = ref(false);
 
 const summary = computed<AnalysisSummary>(() => {
   return (
     analysis.value?.summary_json || {
       resumen_ejecutivo: {
-        veredicto: "Bajo análisis",
-        justificacion: "",
+        veredicto: "No disponible",
+        justificacion: "El reporte aún no está listo.",
         clausulas_criticas_totales: 0,
         mayor_riesgo_identificado: "",
       },
@@ -707,6 +734,33 @@ const summary = computed<AnalysisSummary>(() => {
       clausulas_no_clasificadas: [],
     }
   );
+});
+
+const isForensic = computed(() => analysis.value?.analysis_type === "forensic");
+
+// Debug logging for Forensic sections
+watchEffect(() => {
+  if (analysis.value) {
+    console.log(
+      "[Forensic Debug] analysis_type:",
+      analysis.value.analysis_type,
+    );
+    console.log("[Forensic Debug] isForensic:", isForensic.value);
+    console.log(
+      "[Forensic Debug] analisis_cruzado:",
+      analysis.value.summary_json?.analisis_cruzado?.length || 0,
+      "items",
+    );
+    console.log(
+      "[Forensic Debug] omisiones:",
+      analysis.value.summary_json?.omisiones?.length || 0,
+      "items",
+    );
+    console.log(
+      "[Forensic Debug] mapa_estructural:",
+      analysis.value.summary_json?.mapa_estructural ? "present" : "missing",
+    );
+  }
 });
 
 const fetchAnalysis = async () => {
@@ -734,9 +788,40 @@ const formatDate = (dateString: string) => {
   });
 };
 
-const downloadPDF = () => {
-  // TODO: Implement PDF export
-  alert("Funcionalidad de descarga en desarrollo");
+const downloadPDF = async () => {
+  if (!analysis.value) return;
+
+  downloading.value = true;
+
+  try {
+    // Call PDF export endpoint
+    const response = await $fetch(
+      `/api/analyses/${analysis.value.id}/export-pdf`,
+    );
+
+    if (response.success && response.url) {
+      // Create temporary download link
+      const link = document.createElement("a");
+      link.href = response.url;
+      link.download =
+        response.filename || `clarify-${analysis.value.contract_name}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Show success feedback
+      alert(
+        `Reporte PDF generado exitosamente. ${response.cached ? "(caché)" : ""}`,
+      );
+    }
+  } catch (error: any) {
+    console.error("PDF download failed:", error);
+    const message =
+      error.data?.message || error.message || "Error al generar el PDF";
+    alert(`Error: ${message}`);
+  } finally {
+    downloading.value = false;
+  }
 };
 
 const retryAnalysis = async () => {

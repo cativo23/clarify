@@ -7,6 +7,121 @@ import { getHeader } from "h3";
 import { getPromptConfig } from "../utils/config";
 
 /**
+ * Check if user qualifies for monthly free Basic analysis
+ * - Only applies to 'basic' tier
+ * - Resets at the start of each calendar month
+ * - Can only be used once per month
+ */
+async function checkMonthlyFreeAnalysis(
+  client: any,
+  userId: string,
+  analysisType: string
+): Promise<{ qualifies: boolean; needsReset: boolean }> {
+  // Only basic tier qualifies for free analysis
+  if (analysisType !== "basic") {
+    return { qualifies: false, needsReset: false };
+  }
+
+  // Get user's monthly free analysis status
+  const { data: user, error } = await client
+    .from("users")
+    .select("monthly_free_analysis_used, monthly_free_analysis_reset_date")
+    .eq("id", userId)
+    .single();
+
+  if (error || !user) {
+    console.error("[Monthly Free] Failed to fetch user status:", error);
+    return { qualifies: false, needsReset: false };
+  }
+
+  const now = new Date();
+  const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const resetDate = user.monthly_free_analysis_reset_date
+    ? new Date(user.monthly_free_analysis_reset_date)
+    : null;
+
+  // Check if we need to reset the monthly counter (new month started)
+  const needsReset =
+    !resetDate || resetDate < currentMonthStart || user.monthly_free_analysis_used === null;
+
+  if (needsReset) {
+    // Reset the monthly free analysis flag for the new month
+    await client
+      .from("users")
+      .update({
+        monthly_free_analysis_used: false,
+        monthly_free_analysis_reset_date: currentMonthStart.toISOString(),
+        monthly_free_analysis_counter: 0,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", userId);
+
+    return { qualifies: true, needsReset: true };
+  }
+
+  // User qualifies if they haven't used their free analysis this month
+  return { qualifies: !user.monthly_free_analysis_used, needsReset: false };
+}
+
+/**
+ * Process analysis with monthly free Basic analysis support
+ * Uses atomic database transaction to prevent race conditions
+ */
+async function processAnalysisWithFreeCheck(
+  client: any,
+  userId: string,
+  contractName: string,
+  storagePath: string,
+  analysisType: string,
+  creditCost: number
+): Promise<{ analysisId: string | null; error?: any }> {
+  // Check if user qualifies for monthly free Basic analysis
+  const freeCheck = await checkMonthlyFreeAnalysis(client, userId, analysisType);
+
+  if (freeCheck.qualifies && analysisType === "basic") {
+    // User qualifies for free Basic analysis - use atomic transaction
+    const { data: analysisId, error: txError } = await client.rpc(
+      "process_analysis_transaction_with_free_check",
+      {
+        p_user_id: userId,
+        p_contract_name: contractName,
+        p_storage_path: storagePath,
+        p_analysis_type: analysisType,
+        p_credit_cost: 0, // Free analysis
+        p_is_free: true,
+      }
+    );
+
+    if (txError) {
+      console.error("[Free Analysis] Transaction error:", txError);
+      return { analysisId: null, error: txError };
+    }
+
+    console.log(`[Analyze] Monthly free Basic analysis used for user ${userId}`);
+    return { analysisId };
+  }
+
+  // Normal paid analysis
+  const { data: analysisId, error: txError } = await client.rpc(
+    "process_analysis_transaction",
+    {
+      p_contract_name: contractName,
+      p_storage_path: storagePath,
+      p_analysis_type: analysisType,
+      p_credit_cost: creditCost,
+      p_summary_json: null,
+      p_risk_level: null,
+    }
+  );
+
+  if (txError) {
+    return { analysisId: null, error: txError };
+  }
+
+  return { analysisId };
+}
+
+/**
  * Request validation schema
  * [SECURITY FIX #2] Input sanitization to prevent injection and DoS attacks
  */
@@ -85,21 +200,18 @@ export default defineEventHandler(async (event) => {
 
     const client = await serverSupabaseClient(event);
 
-    // Create analysis record using RPC - credit check and deduction are now atomic
-    const { data: analysisId, error: txError } = await client.rpc(
-      "process_analysis_transaction",
-      {
-        p_contract_name: contract_name,
-        p_storage_path: storagePath,
-        p_analysis_type: analysis_type,
-        p_credit_cost: creditCost,
-        p_summary_json: null,
-        p_risk_level: null,
-      },
+    // Process analysis with monthly free Basic analysis support
+    const { analysisId, error: txError } = await processAnalysisWithFreeCheck(
+      client,
+      user.id,
+      contract_name,
+      storagePath,
+      analysis_type,
+      creditCost,
     );
 
     if (txError) {
-      console.error("Transaction error:", txError);
+      console.error("[Analyze] Transaction error:", txError);
 
       // Check for insufficient credits error - safe to show
       if (txError.message && txError.message.includes("Insufficient credits")) {

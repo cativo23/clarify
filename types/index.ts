@@ -7,6 +7,10 @@ export interface User {
   email: string;
   credits: number;
   is_admin?: boolean;
+  is_suspended?: boolean;
+  suspension_reason?: string | null;
+  suspended_at?: string | null;
+  email_confirmed_at?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -19,10 +23,30 @@ export interface Analysis {
   summary_json: AnalysisSummary | null;
   risk_level: RiskLevel | null;
   credits_used: number;
-  status: "pending" | "processing" | "completed" | "failed";
+  status: "pending" | "processing" | "completed" | "failed" | "queued" | "analyzing" | "finalizing";
   error_message?: string;
   analysis_type?: "basic" | "premium" | "forensic";
   created_at: string;
+  risk_items?: RiskItem[];
+  key_clauses?: KeyClause[];
+  pdf_available?: boolean;
+  tokens_used?: number;
+}
+
+export interface RiskItem {
+  id: string;
+  clause_text: string;
+  risk_level: RiskLevel;
+  category: string;
+  severity: number;
+  recommendation: string;
+}
+
+export interface KeyClause {
+  id: string;
+  title: string;
+  text: string;
+  importance: string;
 }
 
 export interface AnalysisSummary {
@@ -41,11 +65,57 @@ export interface AnalysisSummary {
   };
   hallazgos: Hallazgo[];
 
+  // Fields used in demo and for compatibility with simulated results
+  executive_summary?: string;
+  risk_score?: number;
+  key_findings?: string[];
+  recommendations?: string[];
+
   clausulas_no_clasificadas?: {
     clausula: string;
     motivo: string;
   }[];
+
+  // Forensic-specific fields
+  analisis_cruzado?: AnalisisCruzadoItem[];
+  omisiones?: OmisionCritic[];
+  mapa_estructural?: MapaEstructural;
+
   _debug?: any;
+}
+
+// Forensic-specific interfaces
+export interface AnalisisCruzadoItem {
+  inconsistencia_id: string;
+  tipo: string;
+  clausula_origen: string;
+  clausula_destino: string;
+  texto_origen: string;
+  texto_destino: string;
+  inconsistencia: string;
+  impacto: string;
+  recomendacion: string;
+  severidad: "rojo" | "amarillo";
+}
+
+export interface OmisionCritic {
+  omision_id: string;
+  categoria: string;
+  que_falta: string;
+  por_que_critico: string;
+  riesgo_usuario: string;
+  clausula_sugerida: string;
+}
+
+export interface MapaEstructural {
+  total_secciones: number;
+  total_anexos: number;
+  total_paginas: number;
+  secciones: Array<{
+    nombre: string;
+    paginas: string;
+    riesgo: "rojo" | "amarillo" | "verde" | "gris";
+  }>;
 }
 
 export interface Hallazgo {

@@ -304,6 +304,9 @@
               v-model="selectedFile"
               class="mb-8"
               @error="handleDropzoneError"
+              @uploaded="handleDropzoneUploaded"
+              @complete="handleDropzoneComplete"
+              @cancel="handleDropzoneCancel"
             />
 
             <!-- Error Message (Moved outside file check) -->
@@ -344,7 +347,12 @@
                     checkingTokens ||
                     !uploadedFileUrl ||
                     !contractName ||
-                    (sharedCredits || 0) < (analysisType === 'premium' ? 3 : 1)
+                    (sharedCredits || 0) <
+                      (analysisType === 'forensic'
+                        ? 10
+                        : analysisType === 'premium'
+                          ? 3
+                          : 1)
                   "
                   class="px-10 py-4 bg-secondary text-white rounded-2xl font-black text-lg hover:shadow-glow hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex items-center gap-3"
                   @click="handleAnalyze"
@@ -485,6 +493,40 @@
                     @click="analysisType = 'basic'"
                   >
                     Usar Rápido (1)
+                  </button>
+                  <NuxtLink
+                    to="/credits"
+                    class="text-[10px] font-black uppercase tracking-widest text-secondary hover:underline whitespace-nowrap"
+                  >
+                    Comprar Créditos
+                  </NuxtLink>
+                </div>
+              </div>
+
+              <!-- Forensic Credits Warning -->
+              <div
+                v-else-if="needsMoreForForensic"
+                class="flex items-center justify-between gap-4 p-4 border bg-accent-indigo/5 rounded-2xl border-accent-indigo/10 animate-slide-up"
+              >
+                <div class="flex items-center gap-3">
+                  <div
+                    class="flex items-center justify-center w-8 h-8 rounded-full bg-accent-indigo/10 text-accent-indigo"
+                  >
+                    <ShieldCheckIcon class="w-4 h-4" />
+                  </div>
+                  <p
+                    class="text-xs font-bold text-slate-600 dark:text-slate-400"
+                  >
+                    Necesitas 10 créditos para
+                    <span class="text-accent-indigo">Auditoría Forense</span>.
+                  </p>
+                </div>
+                <div class="flex items-center gap-4">
+                  <button
+                    class="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                    @click="analysisType = 'premium'"
+                  >
+                    Usar Premium (3)
                   </button>
                   <NuxtLink
                     to="/credits"
@@ -680,15 +722,10 @@
                           class="text-[10px] font-bold text-slate-500 dark:text-slate-400"
                           >{{ timeAgo(analysis.created_at) }}</span
                         >
-                        <span
-                          class="w-1.5 h-1.5 rounded-full"
-                          :class="[getStatusDotClass(analysis)]"
-                        ></span>
-                        <span
-                          class="text-[9px] font-black uppercase tracking-tighter"
-                          :class="[getStatusTextClass(analysis)]"
-                          >{{ getStatusLabel(analysis) }}</span
-                        >
+                        <AnalysisStatusBadge
+                          :status="analysis.status"
+                          size="sm"
+                        />
                       </div>
                     </div>
                   </div>
@@ -727,18 +764,10 @@
                           class="text-[10px] font-bold text-slate-500 dark:text-slate-400"
                           >{{ timeAgo(analysis.created_at) }}</span
                         >
-                        <span
-                          v-if="analysis.status === 'processing'"
-                          class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"
-                        ></span>
-                        <span
-                          class="text-[9px] font-black uppercase text-slate-500 dark:text-slate-400"
-                          >{{
-                            analysis.status === "processing"
-                              ? "Analizando..."
-                              : "Pendiente"
-                          }}</span
-                        >
+                        <AnalysisStatusBadge
+                          :status="analysis.status"
+                          size="sm"
+                        />
                       </div>
                     </div>
                   </div>
@@ -755,7 +784,13 @@
 <script setup lang="ts">
 import type { Analysis } from "~/types";
 import type { RealtimeChannel } from "@supabase/supabase-js";
+import { ShieldCheckIcon } from "@heroicons/vue/24/outline";
 import { timeAgo } from "~/composables/useTimeAgo";
+import {
+  normalizeStatus,
+} from "~/composables/useAnalysisStatus";
+import AnalysisStatusBadge from "~/components/AnalysisStatusBadge.vue";
+import SkeletonRecentAnalysis from "~/components/SkeletonRecentAnalysis.vue";
 
 definePageMeta({
   middleware: "auth",
@@ -783,7 +818,7 @@ const riskDistributionData = ref<any>(null);
 
 const selectedFile = ref<File | null>(null);
 const contractName = ref("");
-const analysisType = ref<"basic" | "premium">("premium");
+const analysisType = ref<"basic" | "premium" | "forensic">("premium");
 const analyzing = ref(false);
 const analyzeError = ref("");
 
@@ -797,6 +832,7 @@ let realtimeChannel: RealtimeChannel | null = null;
 const analyzeButtonText = computed(() => {
   if (analyzing.value) return "Procesando...";
   if (checkingTokens.value) return "Calculando tokens...";
+  if (analysisType.value === "forensic") return "Auditoría Forense";
   return analysisType.value === "premium"
     ? "Análisis Completo"
     : "Análisis Rápido";
@@ -808,6 +844,12 @@ const needsMoreForPremium = computed(
     analysisType.value === "premium" &&
     (sharedCredits.value || 0) > 0 &&
     (sharedCredits.value || 0) < 3,
+);
+const needsMoreForForensic = computed(
+  () =>
+    analysisType.value === "forensic" &&
+    (sharedCredits.value || 0) > 0 &&
+    (sharedCredits.value || 0) < 10,
 );
 
 // Chart Logic (from dedicated endpoint)
@@ -956,8 +998,13 @@ const fetchUserData = async () => {
 const setupRealtimeSubscription = () => {
   if (realtimeChannel || !currentUserId.value) return;
 
+  console.log(
+    "Setting up realtime subscription for user:",
+    currentUserId.value,
+  );
+
   realtimeChannel = supabase
-    .channel("analyses-updates")
+    .channel(`analyses-updates-${currentUserId.value}`)
     .on(
       "postgres_changes",
       {
@@ -968,21 +1015,30 @@ const setupRealtimeSubscription = () => {
       },
       async (payload) => {
         const updatedAnalysis = payload.new as Analysis;
-        console.log("Realtime update received:", updatedAnalysis);
+        // Normalize DB status ("processing") to UI status ("analyzing")
+        const normalizedStatus = normalizeStatus(updatedAnalysis.status);
+        console.log("Realtime update received:", {
+          ...updatedAnalysis,
+          status: normalizedStatus,
+        });
 
         // Find and update the analysis in the list
         const index = analyses.value.findIndex(
           (a) => a.id === updatedAnalysis.id,
         );
         if (index !== -1) {
-          // Update existing analysis
+          // Update existing analysis with normalized status
           analyses.value[index] = {
             ...analyses.value[index],
             ...updatedAnalysis,
+            status: normalizedStatus,
           };
         } else {
           // Add to the list if it's not already there
-          analyses.value.unshift(updatedAnalysis);
+          analyses.value.unshift({
+            ...updatedAnalysis,
+            status: normalizedStatus,
+          });
         }
 
         // If job completed or failed, refresh user profile to ensure credits are correct
@@ -1047,7 +1103,52 @@ const setupRealtimeSubscription = () => {
         }
       },
     )
-    .subscribe();
+    .subscribe((status) => {
+      console.log("Realtime subscription status:", status);
+      if (status === "SUBSCRIBED") {
+        console.log("Successfully subscribed to analyses updates");
+      } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+        console.error("Realtime subscription error:", status);
+        // Trigger more aggressive polling when realtime fails
+        console.log("Realtime failed, relying on polling fallback");
+      }
+    });
+};
+
+// Fetch analyses only (for polling fallback)
+const fetchAnalyses = async () => {
+  try {
+    const headers = useRequestHeaders(["cookie"]);
+    const response = await $fetch(
+      "/api/analyses?limit=8&projection=id,contract_name,status,risk_level,created_at,user_id",
+      { headers: headers as any },
+    );
+    // Normalize statuses from DB format to UI format
+    analyses.value = (response.analyses || []).map((a: any) => ({
+      ...a,
+      status: normalizeStatus(a.status),
+    }));
+  } catch (error) {
+    console.error("Error fetching analyses in polling:", error);
+  }
+};
+
+// Polling fallback for pending analyses when realtime is unavailable
+const startStatusPolling = () => {
+  // Poll every 5 seconds for analyses with pending/analyzing status
+  setInterval(async () => {
+    const hasPendingAnalyses = analyses.value.some(
+      (a) =>
+        a.status === "pending" ||
+        a.status === "analyzing" ||
+        a.status === "queued",
+    );
+
+    if (hasPendingAnalyses) {
+      console.log("Polling: Refreshing pending analyses...");
+      await fetchAnalyses();
+    }
+  }, 5000);
 };
 
 onUnmounted(() => {
@@ -1060,9 +1161,12 @@ onUnmounted(() => {
 watch(
   currentUserId,
   async (newId) => {
+    console.log("currentUserId changed:", newId);
     if (newId) {
       await fetchUserData();
       setupRealtimeSubscription();
+      startStatusPolling();
+      console.log("Realtime subscription and polling setup complete");
     }
   },
   { immediate: true },
@@ -1081,43 +1185,6 @@ const getRiskColor = (riskLevel: string | null) => {
       return "bg-slate-100 text-slate-400";
   }
 };
-
-const getStatusDotClass = (analysis: Analysis) => {
-  if (analysis.status === "failed") return "bg-red-500";
-  if (analysis.status === "processing") return "bg-secondary animate-pulse";
-  if (analysis.status === "completed") {
-    if (analysis.risk_level === "high") return "bg-risk-high";
-    if (analysis.risk_level === "medium") return "bg-risk-medium";
-    if (analysis.risk_level === "low") return "bg-risk-low";
-  }
-  return "bg-slate-400";
-};
-
-const getStatusTextClass = (analysis: Analysis) => {
-  if (analysis.status === "failed")
-    return "text-red-500 dark:text-red-400 font-black";
-  if (analysis.status === "completed") {
-    if (analysis.risk_level === "high") return "text-risk-high";
-    if (analysis.risk_level === "medium") return "text-risk-medium";
-    if (analysis.risk_level === "low") return "text-risk-low";
-  }
-  return "text-slate-400";
-};
-
-const getStatusLabel = (analysis: Analysis) => {
-  if (analysis.status === "completed") {
-    if (analysis.risk_level === "high") return "Alto Riesgo";
-    if (analysis.risk_level === "medium") return "Cautela";
-    if (analysis.risk_level === "low") return "Seguro";
-  }
-  if (analysis.status === "processing") return "Procesando...";
-  if (analysis.status === "failed") return "Fallido";
-  return "Pendiente";
-};
-
-// Removed onMounted since watcher handles immediate check
-
-// Removed onMounted since watcher handles immediate check
 
 const lastAnalysisDate = computed(() => {
   if (!sidebarMetrics.value?.lastAnalysisDate) return "Ninguno";
@@ -1159,34 +1226,23 @@ const handleDropzoneError = (message: string) => {
   analyzeError.value = message;
 };
 
-// Watch selectedFile to trigger immediate upload and token check
-watch(selectedFile, async (newFile) => {
-  if (!newFile) {
-    uploadedFileUrl.value = "";
-    tokenCheckResult.value = null;
-    return;
-  }
+// Handle uploaded event from Dropzone - file was uploaded successfully
+const handleDropzoneUploaded = async (data: { file_url: string }) => {
+  if (!data.file_url) return;
 
   checkingTokens.value = true;
   analyzeError.value = "";
 
   try {
-    // 1. Upload Immediately
-    const formData = new FormData();
-    formData.append("file", newFile);
+    uploadedFileUrl.value = data.file_url;
 
-    const uploadResponse = await $fetch("/api/upload", {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!uploadResponse.success || !uploadResponse.file_url) {
-      throw new Error(uploadResponse.error || "Error al subir archivo");
+    // Auto-fill contract name with file name (without extension)
+    if (selectedFile.value && !contractName.value) {
+      const fileName = selectedFile.value.name.replace(/\.[^/.]+$/, "");
+      contractName.value = fileName;
     }
 
-    uploadedFileUrl.value = uploadResponse.file_url;
-
-    // 2. Check Tokens
+    // Check Tokens
     const tokenResponse = await $fetch<any>("/api/check-tokens", {
       method: "POST",
       body: { file_url: uploadedFileUrl.value },
@@ -1200,18 +1256,31 @@ watch(selectedFile, async (newFile) => {
   } catch (error: any) {
     // Extract error message from h3/Nuxt error structure
     const errorMessage =
-      error.data?.message || // From createError({ message: ... })
-      error.message || // Direct message
-      error.statusMessage || // HTTP status message
-      "Error processing file";
+      error.data?.message ||
+      error.message ||
+      error.statusMessage ||
+      "Error calculating tokens";
     analyzeError.value = errorMessage;
-    selectedFile.value = null; // clear to force re-selection
+    selectedFile.value = null;
     uploadedFileUrl.value = "";
     tokenCheckResult.value = null;
   } finally {
     checkingTokens.value = false;
   }
-});
+};
+
+// Handle complete event - upload reached 100%
+const handleDropzoneComplete = () => {
+  // Upload completed, tier selector will be shown
+};
+
+// Handle cancel event - user cancelled upload
+const handleDropzoneCancel = () => {
+  selectedFile.value = null;
+  uploadedFileUrl.value = "";
+  tokenCheckResult.value = null;
+  analyzeError.value = "";
+};
 
 const handleAnalyze = async () => {
   if (!uploadedFileUrl.value || !contractName.value) return;

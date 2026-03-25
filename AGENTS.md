@@ -49,7 +49,7 @@ Clarify is an AI-powered contract auditing platform (Micro-SaaS) that analyzes l
 
 ### Git Guidelines
 Follow [Conventional Commits](https://www.conventionalcommits.org/) with [Gitmoji](https://gitmoji.dev/).
-Format: `<type>(<scope>): <gitmoji> <description>`
+Format: `<gitmoji> <type>(<scope>): <description>`
 Types: `feat` ✨, `fix` 🐛, `docs` 📝, `refactor` ♻️, `chore` 🔧, `security` 🔐, `cleanup` 🔥, `perf` ⚡, `style` 🎨, `test` ✅.
 
 ### GitFlow Release Process
@@ -86,6 +86,13 @@ git branch -D release/v1.0.0-alpha.X
 - Tags and releases are created using GitHub CLI (`gh release create`)
 - Release branches follow naming convention: `release/v1.0.0-alpha.X`
 - All releases are pre-release (`--prerelease` flag) until stable
+
+## 🐳 Docker Execution
+AI Agents MUST execute all commands inside the Docker container to ensure environment consistency. DO NOT run npm or database commands directly on the host machine.
+
+```bash
+docker compose exec app <command>
+```
 
 ## 🛠️ Common Commands
 ```bash

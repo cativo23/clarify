@@ -1,8 +1,19 @@
 # Production Docker Compose with Traefik
 # Network: space-server_web (external)
+#
+# Architecture:
+#   - app: HTTP server only (DISABLE_WORKER=true)
+#   - worker: BullMQ processor (DISABLE_WORKER=false)
+#   - redis: Queue backend
+#
+# This separation allows independent scaling:
+#   - Scale app replicas for more HTTP capacity
+#   - Scale worker replicas for faster queue processing
 
 services:
-  # Nuxt3 Application (Production)
+  # ============================================
+  # HTTP Server (Nuxt 3 + API routes)
+  # ============================================
   app:
     build:
       context: .
@@ -13,6 +24,7 @@ services:
       - NODE_ENV=production
       - NUXT_HOST=0.0.0.0
       - NUXT_PORT=3000
+      - DISABLE_WORKER=true  # ← HTTP-only mode
       - SUPABASE_URL=${SUPABASE_URL}
       - SUPABASE_KEY=${SUPABASE_ANON_KEY}
       - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
@@ -22,6 +34,7 @@ services:
       - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
       - REDIS_HOST=${REDIS_HOST:-redis}
       - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_TOKEN=${REDIS_TOKEN:-}
       - BASE_URL=${BASE_URL:-https://clarify.yourdomain.com}
     networks:
       - web
@@ -29,34 +42,34 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1'
-          memory: 512M
+          cpus: '0.5'
+          memory: 256M
         reservations:
           cpus: '0.25'
-          memory: 256M
+          memory: 128M
     labels:
       # Enable Traefik
       - "traefik.enable=true"
       - "traefik.docker.network=space-server_web"
-      
+
       # HTTP Router - Redirect to HTTPS
       - "traefik.http.routers.clarify-http.rule=Host(`clarify.yourdomain.com`)"
       - "traefik.http.routers.clarify-http.entrypoints=http"
       - "traefik.http.routers.clarify-http.middlewares=https-redirect"
-      
+
       # HTTPS Router
       - "traefik.http.routers.clarify.rule=Host(`clarify.yourdomain.com`)"
       - "traefik.http.routers.clarify.entrypoints=https"
       - "traefik.http.routers.clarify.tls=true"
       - "traefik.http.routers.clarify.tls.certresolver=letsencrypt"
-      
+
       # Service
       - "traefik.http.services.clarify.loadbalancer.server.port=3000"
-      
+
       # Middleware - HTTPS Redirect
       - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
       - "traefik.http.middlewares.https-redirect.redirectscheme.permanent=true"
-      
+
       # Security Headers
       - "traefik.http.middlewares.clarify-headers.headers.stsSeconds=31536000"
       - "traefik.http.middlewares.clarify-headers.headers.stsIncludeSubdomains=true"
@@ -70,7 +83,50 @@ services:
       retries: 3
       start_period: 10s
 
-  # Redis (Production)
+  # ============================================
+  # BullMQ Worker (Queue processor)
+  # ============================================
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: clarify-worker-prod
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - DISABLE_WORKER=false  # ← Enable worker mode
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - REDIS_HOST=${REDIS_HOST:-redis}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_TOKEN=${REDIS_TOKEN:-}
+      - BULLMQ_CONCURRENCY=2  # Process 2 jobs concurrently
+    networks:
+      - internal
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 768M
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "console.log('worker alive')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # ============================================
+  # Redis (Queue backend)
+  # ============================================
   redis:
     image: redis:7-alpine
     container_name: clarify-redis-prod
