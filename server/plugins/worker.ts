@@ -17,6 +17,12 @@ function prepareSummaryForStorage(summary: any): any {
 }
 
 export default defineNitroPlugin((_nitroApp) => {
+  // Skip worker initialization if disabled via env (e.g., HTTP-only containers)
+  if (process.env.DISABLE_WORKER === "true") {
+    console.log("[Worker] Worker disabled via DISABLE_WORKER=true — HTTP-only mode");
+    return;
+  }
+
   const worker = new Worker(
     "analysis-queue",
     async (job) => {
