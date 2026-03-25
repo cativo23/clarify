@@ -42,6 +42,7 @@ const xFormatter = (i: number) => {
       xLabel="User"
       yLabel="Analyses"
       :showLegend="false"
+      :yAxis="['count']"
     />
   </div>
   <div v-else class="flex items-center justify-center h-64 text-slate-400">

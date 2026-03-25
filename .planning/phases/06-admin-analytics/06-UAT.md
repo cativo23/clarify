@@ -39,23 +39,23 @@ severity: major
 
 ### 4. Conversion Funnel - Drop-off Visualization
 expected: Funnel bars decrease in width showing drop-off between stages. Percentage rates displayed between stages (e.g., 85% email verified, 70% first analysis, 41% first purchase).
-result: [pending]
+result: pass
 
 ### 5. Cost Analysis - 3 Tier Cards
 expected: Navigate to /admin/analytics, scroll to cost analysis section. Three tier cards display (Basic/Premium/Forensic) showing: analysis count, revenue, AI cost, gross margin, margin percentage.
-result: [pending]
+result: pass
 
 ### 6. Cost Analysis - Summary Totals
 expected: Cost analysis summary card shows: total revenue, total AI cost, total margin, overall margin percentage, blended cost per analysis.
-result: [pending]
+result: pass
 
 ### 7. Cost Analysis - Time Range Selector
 expected: Cost analysis has time range selector (7d/30d/90d/all). Selecting different ranges updates the displayed cost data.
-result: [pending]
+result: pass
 
 ### 8. User Management - Navigate to User Detail
 expected: From /admin/analytics user table, click "View" on any user. Navigates to /admin/user/[id] page showing user detail.
-result: [pending]
+result: pass
 
 ### 9. User Management - User Header Display
 expected: User detail page shows header with: email, user ID, signup date, current credit balance badge, suspension status badge (if suspended), last activity timestamp.

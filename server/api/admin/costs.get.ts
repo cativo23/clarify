@@ -70,7 +70,7 @@ export default defineEventHandler(async (event) => {
   // Fetch completed analyses with summary_json containing usage data
   const { data: analyses, error: analysesError } = await supabase
     .from("analyses")
-    .select("id, user_id, credits_used, summary_json, created_at")
+    .select("id, user_id, credits_used, analysis_type, summary_json, created_at")
     .eq("status", "completed")
     .gte("created_at", startDate.toISOString())
     .lte("created_at", endDate.toISOString());
@@ -103,15 +103,8 @@ export default defineEventHandler(async (event) => {
       continue;
     }
 
-    // Extract tier from summary or infer from credits_used
-    let tier = summary?.tier?.toLowerCase() || "basic";
-    if (!tierData[tier]) {
-      // Infer tier from credits used
-      if (analysis.credits_used === 1) tier = "basic";
-      else if (analysis.credits_used === 3) tier = "premium";
-      else if (analysis.credits_used >= 10) tier = "forensic";
-      else tier = "basic";
-    }
+    // Use analysis_type field directly from database
+    const tier = (analysis.analysis_type as string)?.toLowerCase() || "basic";
 
     // Extract tokens
     const inputTokens =
