@@ -44,6 +44,14 @@ const xFormatter = (i: number) => {
   if (!chartData.value.data[i]) return '';
   return chartData.value.data[i].date;
 };
+
+const markerConfig = computed(() => {
+  if (!props.data?.revenue) return {};
+  return {
+    gross: { show: true, type: 'circle', size: 8, color: '#10b981', strokeWidth: 2, strokeColor: '#10b981' },
+    net: { show: true, type: 'circle', size: 8, color: '#3b82f6', strokeWidth: 2, strokeColor: '#3b82f6' },
+  };
+});
 </script>
 
 <template>
@@ -57,6 +65,8 @@ const xFormatter = (i: number) => {
       yLabel="Revenue (USD)"
       :showLegend="true"
       :curve="true"
+      :yAxis="['gross', 'net']"
+      :markerConfig="markerConfig"
     />
   </div>
   <div v-else class="flex items-center justify-center h-72 text-slate-400">
