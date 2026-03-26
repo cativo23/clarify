@@ -2,13 +2,11 @@
 
 ## Current State
 
-**v1.0 MVP: SHIPPED** ✅ (2026-03-15)
+**v1.1 Admin & Deploy: SHIPPED** ✅ (2026-03-25)
 
-Clarify is a shipped AI-powered contract analysis platform with 3-tier pricing, Stripe payments, free credits onboarding, and interactive demo.
+Clarify is a shipped AI-powered contract analysis platform with 3-tier pricing, Stripe payments, free credits onboarding, interactive demo, and admin analytics dashboard.
 
-**Next Milestone: v1.1 Admin & Deploy**
-- Admin analytics dashboard (revenue, conversion, cost per analysis)
-- Production deployment on Vercel with workers on Railway/Render
+**Next Milestone: v2.0** — TBD (planning required)
 
 ---
 
@@ -41,13 +39,13 @@ Democratizing legal advice by making contract analysis accessible and affordable
 - ✓ CREDIT-02: Monthly Free Analysis — 1 free Basic analysis per user per month
 - ✓ DEMO-01: Homepage Demo — Interactive element to show product value
 
-### Active (v1.1)
+### Validated (v1.1)
 
-- [ ] **ADMIN-01**: Admin Conversion Tracking — Signup → purchase funnel visualization
-- [ ] **ADMIN-02**: Admin Revenue Dashboard — Daily/weekly/monthly revenue charts
-- [ ] **ADMIN-03**: Admin Cost Analysis — Cost per analysis vs profit margin
-- [ ] **ADMIN-04**: Admin User Management — Add credits, suspend users, view history
-- [ ] **DEPLOY-01**: Vercel Deployment — Verified production deployment with all environments configured
+- ✓ ADMIN-01: Admin Conversion Tracking — Signup → purchase funnel visualization (4-stage funnel) — v1.1
+- ✓ ADMIN-02: Admin Revenue Dashboard — Daily/weekly/monthly/quarterly revenue charts with gross/net comparison — v1.1
+- ✓ ADMIN-03: Admin Cost Analysis — Cost per analysis vs profit margin by tier — v1.1
+- ✓ ADMIN-04: Admin User Management — Add credits, suspend users, view history with audit trail — v1.1
+- ✓ DEPLOY-01: Vercel Deployment — Production infrastructure ready (live verification pending) — v1.1
 
 ### Out of Scope
 
@@ -60,6 +58,7 @@ Democratizing legal advice by making contract analysis accessible and affordable
 ## Context
 
 **Shipped v1.0:** 2026-03-15 with 22 plans across 5 phases, 95+ tests, 17/20 requirements complete.
+**Shipped v1.1:** 2026-03-25 with 4 plans across 2 phases, 43 admin tests, 5/5 requirements (DEPLOY-01 partial).
 
 **Technical Environment:**
 - Nuxt 3.15.1 with Vue 3 Composition API
@@ -91,6 +90,11 @@ Individual consumers who need to understand contracts — renters, freelancers, 
 | Forensic tier buffer allocation (5k tokens) | Maximize 120k context window for exhaustive analysis | ✓ Implemented v1.0 |
 | Email verification for free credits | Prevent abuse while removing trial barriers | ✓ Validated v1.0 |
 | Demo rate limiting (5 req/day per IP) | Balance UX with abuse prevention | ✓ Adjusted per user feedback |
+| Horizontal bar chart for conversion funnel | Easier to read stage names and compare widths | ✓ Validated v1.1 |
+| Gross vs net as solid vs dashed lines | Visual distinction without relying solely on color | ✓ Validated v1.1 |
+| Package inference from amount ranges | Avoids schema changes; uses amount ranges to determine tier | ✓ Validated v1.1 |
+| Credit adjustments logged as type='adjustment' with amount=0 | Audit trail without monetary value | ✓ Validated v1.1 |
+| Suspension requires mandatory reason field | Compliance and accountability | ✓ Validated v1.1 |
 
 ---
-*Last updated: 2026-03-15 after v1.0 MVP milestone*
+*Last updated: 2026-03-25 after v1.1 Admin & Deploy milestone*
