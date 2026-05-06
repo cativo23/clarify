@@ -1226,9 +1226,20 @@ const handleDropzoneError = (message: string) => {
   analyzeError.value = message;
 };
 
+// Cancellation guard for in-flight token checks. If the user uploads a
+// new file before the previous /api/check-tokens response arrives, we
+// abort the stale request so its result can't overwrite the fresh one.
+let tokenCheckAbortController: AbortController | null = null;
+
 // Handle uploaded event from Dropzone - file was uploaded successfully
 const handleDropzoneUploaded = async (data: { file_url: string }) => {
   if (!data.file_url) return;
+
+  if (tokenCheckAbortController) {
+    tokenCheckAbortController.abort();
+  }
+  const controller = new AbortController();
+  tokenCheckAbortController = controller;
 
   checkingTokens.value = true;
   analyzeError.value = "";
@@ -1245,8 +1256,11 @@ const handleDropzoneUploaded = async (data: { file_url: string }) => {
     // Check Tokens
     const tokenResponse = await $fetch<any>("/api/check-tokens", {
       method: "POST",
-      body: { file_url: uploadedFileUrl.value },
+      body: { file_url: data.file_url },
+      signal: controller.signal,
     });
+
+    if (controller.signal.aborted) return;
 
     if (!tokenResponse.success) {
       throw new Error(tokenResponse.error || "Error calculating tokens");
@@ -1254,6 +1268,9 @@ const handleDropzoneUploaded = async (data: { file_url: string }) => {
 
     tokenCheckResult.value = tokenResponse;
   } catch (error: any) {
+    if (controller.signal.aborted || error?.name === "AbortError") {
+      return;
+    }
     // Extract error message from h3/Nuxt error structure
     const errorMessage =
       error.data?.message ||
@@ -1265,7 +1282,12 @@ const handleDropzoneUploaded = async (data: { file_url: string }) => {
     uploadedFileUrl.value = "";
     tokenCheckResult.value = null;
   } finally {
-    checkingTokens.value = false;
+    if (tokenCheckAbortController === controller) {
+      tokenCheckAbortController = null;
+    }
+    if (!controller.signal.aborted) {
+      checkingTokens.value = false;
+    }
   }
 };
 

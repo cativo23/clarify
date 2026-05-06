@@ -32,11 +32,26 @@ export async function isAdminUser(event: H3Event): Promise<boolean> {
     return false;
   }
 
+  return isAdminEmail(event, user.email);
+}
+
+/**
+ * Same admin check as isAdminUser, but accepts an already-resolved email
+ * to avoid a redundant auth.getUser() round-trip when the caller has just
+ * fetched the user themselves.
+ */
+export async function isAdminEmail(
+  event: H3Event,
+  email: string,
+): Promise<boolean> {
+  if (!email) {
+    return false;
+  }
+
   const config = useRuntimeConfig();
   const adminEmailConfig = config.adminEmail;
 
-  // Normalize user's email for comparison
-  const userEmail = normalizeEmail(user.email);
+  const userEmail = normalizeEmail(email);
 
   // Check 1: Compare against config.adminEmail (normalized)
   if (adminEmailConfig) {

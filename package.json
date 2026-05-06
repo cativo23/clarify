@@ -1,6 +1,6 @@
 {
   "name": "clarify",
-  "version": "1.0.0-alpha.17",
+  "version": "1.0.0-alpha.18",
   "private": true,
   "type": "module",
   "scripts": {
@@ -14,6 +14,8 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
+    "test:unit": "vitest run --project unit",
+    "test:integration": "vitest run --project integration",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "security:audit": "npm audit --audit-level=high",

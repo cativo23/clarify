@@ -4,6 +4,7 @@ import { preprocessDocument } from "~/server/utils/preprocessing";
 import { getPromptConfig } from "~/server/utils/config";
 import { validateSupabaseStorageUrl } from "~/server/utils/ssrf-protection";
 import { handleApiError } from "~/server/utils/error-handler";
+import { applyRateLimit, RateLimitPresets } from "~/server/utils/rate-limit";
 
 export default defineEventHandler(async (event) => {
   let user;
