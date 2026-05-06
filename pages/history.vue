@@ -427,8 +427,10 @@ const filteredAnalyses = computed(() => {
       // Set TO date to end of day so all analyses on that date are included
       // regardless of time component. new Date('2026-02-21') yields midnight,
       // which would exclude analyses created later in the same day.
-      const toDate = new Date(dateTo.value);
-      toDate.setHours(23, 59, 59, 999);
+      // Anchor to local end-of-day; `new Date('YYYY-MM-DD')` parses as UTC
+      // midnight, so setHours afterward shifts the date back a day in
+      // negative-offset zones (e.g. UTC-6 excluded today's analyses).
+      const toDate = new Date(dateTo.value + "T23:59:59.999");
       matchesDateTo = new Date(a.created_at) <= toDate;
     }
     return matchesSearch && matchesFilter && matchesDateFrom && matchesDateTo;

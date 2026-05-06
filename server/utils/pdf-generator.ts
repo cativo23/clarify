@@ -403,27 +403,42 @@ function addFooterToPage(
   // Footer background
   doc.rect(50, footerY, 495, 45).fill("#fef3c7").stroke("#f59e0b");
 
-  // Footer content
+  // pdfkit's text() uses doc.y for overflow detection; after switchToPage,
+  // doc.y holds the prior page's last cursor position, so a subsequent text()
+  // — even with explicit (x, y) — auto-paginates if the inherited y is near
+  // the bottom margin. Reset doc.y before each call AND pass lineBreak:false
+  // so the footer stamps onto the existing page.
+  doc.y = footerY + 5;
+  doc.x = 55;
   doc
     .fillColor("#92400e")
     .font("Helvetica-Bold")
     .fontSize(8)
-    .text("NOTA LEGAL", 55, footerY + 5);
-  doc
-    .fillColor("#78350f")
-    .font("Helvetica")
-    .fontSize(6)
-    .text(
-      "Este análisis es una guía informativa generada por IA y NO constituye asesoría legal profesional. Para decisiones legales importantes, consulte con un abogado calificado.",
-      55,
-      footerY + 15,
-    );
+    .text("NOTA LEGAL", 55, footerY + 5, { lineBreak: false });
 
-  // Page number
-  doc
-    .fillColor("#6b7280")
-    .fontSize(8)
-    .text(`Página ${currentPage} de ${totalPages}`, 495, footerY + 30, {
-      align: "right",
-    });
+  doc.fillColor("#78350f").font("Helvetica").fontSize(6);
+  doc.y = footerY + 15;
+  doc.x = 55;
+  doc.text(
+    "Este análisis es una guía informativa generada por IA y NO constituye",
+    55,
+    footerY + 15,
+    { lineBreak: false },
+  );
+  doc.y = footerY + 22;
+  doc.x = 55;
+  doc.text(
+    "asesoría legal profesional. Consulte con un abogado calificado.",
+    55,
+    footerY + 22,
+    { lineBreak: false },
+  );
+
+  doc.fillColor("#6b7280").fontSize(8);
+  const pageLabel = `Página ${currentPage} de ${totalPages}`;
+  const labelWidth = doc.widthOfString(pageLabel);
+  const labelX = 545 - labelWidth;
+  doc.y = footerY + 30;
+  doc.x = labelX;
+  doc.text(pageLabel, labelX, footerY + 30, { lineBreak: false });
 }
