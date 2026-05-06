@@ -14,6 +14,7 @@
  */
 
 import type { Analysis } from "~/types";
+import { isAdminUser } from "./auth";
 
 /**
  * Strip sensitive debug info from analysis summary
@@ -97,9 +98,9 @@ export async function getRequestUserContext(event: any) {
       };
     }
 
-    // Check admin status by comparing with admin email from runtime config
-    const config = useRuntimeConfig(event);
-    const isAdmin = user.email === config.adminEmail;
+    // [SECURITY FIX H1] Delegate admin check to single source of truth
+    // (case/Unicode-normalized comparison + admin_emails table lookup)
+    const isAdmin = await isAdminUser(event);
 
     return {
       userId: user.id,
