@@ -414,8 +414,15 @@ const filteredAnalyses = computed(() => {
         : a.risk_level === activeFilter.value);
     const matchesDateFrom =
       !dateFrom.value || new Date(a.created_at) >= new Date(dateFrom.value);
-    const matchesDateTo =
-      !dateTo.value || new Date(a.created_at) <= new Date(dateTo.value);
+    let matchesDateTo = true;
+    if (dateTo.value) {
+      // Set TO date to end of day so all analyses on that date are included
+      // regardless of time component. new Date('2026-02-21') yields midnight,
+      // which would exclude analyses created later in the same day.
+      const toDate = new Date(dateTo.value);
+      toDate.setHours(23, 59, 59, 999);
+      matchesDateTo = new Date(a.created_at) <= toDate;
+    }
     return matchesSearch && matchesFilter && matchesDateFrom && matchesDateTo;
   });
 });
