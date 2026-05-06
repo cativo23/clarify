@@ -12,7 +12,7 @@ const sharedAlias = {
 const sharedTest = {
   environment: "happy-dom" as const,
   globals: true,
-  setupFiles: ["./tests/setup.ts"],
+  setupFiles: [resolve(root, "tests/setup.ts")],
   server: {
     deps: {
       inline: ["@nuxt/test-utils"],
@@ -29,10 +29,7 @@ export default defineConfig({
         test: {
           ...sharedTest,
           name: "unit",
-          include: [
-            "tests/unit/**/*.{test,spec}.ts",
-            "tests/components/**/*.{test,spec}.ts",
-          ],
+          include: ["tests/unit/**/*.{test,spec}.ts"],
         },
         resolve: {
           alias: {
