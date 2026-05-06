@@ -38,3 +38,37 @@ Shipped versions and key releases.
 ---
 
 _For detailed milestone archive, see `.planning/milestones/v1.0-mvp-ROADMAP.md`_
+
+---
+
+## v1.1 Admin & Deploy — 2026-03-25
+
+**Phases:** 6-7 | **Plans:** 4 | **Status:** ✅ SHIPPED
+
+### Key Accomplishments
+
+1. **Admin Revenue Dashboard** — Daily/weekly/monthly/quarterly revenue charts with gross/net comparison and package breakdown
+2. **Conversion Funnel Tracking** — 4-stage funnel (Signups → Email Verified → First Analysis → First Purchase) with conversion rates
+3. **Cost Analysis by Tier** — Profit margin tracking for Basic/Premium/Forensic with AI cost calculations
+4. **User Management** — Credit adjustments and account suspension with audit trail logging
+5. **Production Infrastructure** — `.env.example` template, configurable worker concurrency, Redis health check
+
+### Stats
+
+- **Timeline:** 2026-03-16 → 2026-03-25 (9 days)
+- **Files Modified:** 15+
+- **Test Coverage:** 43 admin tests (14 costs, 16 user-management, 6 revenue, 7 funnel)
+- **Requirements:** 4/5 complete (80%)
+
+### Known Gaps
+
+- **DEPLOY-01** — Deployment artifacts complete, live verification pending (HTTPS, health endpoint, worker processing, Traefik routing)
+
+### Tech Debt
+
+- Phase 06 missing VERIFICATION.md file
+- Database migrations for user suspension require manual Supabase execution
+
+---
+
+_For detailed milestone archive, see `.planning/milestones/v1.1-admin-deploy-ROADMAP.md`_

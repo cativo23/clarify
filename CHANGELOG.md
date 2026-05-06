@@ -2,7 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased] - v1.0.0-alpha.15
+## [1.0.0-alpha.17] - 2026-05-06
+
+### Changed
+- Completed v1.1 Admin & Deploy milestone archival
+- Branch sync: reconcile develop and main after v1.1 milestone
+
+---
+
+## [1.0.0-alpha.16] - 2026-03-25
+
+### Changed
+- CI/CD workflow matches portfolio auto-deploy structure
+- Use `environment: prod` for deployment jobs
+- Docker login on server before pulling images
+- Use `docker compose down` before `up -d` for clean deploy
+
+### Fixed
+- Deploy workflow now uses correct secrets (`SSH_HOST`, etc.)
+- Removed lint job from release pipeline (build + deploy only)
+
+---
+
+## [1.0.0-alpha.15] - 2026-03-25
 
 ### Added
 - Auto-release GitHub Actions workflow for automated versioning
