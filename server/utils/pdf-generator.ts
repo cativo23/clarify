@@ -41,8 +41,10 @@ export async function generateAnalysisPDF(
   const { includeBranding = true, includeDisclaimer = true } = options;
 
   // Create PDF document
+  // bufferPages: true allows post-render iteration to add footer on every page
   const doc = new PDFDocument({
     margin: 50,
+    bufferPages: true,
   });
 
   const chunks: Uint8Array[] = [];
@@ -110,8 +112,12 @@ export async function generateAnalysisPDF(
   const ejecutivo = summary.resumen_ejecutivo;
   if (ejecutivo) {
     // Verdict
-    doc.font("Helvetica-Bold").text("Veredicto: ", 50, doc.y, { continued: true });
-    doc.font("Helvetica").text(ejecutivo.veredicto || "Sin veredicto", doc.x, doc.y);
+    doc
+      .font("Helvetica-Bold")
+      .text("Veredicto: ", 50, doc.y, { continued: true });
+    doc
+      .font("Helvetica")
+      .text(ejecutivo.veredicto || "Sin veredicto", doc.x, doc.y);
     doc.moveDown(0.5);
 
     // Justification
@@ -145,7 +151,9 @@ export async function generateAnalysisPDF(
 
   const hallazgos = summary.hallazgos || [];
   if (hallazgos.length === 0) {
-    doc.fillColor("#9ca3af").text("No se encontraron hallazgos en este análisis.", 50, doc.y);
+    doc
+      .fillColor("#9ca3af")
+      .text("No se encontraron hallazgos en este análisis.", 50, doc.y);
   } else {
     for (const hallazgo of hallazgos) {
       const color = hallazgo.color || "verde";
@@ -153,11 +161,8 @@ export async function generateAnalysisPDF(
         RISK_COLORS[color as keyof typeof RISK_COLORS] || RISK_COLORS.verde;
 
       // Check if we need a new page before drawing the border
+      // (footers added in post-pass over all buffered pages)
       if (doc.y > CONTENT_BOTTOM) {
-        // Add footer to current page before creating a new page
-        if (includeDisclaimer) {
-          addFooterToPage(doc, PAGE_HEIGHT, FOOTER_HEIGHT, 1, 1); // Placeholder page numbers
-        }
         doc.addPage();
       }
 
@@ -177,7 +182,10 @@ export async function generateAnalysisPDF(
       }
 
       if (hallazgo.clausula) {
-        doc.fillColor("#6b7280").font("Helvetica-Oblique").text(`Cláusula: ${hallazgo.clausula}`, 60, doc.y);
+        doc
+          .fillColor("#6b7280")
+          .font("Helvetica-Oblique")
+          .text(`Cláusula: ${hallazgo.clausula}`, 60, doc.y);
         doc.font("Helvetica").fillColor("black");
       }
 
@@ -213,9 +221,6 @@ export async function generateAnalysisPDF(
   ) {
     // Check if we need a new page
     if (doc.y > CONTENT_BOTTOM) {
-      if (includeDisclaimer) {
-        addFooterToPage(doc, PAGE_HEIGHT, FOOTER_HEIGHT, 1, 1); // Placeholder page numbers
-      }
       doc.addPage();
     }
 
@@ -231,16 +236,11 @@ export async function generateAnalysisPDF(
       for (const cruce of summary.analisis_cruzado) {
         // Check page boundary
         if (doc.y > CONTENT_BOTTOM) {
-          if (includeDisclaimer) {
-            addFooterToPage(doc, PAGE_HEIGHT, FOOTER_HEIGHT, 1, 1); // Placeholder page numbers
-          }
           doc.addPage();
         }
 
         const severityColor =
-          cruce.severidad === "rojo"
-            ? RISK_COLORS.rojo
-            : RISK_COLORS.amarillo;
+          cruce.severidad === "rojo" ? RISK_COLORS.rojo : RISK_COLORS.amarillo;
 
         doc
           .fillColor(severityColor)
@@ -250,11 +250,13 @@ export async function generateAnalysisPDF(
           .font("Helvetica")
           .fillColor("#4b5563")
           .text(cruce.inconsistencia || "", 50, doc.y);
-        doc.fillColor("#6b7280").text(
-          `${cruce.clausula_origen} ↔ ${cruce.clausula_destino}`,
-          50,
-          doc.y
-        );
+        doc
+          .fillColor("#6b7280")
+          .text(
+            `${cruce.clausula_origen} ↔ ${cruce.clausula_destino}`,
+            50,
+            doc.y,
+          );
         doc.fillColor("#059669").text(cruce.recomendacion || "", 50, doc.y);
 
         doc.moveDown(1);
@@ -265,9 +267,6 @@ export async function generateAnalysisPDF(
     if (summary.omisiones && summary.omisiones.length > 0) {
       // Check page boundary
       if (doc.y > CONTENT_BOTTOM) {
-        if (includeDisclaimer) {
-          addFooterToPage(doc, PAGE_HEIGHT, FOOTER_HEIGHT, 1, 1); // Placeholder page numbers
-        }
         doc.addPage();
       }
 
@@ -281,9 +280,6 @@ export async function generateAnalysisPDF(
       for (const omision of summary.omisiones) {
         // Check page boundary
         if (doc.y > CONTENT_BOTTOM) {
-          if (includeDisclaimer) {
-            addFooterToPage(doc, PAGE_HEIGHT, FOOTER_HEIGHT, 1, 1); // Placeholder page numbers
-          }
           doc.addPage();
         }
 
@@ -297,13 +293,15 @@ export async function generateAnalysisPDF(
           .text(
             `Categoría: ${omision.categoria || "No especificada"}`,
             50,
-            doc.y
+            doc.y,
           );
-        doc.fillColor("#4b5563").text(
-          `Riesgo: ${omision.riesgo_usuario || "No especificado"}`,
-          50,
-          doc.y
-        );
+        doc
+          .fillColor("#4b5563")
+          .text(
+            `Riesgo: ${omision.riesgo_usuario || "No especificado"}`,
+            50,
+            doc.y,
+          );
 
         if (omision.clausula_sugerida) {
           doc
@@ -321,9 +319,6 @@ export async function generateAnalysisPDF(
     if (summary.mapa_estructural) {
       // Check page boundary
       if (doc.y > CONTENT_BOTTOM) {
-        if (includeDisclaimer) {
-          addFooterToPage(doc, PAGE_HEIGHT, FOOTER_HEIGHT, 1, 1); // Placeholder page numbers
-        }
         doc.addPage();
       }
 
@@ -335,11 +330,13 @@ export async function generateAnalysisPDF(
         .text("MAPA ESTRUCTURAL DEL DOCUMENTO", 50, doc.y);
       doc.font("Helvetica").fillColor("black").fontSize(10);
 
-      doc.fillColor("#4b5563").text(
-        `Total secciones: ${mapa.total_secciones} | Anexos: ${mapa.total_anexos} | Páginas: ${mapa.total_paginas || "N/A"}`,
-        50,
-        doc.y
-      );
+      doc
+        .fillColor("#4b5563")
+        .text(
+          `Total secciones: ${mapa.total_secciones} | Anexos: ${mapa.total_anexos} | Páginas: ${mapa.total_paginas || "N/A"}`,
+          50,
+          doc.y,
+        );
 
       if (mapa.secciones && mapa.secciones.length > 0) {
         doc
@@ -351,39 +348,36 @@ export async function generateAnalysisPDF(
         for (const seccion of mapa.secciones) {
           // Check page boundary
           if (doc.y > CONTENT_BOTTOM) {
-            if (includeDisclaimer) {
-              addFooterToPage(doc, PAGE_HEIGHT, FOOTER_HEIGHT, 1, 1); // Placeholder page numbers
-            }
             doc.addPage();
           }
 
           const riskColor =
             RISK_COLORS[seccion.riesgo as keyof typeof RISK_COLORS] ||
             RISK_COLORS.gris;
-          doc.fillColor(riskColor).text(`• ${seccion.nombre} (pág. ${seccion.paginas})`, 50, doc.y);
+          doc
+            .fillColor(riskColor)
+            .text(`• ${seccion.nombre} (pág. ${seccion.paginas})`, 50, doc.y);
         }
       }
     }
   }
 
-  // Add footer to the last page
+  // Add footer to EVERY page using buffered page range.
+  // pdfkit with bufferPages: true lets us switch to each page after content is
+  // written and stamp the footer + page number, ensuring it appears on all pages
+  // (not just the last). Switching pages is required because pdfkit's drawing
+  // commands target the "current" page.
   if (includeDisclaimer) {
-    // We need to calculate the actual page count, so we'll use a simpler approach
-    // For now, add the footer to the current page
-    const currentPageNum = doc.bufferedPageRange
-      ? doc.bufferedPageRange().count
-      : 1;
-    const totalPages = currentPageNum; // This is a simplification
-
-    addFooterToPage(
-      doc,
-      PAGE_HEIGHT,
-      FOOTER_HEIGHT,
-      currentPageNum,
-      totalPages,
-    );
+    const range = doc.bufferedPageRange();
+    const totalPages = range.count;
+    for (let i = 0; i < totalPages; i++) {
+      doc.switchToPage(range.start + i);
+      addFooterToPage(doc, PAGE_HEIGHT, FOOTER_HEIGHT, i + 1, totalPages);
+    }
   }
 
+  // Flush buffered pages before ending so footer writes are committed.
+  doc.flushPages();
   doc.end();
 
   return new Promise((resolve, reject) => {
