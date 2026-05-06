@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-alpha.18] - 2026-05-06
+
+### Security
+- **#33** Fix missing rate-limit import in `/api/check-tokens` (would have bypassed DoS protection at runtime)
+- **#35** Replace `createRequire` with native ESM import for `pdf-parse` (restores tree-shaking)
+- **#36** Unify admin authorization in `getRequestUserContext` to delegate to `isAdminUser` (NFKC normalization + `admin_emails` table lookup); secondary admins were silently losing privileges in `/api/analyses` endpoints
+
+### Performance
+- **#34** Cancel stale `/api/check-tokens` requests on rapid file selection in dashboard via `AbortController`
+
+### Tests / Tooling
+- **#37** Split vitest into `unit` and `integration` projects so the `#supabase/server` mock alias only applies to unit tests; adds `npm run test:unit` and `npm run test:integration`
+- New unit tests for `getRequestUserContext` admin paths
+- Extract `isAdminEmail(event, email)` helper to avoid redundant `auth.getUser()` round-trip
+
+---
+
 ## [1.0.0-alpha.17] - 2026-05-06
 
 ### Changed
