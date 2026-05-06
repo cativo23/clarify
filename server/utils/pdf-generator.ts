@@ -123,7 +123,7 @@ export async function generateAnalysisPDF(
     const metricas = summary.metricas;
     if (metricas) {
       doc.text(
-        `Métricas: 🔴 ${metricas.total_rojas || 0}  🟡 ${metricas.total_amarillas || 0}  🟢 ${metricas.total_verdes || 0}`,
+        `Hallazgos: ${metricas.total_rojas || 0} críticos, ${metricas.total_amarillas || 0} medios, ${metricas.total_verdes || 0} bajos`,
         50,
         doc.y,
       );
