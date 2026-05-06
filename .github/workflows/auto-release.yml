@@ -40,10 +40,13 @@ jobs:
           fi
           echo "tag=$RAW" >> "$GITHUB_OUTPUT"
           echo "number=${RAW#v}" >> "$GITHUB_OUTPUT"
-          # Detect prerelease: v0.x.y is prerelease
+          # Detect prerelease:
+          #  - v0.x.y is always prerelease (pre-1.0)
+          #  - any tag with a SemVer pre-release identifier (e.g. -alpha, -beta,
+          #    -rc, -alpha.18) is prerelease, regardless of major
           MAJOR="${RAW#v}"
           MAJOR="${MAJOR%%.*}"
-          if [[ "$MAJOR" -eq 0 ]]; then
+          if [[ "$MAJOR" -eq 0 ]] || [[ "$RAW" == *-* ]]; then
             echo "prerelease=true" >> "$GITHUB_OUTPUT"
           else
             echo "prerelease=false" >> "$GITHUB_OUTPUT"
