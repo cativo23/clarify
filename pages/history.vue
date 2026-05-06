@@ -89,6 +89,14 @@
             </div>
           </div>
 
+          <button
+            v-if="hasActiveFilters"
+            class="px-3 py-2 text-xs font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+            @click="resetFilters"
+          >
+            Limpiar filtros
+          </button>
+
           <div
             class="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-2xl border border-slate-200 dark:border-slate-800"
           >
@@ -414,8 +422,15 @@ const filteredAnalyses = computed(() => {
         : a.risk_level === activeFilter.value);
     const matchesDateFrom =
       !dateFrom.value || new Date(a.created_at) >= new Date(dateFrom.value);
-    const matchesDateTo =
-      !dateTo.value || new Date(a.created_at) <= new Date(dateTo.value);
+    let matchesDateTo = true;
+    if (dateTo.value) {
+      // Set TO date to end of day so all analyses on that date are included
+      // regardless of time component. new Date('2026-02-21') yields midnight,
+      // which would exclude analyses created later in the same day.
+      const toDate = new Date(dateTo.value);
+      toDate.setHours(23, 59, 59, 999);
+      matchesDateTo = new Date(a.created_at) <= toDate;
+    }
     return matchesSearch && matchesFilter && matchesDateFrom && matchesDateTo;
   });
 });
