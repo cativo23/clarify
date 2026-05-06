@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-alpha.17] - 2026-05-06
+
+### Changed
+- Completed v1.1 Admin & Deploy milestone archival
+- Branch sync: reconcile develop and main after v1.1 milestone
+
+---
+
 ## [1.0.0-alpha.16] - 2026-03-25
 
 ### Changed
