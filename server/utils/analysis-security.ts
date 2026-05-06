@@ -14,7 +14,7 @@
  */
 
 import type { Analysis } from "~/types";
-import { isAdminUser } from "./auth";
+import { isAdminEmail } from "./auth";
 
 /**
  * Strip sensitive debug info from analysis summary
@@ -99,8 +99,9 @@ export async function getRequestUserContext(event: any) {
     }
 
     // [SECURITY FIX H1] Delegate admin check to single source of truth
-    // (case/Unicode-normalized comparison + admin_emails table lookup)
-    const isAdmin = await isAdminUser(event);
+    // (case/Unicode-normalized comparison + admin_emails table lookup).
+    // Pass the already-fetched email to avoid a redundant auth.getUser() call.
+    const isAdmin = user.email ? await isAdminEmail(event, user.email) : false;
 
     return {
       userId: user.id,
