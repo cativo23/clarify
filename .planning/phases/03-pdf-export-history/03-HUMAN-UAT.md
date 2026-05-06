@@ -1,14 +1,14 @@
 ---
-status: partial
+status: complete
 phase: 03-pdf-export-history
 source: [03-VERIFICATION.md]
 started: 2026-05-06T00:00:00Z
-updated: 2026-05-06T23:25:00Z
+updated: 2026-05-06T23:30:00Z
 ---
 
 ## Current Test
 
-[items 4 & 5 still require manual run]
+[all 5 tests complete]
 
 ## Tests
 
@@ -32,14 +32,14 @@ result: passed — first export-pdf returned `cached: false`, second returned `c
 
 ### 5. Cross-user PDF access denial
 expected: User A cannot download PDF for an analysis owned by User B (RLS/ownership enforced)
-result: pending — needs a second auth user; deferred.
+result: passed — seeded user2 (3273b585...) with private analysis 18072af2. User1 fetching `/api/analyses/18072af2.../export-pdf` returns 404 NOT_FOUND_ERROR. Endpoint correctly denies and does not leak ownership (404 rather than 403).
 
 ## Summary
 
 total: 5
-passed: 4
+passed: 5
 issues: 0
-pending: 1
+pending: 0
 skipped: 0
 blocked: 0
 
