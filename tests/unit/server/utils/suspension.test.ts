@@ -121,6 +121,15 @@ describe('upload route suspension gate (ADMIN-04)', () => {
     vi.doMock('#supabase/server', () => ({
       serverSupabaseClient: (...args: any[]) => mockUploadClient(...args),
     }))
+    // upload.post.ts imports via "../utils/auth" relative to server/api/.
+    // Mock by the resolved alias path used by the vitest tsconfig.
+    vi.doMock('@/server/utils/auth', () => ({
+      assertNotSuspended: (...args: any[]) => {
+        callOrder.push('assertNotSuspended')
+        return mockAssertNotSuspended(...args)
+      },
+      ACCOUNT_SUSPENDED: 'ACCOUNT_SUSPENDED',
+    }))
     vi.doMock('~/server/utils/auth', () => ({
       assertNotSuspended: (...args: any[]) => {
         callOrder.push('assertNotSuspended')
@@ -128,7 +137,6 @@ describe('upload route suspension gate (ADMIN-04)', () => {
       },
       ACCOUNT_SUSPENDED: 'ACCOUNT_SUSPENDED',
     }))
-    // The upload route imports via "../utils/auth" — alias both forms.
     vi.doMock('../utils/auth', () => ({
       assertNotSuspended: (...args: any[]) => {
         callOrder.push('assertNotSuspended')
@@ -140,6 +148,13 @@ describe('upload route suspension gate (ADMIN-04)', () => {
       handleApiError: (err: any) => {
         throw err
       },
+    }))
+    vi.doMock('@/server/utils/file-validation', () => ({
+      validateFileUpload: (...args: any[]) => {
+        callOrder.push('validateFileUpload')
+        return mockValidateFileUpload(...args)
+      },
+      logFileValidation: vi.fn(),
     }))
     vi.doMock('../utils/file-validation', () => ({
       validateFileUpload: (...args: any[]) => {
