@@ -34,7 +34,7 @@
 
 ### 🔄 v2.0 Analysis Experience (Phases 11-13)
 
-- [ ] **Phase 11: Prompt Engineering** — Upgrade all tier prompts to emit structured clause-level output
+- [x] **Phase 11: Prompt Engineering** — Upgrade all tier prompts to emit structured clause-level output
 - [ ] **Phase 12: Analysis Results UI & Confidence Signals** — Navigable clause cards, risk score, certainty badges, coverage indicator
 - [ ] **Phase 13: Launch Verification** — Confirm production is live and all deferred UAT gaps are closed
 
@@ -51,8 +51,8 @@
   4. All three tier prompts produce parseable structured output (no free-form text blobs where structured fields are expected)
 **Plans**: 2 plans
 Plans:
-- [ ] 11-01-PLAN.md — Types + Basic/Premium prompt upgrades (confianza, categoria_riesgo, puntaje_riesgo, desglose_riesgo)
-- [ ] 11-02-PLAN.md — Forensic prompt upgrade (same shared fields + clausulas_analizadas/clausulas_total coverage)
+- [x] 11-01-PLAN.md — Types + Basic/Premium prompt upgrades (confianza, categoria_riesgo, puntaje_riesgo, desglose_riesgo)
+- [x] 11-02-PLAN.md — Forensic prompt upgrade (same shared fields + clausulas_analizadas/clausulas_total coverage)
 
 ### Phase 12: Analysis Results UI & Confidence Signals
 **Goal**: Users can navigate analysis results with clarity — understanding what was flagged, why, how confident the AI is, and how much of their contract was covered
