@@ -9,6 +9,9 @@ vi.mock('#supabase/server', () => ({
 }))
 
 vi.stubGlobal('useRuntimeConfig', mockRuntimeConfig)
+// auth.ts uses Nuxt's globally-injected createError — stub it so thrown errors
+// retain statusCode/data fields the assertions inspect.
+vi.stubGlobal('createError', (err: any) => err)
 
 /**
  * Builds a Supabase client stub whose
