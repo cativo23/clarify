@@ -96,3 +96,135 @@ describe('assertNotSuspended (ADMIN-04)', () => {
     await expect(assertNotSuspended(event, 'user-1')).resolves.toBeUndefined()
   })
 })
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Task 2 — Upload route suspension gate
+//
+// We mock the auth module's assertNotSuspended at the boundary and the file
+// validation utility, then invoke the route handler. The goal is to verify
+// (a) the gate runs after auth, (b) it runs BEFORE file validation, and (c)
+// when it throws, no file work occurs.
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('upload route suspension gate (ADMIN-04)', () => {
+  let callOrder: string[]
+  const mockAssertNotSuspended = vi.fn()
+  const mockReadMultipartFormData = vi.fn()
+  const mockValidateFileUpload = vi.fn()
+  const mockUploadClient = vi.fn()
+
+  beforeEach(() => {
+    vi.resetModules()
+    vi.clearAllMocks()
+    callOrder = []
+
+    vi.doMock('#supabase/server', () => ({
+      serverSupabaseClient: (...args: any[]) => mockUploadClient(...args),
+    }))
+    vi.doMock('~/server/utils/auth', () => ({
+      assertNotSuspended: (...args: any[]) => {
+        callOrder.push('assertNotSuspended')
+        return mockAssertNotSuspended(...args)
+      },
+      ACCOUNT_SUSPENDED: 'ACCOUNT_SUSPENDED',
+    }))
+    // The upload route imports via "../utils/auth" — alias both forms.
+    vi.doMock('../utils/auth', () => ({
+      assertNotSuspended: (...args: any[]) => {
+        callOrder.push('assertNotSuspended')
+        return mockAssertNotSuspended(...args)
+      },
+      ACCOUNT_SUSPENDED: 'ACCOUNT_SUSPENDED',
+    }))
+    vi.doMock('~/server/utils/error-handler', () => ({
+      handleApiError: (err: any) => {
+        throw err
+      },
+    }))
+    vi.doMock('../utils/file-validation', () => ({
+      validateFileUpload: (...args: any[]) => {
+        callOrder.push('validateFileUpload')
+        return mockValidateFileUpload(...args)
+      },
+      logFileValidation: vi.fn(),
+    }))
+
+    vi.stubGlobal('defineEventHandler', (cb: any) => cb)
+    vi.stubGlobal('createError', (err: any) => {
+      const e: any = new Error(err.message || 'error')
+      Object.assign(e, err)
+      return e
+    })
+    vi.stubGlobal('readMultipartFormData', (...args: any[]) => {
+      callOrder.push('readMultipartFormData')
+      return mockReadMultipartFormData(...args)
+    })
+
+    mockUploadClient.mockResolvedValue({
+      auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'u-1' } } }) },
+      storage: {
+        from: vi.fn().mockReturnValue({
+          upload: vi.fn().mockResolvedValue({ data: {}, error: null }),
+          getPublicUrl: vi.fn().mockReturnValue({ data: { publicUrl: 'https://x/y' } }),
+        }),
+      },
+    })
+  })
+
+  it('Test 5: suspended user POST /api/upload returns 403 ACCOUNT_SUSPENDED', async () => {
+    mockAssertNotSuspended.mockImplementation(() => {
+      const err: any = new Error('Account suspended')
+      err.statusCode = 403
+      err.data = { code: 'ACCOUNT_SUSPENDED' }
+      throw err
+    })
+
+    const handler = (await import('@/server/api/upload.post')).default
+    let caught: any = null
+    try {
+      await handler({} as any)
+    } catch (err) {
+      caught = err
+    }
+    expect(caught).toBeTruthy()
+    expect(caught.statusCode).toBe(403)
+    expect(caught.data?.code).toBe('ACCOUNT_SUSPENDED')
+  })
+
+  it('Test 6: non-suspended authenticated user passes the gate and proceeds', async () => {
+    mockAssertNotSuspended.mockResolvedValue(undefined)
+    mockReadMultipartFormData.mockResolvedValue([
+      { filename: 'c.pdf', data: Buffer.from('%PDF-1.4 hi') },
+    ])
+    mockValidateFileUpload.mockReturnValue({
+      isValid: true,
+      file: { detectedExtension: 'pdf', detectedType: 'application/pdf', size: 11 },
+    })
+
+    const handler = (await import('@/server/api/upload.post')).default
+    const result = await handler({} as any)
+    expect(result.success).toBe(true)
+    expect(mockAssertNotSuspended).toHaveBeenCalled()
+  })
+
+  it('Test 7: suspension check runs BEFORE readMultipartFormData (no PDF parsed for suspended user)', async () => {
+    mockAssertNotSuspended.mockImplementation(() => {
+      const err: any = new Error('Account suspended')
+      err.statusCode = 403
+      err.data = { code: 'ACCOUNT_SUSPENDED' }
+      throw err
+    })
+
+    const handler = (await import('@/server/api/upload.post')).default
+    try {
+      await handler({} as any)
+    } catch {
+      /* expected */
+    }
+    expect(callOrder).toContain('assertNotSuspended')
+    expect(callOrder).not.toContain('readMultipartFormData')
+    expect(callOrder).not.toContain('validateFileUpload')
+    expect(mockReadMultipartFormData).not.toHaveBeenCalled()
+    expect(mockValidateFileUpload).not.toHaveBeenCalled()
+  })
+})
