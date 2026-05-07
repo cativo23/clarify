@@ -52,23 +52,21 @@ Transform the flat analysis report into a structured, navigable reading experien
 
 ## Traceability
 
-_Filled by roadmapper when ROADMAP.md is created._
-
 | REQ-ID | Phase | Plan |
 |--------|-------|------|
-| RESULT-01 | — | — |
-| RESULT-02 | — | — |
-| RESULT-03 | — | — |
-| CONF-01 | — | — |
-| CONF-02 | — | — |
-| CONF-03 | — | — |
-| PROMPT-02 | — | — |
-| PROMPT-03 | — | — |
-| LAUNCH-01 | — | — |
-| LAUNCH-02 | — | — |
-| LAUNCH-03 | — | — |
-| LAUNCH-04 | — | — |
+| PROMPT-02 | Phase 11 | — |
+| PROMPT-03 | Phase 11 | — |
+| RESULT-01 | Phase 12 | — |
+| RESULT-02 | Phase 12 | — |
+| RESULT-03 | Phase 12 | — |
+| CONF-01 | Phase 12 | — |
+| CONF-02 | Phase 12 | — |
+| CONF-03 | Phase 12 | — |
+| LAUNCH-01 | Phase 13 | — |
+| LAUNCH-02 | Phase 13 | — |
+| LAUNCH-03 | Phase 13 | — |
+| LAUNCH-04 | Phase 13 | — |
 
 ---
 
-*Last updated: 2026-05-07 — v2.0 requirements defined*
+*Last updated: 2026-05-07 — v2.0 roadmap created, traceability filled (Phases 11-13)*

@@ -5,7 +5,7 @@ milestone_name: Analysis Experience
 status: planning
 last_updated: "2026-05-07T00:00:00.000Z"
 progress:
-  total_phases: 0
+  total_phases: 3
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -19,14 +19,18 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-07 — v2.0 Analysis Experience started)
 
 **Core value:** Democratizing legal advice by making contract analysis accessible and affordable for non-lawyers.
-**Current focus:** v2.0 — Analysis Experience (clause navigation, confidence signals, prompt improvements)
+**Current focus:** v2.0 — Analysis Experience (clause navigation, confidence signals, prompt improvements, launch verification)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 11 (Prompt Engineering) — not started
 Plan: —
-Status: Defining requirements
-Last activity: 2026-05-07 — Milestone v2.0 started
+Status: Roadmap created, ready to plan Phase 11
+Last activity: 2026-05-07 — v2.0 roadmap created (Phases 11-13)
+
+```
+Progress: [░░░░░░░░░░░░░░░░░░░░] 0% — 0/3 phases complete
+```
 
 ## Performance Metrics
 
@@ -51,33 +55,34 @@ All decisions logged in PROJECT.md Key Decisions table.
 
 ### Blockers/Concerns
 
-**All Resolved (Phase 10):**
-
-- ADMIN-04 (BLOCKER): Suspension flag never enforced — FIXED (upload + worker gates)
-- DEPLOY-01 (BLOCKER): .env.example missing critical vars — FIXED (6 keys documented)
-- ADMIN-01: Funnel Stage 2 RPC missing — FIXED (migration + SECURITY DEFINER function)
-- ADMIN-02: Revenue package breakdown brittle — FIXED (credits_purchased join, lookup table)
+None — all v1.1 blockers resolved in Phase 10.
 
 ## Deferred Items
 
-Items acknowledged and deferred at milestone close on 2026-05-07:
+Items acknowledged and deferred at v1.1 milestone close on 2026-05-07 — now tracked as v2.0 requirements:
 
 | Category | Item | Status |
 |----------|------|--------|
-| uat_gap | Phase 01 tests_partial: 1 — Test 4 (Forensic UI sections) | Deferred to v2.0 (Phase 2 gap) |
-| uat_gap | Phase 07 production env tests (5 items) | Deferred to v2.0 launch (requires live clarify.cativo.dev) |
-| uat_gap | PDF render verification (Phase 03) | Deferred to v2.0 launch (requires PDF viewer + storage bucket) |
-| uat_gap | PDF caching round-trip (Phase 03) | Deferred to v2.0 launch (requires Supabase Storage bucket setup) |
+| uat_gap | Phase 01 Test 4 (Forensic UI sections) | → LAUNCH-04 (Phase 13) |
+| uat_gap | Phase 07 production env tests (5 items) | → LAUNCH-01 (Phase 13) |
+| uat_gap | PDF render verification (Phase 03) | → LAUNCH-02 (Phase 13) |
+| uat_gap | PDF caching round-trip (Phase 03) | → LAUNCH-03 (Phase 13) |
 
 ---
 
 ## Session Continuity
 
-**v1.1 Full Close (2026-05-07):**
+**v2.0 Roadmap Created (2026-05-07):**
 
-All phases complete, all audit blockers resolved, UAT complete.
+3 phases defined, 12 requirements mapped (100% coverage).
 
-**All Phases Complete:**
+| Phase | Name | Requirements | Status |
+|-------|------|--------------|--------|
+| 11 | Prompt Engineering | PROMPT-02, PROMPT-03 | Not started |
+| 12 | Analysis Results UI & Confidence Signals | RESULT-01-03, CONF-01-03 | Not started |
+| 13 | Launch Verification | LAUNCH-01-04 | Not started |
+
+**Previously Complete (v1.0 + v1.1):**
 
 | Phase | Name | Plans | Status |
 |-------|------|-------|--------|
@@ -90,11 +95,8 @@ All phases complete, all audit blockers resolved, UAT complete.
 | 7 | Production Deployment | 1/1 | Complete |
 | 10 | v1.1 Audit Gap Closure | 4/4 | Complete |
 
-**Next: v2.0 Planning**
-
-- Run `/gsd-new-milestone` to start v2.0 planning cycle
-- Requirements discovery → roadmap → phase planning
+**Next: `/gsd-plan-phase 11`**
 
 ---
 
-_Last updated: 2026-05-07 after v1.1 full milestone close (including Phase 10 audit gap closure)_
+_Last updated: 2026-05-07 — v2.0 roadmap created (Phases 11-13, 12 requirements)_
