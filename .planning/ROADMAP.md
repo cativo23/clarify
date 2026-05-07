@@ -48,6 +48,16 @@
 | 6. Admin Analytics| v1.1      | 3/3            | Complete    | 2026-03-16 |
 | 7. Production Deploy | v1.1   | 1/1            | Complete    | 2026-03-25 |
 
+### Phase 10: v1.1 audit gap closure: enforce suspension, complete .env.example, fix funnel RPC, fix revenue package join
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 9
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 10 to break down)
+
 ---
 
 _For detailed milestone archives, see `.planning/milestones/`_

@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Admin & Deploy
-status: ready_to_plan
-last_updated: "2026-05-06T22:57:57.618Z"
+status: unknown
+last_updated: "2026-05-07T00:34:24.304Z"
 progress:
-  total_phases: 7
-  completed_phases: 7
-  total_plans: 26
-  completed_plans: 26
-  percent: 100
+  total_phases: 1
+  completed_phases: 0
+  total_plans: 4
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -40,6 +40,10 @@ Plan: Not started
 - Phase 7: Production Deployment (1/1 plans) — infrastructure ready
 
 ## Accumulated Context
+
+### Roadmap Evolution
+
+- Phase 10 added: v1.1 audit gap closure: enforce suspension, complete .env.example, fix funnel RPC, fix revenue package join
 
 ### Decisions
 
