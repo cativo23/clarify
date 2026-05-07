@@ -113,7 +113,9 @@ scripts/test-redis.ts    # Verify Redis connectivity
 ```
 
 ## ⚙️ Environment Variables
-Required in `.env`: `SUPABASE_URL`, `SUPABASE_KEY`, `SUPABASE_SERVICE_KEY`, `OPENAI_API_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `REDIS_HOST`, `REDIS_PORT`, `REDIS_TOKEN`, `ADMIN_EMAIL`.
+Required in `.env`: `SUPABASE_URL`, `SUPABASE_KEY`, `SUPABASE_SERVICE_KEY`, `OPENAI_API_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID_5_CREDITS`, `STRIPE_PRICE_ID_10_CREDITS`, `STRIPE_PRICE_ID_25_CREDITS`, `REDIS_HOST`, `REDIS_PORT`, `REDIS_TOKEN`, `ADMIN_EMAIL`, `ALLOWED_REDIRECT_ORIGINS`, `DISABLE_WORKER`, `NODE_ENV`.
+
+See `.env.example` for full per-key documentation and consequences-if-missing.
 
 ## ⚠️ Critical Reminders
 1.  **Never commit .env files**.
