@@ -57,10 +57,13 @@ export interface AnalysisSummary {
     mayor_riesgo_identificado: string;
   };
   nivel_riesgo_general: "Alto" | "Medio" | "Bajo";
+  puntaje_riesgo?: number;
+  desglose_riesgo?: Record<string, number>;
   metricas: {
     total_rojas: number;
     total_amarillas: number;
     total_verdes: number;
+    total_grises?: number;
     porcentaje_clausulas_analizadas: string;
   };
   hallazgos: Hallazgo[];
@@ -119,13 +122,15 @@ export interface MapaEstructural {
 }
 
 export interface Hallazgo {
-  color: "rojo" | "amarillo" | "verde";
+  color: "rojo" | "amarillo" | "verde" | "gris";
   titulo: string;
   explicacion: string;
   clausula?: string;
   cita_textual?: string;
   riesgo_real?: string;
   mitigacion?: string;
+  confianza?: "Alta" | "Media" | "Baja";
+  categoria_riesgo?: string;
 }
 
 export interface Transaction {
