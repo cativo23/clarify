@@ -85,6 +85,11 @@ export default defineEventHandler(async (event) => {
   let verifiedUserIds: string[] = [];
 
   if (verifiedError) {
+    console.warn(
+      "[Funnel API] get_email_verified_users_in_range RPC failed; falling back to created_at approximation. " +
+        "Stage 2 will equal Stage 1. Run `npm run db:migrate` to apply migration 20260506000001. Error:",
+      verifiedError.message
+    );
     // Fallback: query users table for users with email confirmation
     // Note: This assumes users.created_at approximates email confirmation
     // In production, you'd want to track email_confirmed_at in public.users
