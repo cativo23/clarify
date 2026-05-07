@@ -273,8 +273,8 @@ ELSE:
 - **9–10**: Múltiples rojas extremas. Ejemplos de rojas extremas: venta de datos sin opt-out, renuncia total a demandar, confiscación de fondos.
 
 **Consistencia obligatoria:** `puntaje_riesgo` DEBE ser coherente con `nivel_riesgo_general`:
-- Bajo → puntaje 0–3
-- Medio → puntaje 3–6
+- Bajo → puntaje 0–2
+- Medio → puntaje 3–5
 - Alto → puntaje 6–10
 
 ### `desglose_riesgo`:
