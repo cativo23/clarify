@@ -103,3 +103,64 @@ export async function requireAdmin(event: H3Event): Promise<void> {
     });
   }
 }
+
+/**
+ * Standardized error code thrown when a suspended user touches any
+ * surface gated by `assertNotSuspended`. Clients/UI should branch on
+ * `error.data.code === ACCOUNT_SUSPENDED` rather than parsing messages.
+ */
+export const ACCOUNT_SUSPENDED = "ACCOUNT_SUSPENDED" as const;
+
+/**
+ * Throws 403 if `users.is_suspended` is true for the resolved user.
+ *
+ * Behavior:
+ * - If `userId` is provided, looks up that row directly.
+ * - If omitted, resolves the user from `serverSupabaseClient(event).auth.getUser()`.
+ *   When no authenticated user is present, returns silently — auth gating is the
+ *   caller's responsibility (matches existing `requireAdmin` separation).
+ * - On lookup error, fails OPEN (returns silently). Same defensive pattern used by
+ *   `isAdminEmail` for the admin_emails table: an infra hiccup must not lock out
+ *   legitimate users. Suspension is a deliberate admin action; absence of evidence
+ *   is treated as "not suspended" rather than "suspended by default".
+ *
+ * The error contract is intentionally minimal — fixed code, no DB error text —
+ * to avoid leaking internal state (T-10-04 in plan threat model).
+ *
+ * @param event - The H3 event (used to obtain a request-scoped Supabase client)
+ * @param userId - Optional user id; when omitted, resolved from the session
+ * @throws 403 with `data.code === ACCOUNT_SUSPENDED` when the user is suspended
+ */
+export async function assertNotSuspended(
+  event: H3Event,
+  userId?: string,
+): Promise<void> {
+  const client = await serverSupabaseClient(event);
+
+  let uid = userId;
+  if (!uid) {
+    const { data } = await client.auth.getUser();
+    if (!data.user) return; // unauthenticated path is handled by callers
+    uid = data.user.id;
+  }
+
+  const { data, error } = await client
+    .from("users")
+    .select("is_suspended")
+    .eq("id", uid)
+    .maybeSingle();
+
+  if (error) {
+    // Fail-open on infra error — see jsdoc above for rationale.
+    console.error("[Auth] suspension lookup failed:", error.message);
+    return;
+  }
+
+  if (data?.is_suspended === true) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: "Account suspended",
+      data: { code: ACCOUNT_SUSPENDED },
+    });
+  }
+}

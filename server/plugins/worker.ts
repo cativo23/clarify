@@ -36,6 +36,21 @@ export default defineNitroPlugin((_nitroApp) => {
       const supabase = getWorkerSupabaseClient();
 
       try {
+        // [ADMIN-04] Reject jobs from suspended users at pickup.
+        // Jobs may have been queued before the admin suspended the account, so
+        // we MUST gate at pickup (not at enqueue). Early return with
+        // status=failed and no credit refund — no work was done, so no debit
+        // to reverse.
+        if (await supabase.isUserSuspended(userId)) {
+          console.warn(
+            `[Worker] Rejecting analysis ${analysisId}: user ${userId} is suspended`,
+          );
+          await supabase.updateAnalysisStatus(analysisId, "failed", {
+            error_message: "account_suspended",
+          });
+          return;
+        }
+
         // 1. Update status to processing
         const updateResult = await supabase.updateAnalysisStatus(
           analysisId,

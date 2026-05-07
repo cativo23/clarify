@@ -43,6 +43,17 @@ interface WorkerSupabaseClient {
     storage_path?: string;
     error?: string;
   }>;
+
+  /**
+   * [ADMIN-04] Check whether a user is suspended.
+   *
+   * Reads only `users.is_suspended` for the given id. Fails OPEN (returns
+   * false) on lookup error: an infra hiccup must not orphan analyses or
+   * silently consume credits without producing output. Suspension is a
+   * deliberate admin action, so absence of evidence is treated as
+   * "not suspended" rather than the inverse.
+   */
+  isUserSuspended: (userId: string) => Promise<boolean>;
 }
 
 let cachedClient: {
@@ -152,6 +163,34 @@ export function getWorkerSupabaseClient(): WorkerSupabaseClient {
       } catch (err: any) {
         console.error("[Worker Supabase] Download error:", err.message);
         return { error: err.message };
+      }
+    },
+
+    async isUserSuspended(userId: string): Promise<boolean> {
+      if (!userId || typeof userId !== "string") {
+        return false;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from("users")
+          .select("is_suspended")
+          .eq("id", userId)
+          .maybeSingle();
+
+        if (error) {
+          console.error(
+            "[Worker Supabase] isUserSuspended lookup failed:",
+            error.message,
+          );
+          // Fail-open: do not block legitimate jobs on infra error.
+          return false;
+        }
+
+        return data?.is_suspended === true;
+      } catch (err: any) {
+        console.error("[Worker Supabase] isUserSuspended error:", err.message);
+        return false;
       }
     },
 

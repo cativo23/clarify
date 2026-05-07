@@ -4,6 +4,7 @@ import {
   validateFileUpload,
   logFileValidation,
 } from "../utils/file-validation";
+import { assertNotSuspended } from "../utils/auth";
 import { handleApiError } from "~/server/utils/error-handler";
 
 export default defineEventHandler(async (event): Promise<UploadResponse> => {
@@ -22,6 +23,10 @@ export default defineEventHandler(async (event): Promise<UploadResponse> => {
     }
 
     userId = user.id;
+
+    // [ADMIN-04] Reject suspended users before any file work.
+    // Throws 403 with data.code='ACCOUNT_SUSPENDED' when users.is_suspended=true.
+    await assertNotSuspended(event, user.id);
 
     // Parse multipart form data
     const formData = await readMultipartFormData(event);
