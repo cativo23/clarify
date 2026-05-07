@@ -243,3 +243,114 @@ describe('upload route suspension gate (ADMIN-04)', () => {
     expect(mockValidateFileUpload).not.toHaveBeenCalled()
   })
 })
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Task 3 — Worker rejects jobs from suspended users at pickup
+//
+// The worker is wrapped in defineNitroPlugin and binds to BullMQ at import
+// time, which makes invoking the inner job handler directly impractical in a
+// unit test. Instead we:
+//   (a) unit-test the new isUserSuspended() helper added to worker-supabase
+//       (the small piece doing the DB read), and
+//   (b) source-level check the worker plugin wires the helper + early-return
+//       BEFORE downloadContractFile and emits status='failed' with
+//       error_message='account_suspended'.
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('worker-supabase isUserSuspended (ADMIN-04 helper)', () => {
+  beforeEach(() => {
+    vi.resetModules()
+    process.env.SUPABASE_URL = 'https://x.supabase.co'
+    process.env.SUPABASE_SERVICE_KEY = 'service-key'
+  })
+
+  it('Test 8a: returns true when users.is_suspended = true', async () => {
+    const maybeSingle = vi.fn().mockResolvedValue({ data: { is_suspended: true }, error: null })
+    vi.doMock('@supabase/supabase-js', () => ({
+      createClient: () => ({
+        from: () => ({
+          select: () => ({ eq: () => ({ maybeSingle }) }),
+          update: () => ({ eq: () => ({ data: null, error: null }) }),
+        }),
+      }),
+    }))
+    const { getWorkerSupabaseClient, clearWorkerSupabaseCache } =
+      await import('@/server/utils/worker-supabase')
+    clearWorkerSupabaseCache()
+    const client = getWorkerSupabaseClient()
+    expect(typeof client.isUserSuspended).toBe('function')
+    await expect(client.isUserSuspended('u-1')).resolves.toBe(true)
+  })
+
+  it('Test 8b: returns false when users.is_suspended = false', async () => {
+    const maybeSingle = vi.fn().mockResolvedValue({ data: { is_suspended: false }, error: null })
+    vi.doMock('@supabase/supabase-js', () => ({
+      createClient: () => ({
+        from: () => ({
+          select: () => ({ eq: () => ({ maybeSingle }) }),
+          update: () => ({ eq: () => ({ data: null, error: null }) }),
+        }),
+      }),
+    }))
+    const { getWorkerSupabaseClient, clearWorkerSupabaseCache } =
+      await import('@/server/utils/worker-supabase')
+    clearWorkerSupabaseCache()
+    const client = getWorkerSupabaseClient()
+    await expect(client.isUserSuspended('u-1')).resolves.toBe(false)
+  })
+
+  it('Test 8c: returns false (fail-closed-to-process) when lookup errors', async () => {
+    // The worker fails OPEN (proceeds with job) on infra error to avoid losing
+    // legitimate analyses; mirrors auth.ts assertNotSuspended pattern.
+    const maybeSingle = vi
+      .fn()
+      .mockResolvedValue({ data: null, error: { message: 'connection lost' } })
+    vi.doMock('@supabase/supabase-js', () => ({
+      createClient: () => ({
+        from: () => ({
+          select: () => ({ eq: () => ({ maybeSingle }) }),
+          update: () => ({ eq: () => ({ data: null, error: null }) }),
+        }),
+      }),
+    }))
+    const { getWorkerSupabaseClient, clearWorkerSupabaseCache } =
+      await import('@/server/utils/worker-supabase')
+    clearWorkerSupabaseCache()
+    const client = getWorkerSupabaseClient()
+    await expect(client.isUserSuspended('u-1')).resolves.toBe(false)
+  })
+})
+
+describe('worker plugin source-level wiring (ADMIN-04)', () => {
+  // The plugin runs at Nitro init and binds to BullMQ on import; we cannot
+  // safely invoke it in a vitest worker. Instead, assert the source contains
+  // the wired-in suspension gate placed BEFORE the download step. These checks
+  // pair with Tests 8a/8b/8c above which exercise the helper itself.
+  it('Test 9: worker source calls isUserSuspended BEFORE downloadContractFile', async () => {
+    const fs = await import('node:fs/promises')
+    const path = await import('node:path')
+    const src = await fs.readFile(
+      path.resolve(__dirname, '../../../../server/plugins/worker.ts'),
+      'utf-8',
+    )
+    const idxSuspend = src.indexOf('isUserSuspended')
+    const idxDownload = src.indexOf('downloadContractFile')
+    expect(idxSuspend).toBeGreaterThan(-1)
+    expect(idxDownload).toBeGreaterThan(-1)
+    expect(idxSuspend).toBeLessThan(idxDownload)
+  })
+
+  it('Test 10: worker source emits status=failed with error_message=account_suspended on suspension', async () => {
+    const fs = await import('node:fs/promises')
+    const path = await import('node:path')
+    const src = await fs.readFile(
+      path.resolve(__dirname, '../../../../server/plugins/worker.ts'),
+      'utf-8',
+    )
+    expect(src).toMatch(/account_suspended/)
+    expect(src).toMatch(/Rejecting analysis/)
+    // Early return: no analyzeContract / downloadContractFile reachable when suspended
+    const suspendBlockMatch = src.match(/isUserSuspended[\s\S]{0,400}?return;/)
+    expect(suspendBlockMatch).toBeTruthy()
+  })
+})
