@@ -1,13 +1,13 @@
 # Roadmap: Clarify
 
-**Current Version:** v1.1 (Admin & Deploy)
+**Current Version:** v1.1 (Admin & Deploy — fully closed 2026-05-07)
 **Next Version:** v2.0 (TBD)
-**Target:** Q2 2026
+**Target:** Q3 2026
 
 ## Milestones
 
 - ✅ **v1.0 MVP** — Phases 1-5 (shipped 2026-03-15)
-- ✅ **v1.1 Admin & Deploy** — Phases 6-7 (shipped 2026-03-25)
+- ✅ **v1.1 Admin & Deploy** — Phases 6, 7, 10 (shipped 2026-03-25, audit gaps closed 2026-05-07)
 - 📋 **v2.0** — TBD (planning required)
 
 ## Phases
@@ -24,10 +24,11 @@
 </details>
 
 <details>
-<summary>✅ v1.1 Admin & Deploy (Phases 6-7) — SHIPPED 2026-03-25</summary>
+<summary>✅ v1.1 Admin & Deploy (Phases 6, 7, 10) — fully closed 2026-05-07</summary>
 
 - [x] Phase 6: Admin Analytics (3/3 plans) — completed 2026-03-16
 - [x] Phase 7: Production Deployment (1/1 plans) — completed 2026-03-25
+- [x] Phase 10: v1.1 Audit Gap Closure (4/4 plans) — completed 2026-05-07
 
 </details>
 
@@ -38,25 +39,16 @@
 
 ## Progress
 
-| Phase             | Milestone | Plans Complete | Status      | Completed  |
-| ----------------- | --------- | -------------- | ----------- | ---------- |
-| 1. Core Analysis  | v1.0      | 4/4            | Complete    | 2026-02-17 |
-| 2. Tier Selection | v1.0      | 6/6            | Complete    | 2026-02-20 |
-| 3. PDF & History  | v1.0      | 3/3            | Complete    | 2026-02-25 |
-| 4. Monetization   | v1.0      | 5/5            | Complete    | 2026-03-01 |
-| 5. Free Credits   | v1.0      | 4/4            | Complete    | 2026-03-15 |
-| 6. Admin Analytics| v1.1      | 3/3            | Complete    | 2026-03-16 |
-| 7. Production Deploy | v1.1   | 1/1            | Complete    | 2026-03-25 |
-
-### Phase 10: v1.1 audit gap closure: enforce suspension, complete .env.example, fix funnel RPC, fix revenue package join
-
-**Goal:** [To be planned]
-**Requirements**: TBD
-**Depends on:** Phase 9
-**Plans:** 4/4 plans complete
-
-Plans:
-- [x] TBD (run /gsd-plan-phase 10 to break down) (completed 2026-05-07)
+| Phase                 | Milestone | Plans Complete | Status      | Completed  |
+| --------------------- | --------- | -------------- | ----------- | ---------- |
+| 1. Core Analysis      | v1.0      | 4/4            | Complete    | 2026-02-17 |
+| 2. Tier Selection     | v1.0      | 6/6            | Complete    | 2026-02-20 |
+| 3. PDF & History      | v1.0      | 3/3            | Complete    | 2026-02-25 |
+| 4. Monetization       | v1.0      | 5/5            | Complete    | 2026-03-01 |
+| 5. Free Credits       | v1.0      | 4/4            | Complete    | 2026-03-15 |
+| 6. Admin Analytics    | v1.1      | 3/3            | Complete    | 2026-03-16 |
+| 7. Production Deploy  | v1.1      | 1/1            | Complete    | 2026-03-25 |
+| 10. Audit Gap Closure | v1.1      | 4/4            | Complete    | 2026-05-07 |
 
 ---
 

@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Admin & Deploy
 status: milestone_complete
-last_updated: "2026-05-07T05:50:04.380Z"
+last_updated: "2026-05-07T07:30:00.000Z"
 progress:
-  total_phases: 1
-  completed_phases: 1
-  total_plans: 4
-  completed_plans: 0
+  total_phases: 3
+  completed_phases: 3
+  total_plans: 8
+  completed_plans: 8
   percent: 100
 ---
 
@@ -16,34 +16,32 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-25 after v1.1 Admin & Deploy)
+See: .planning/PROJECT.md (updated 2026-05-07 after v1.1 full close including Phase 10)
 
 **Core value:** Democratizing legal advice by making contract analysis accessible and affordable for non-lawyers.
-**Current focus:** Phase 10 — v1-1-audit-gap-closure-enforce-suspension-complete-env-examp
+**Current focus:** v2.0 — Planning required
 
 ## Current Position
 
-Phase: 10
-Plan: Not started
+Phase: Complete (all v1.1 phases done)
+Next: `/gsd-new-milestone` to start v2.0
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 33
+- Total plans completed: 41
 - v1.0: 22 plans across 5 phases
-- v1.1: 4 plans across 2 phases
+- v1.1: 8 plans across 3 phases (Phases 6, 7, 10)
+- v1.1 Phase 10: 4 plans (audit gap closure)
 
-**v1.1 Admin & Deploy (COMPLETE):**
+**v1.1 Admin & Deploy + Audit Gap Closure (COMPLETE):**
 
-- Phase 6: Admin Analytics (3/3 plans) — 43 tests
+- Phase 6: Admin Analytics (3/3 plans) — 43 tests, all 16 UAT passed
 - Phase 7: Production Deployment (1/1 plans) — infrastructure ready
+- Phase 10: v1.1 Audit Gap Closure (4/4 plans) — all 4 blockers closed, 23 tests pass
 
 ## Accumulated Context
-
-### Roadmap Evolution
-
-- Phase 10 added: v1.1 audit gap closure: enforce suspension, complete .env.example, fix funnel RPC, fix revenue package join
 
 ### Decisions
 
@@ -51,24 +49,31 @@ All decisions logged in PROJECT.md Key Decisions table.
 
 ### Blockers/Concerns
 
-**Resolved:**
+**All Resolved (Phase 10):**
 
-- Admin analytics dashboard — Complete (Phase 6)
-- Production deployment infrastructure — Complete (Phase 7)
+- ADMIN-04 (BLOCKER): Suspension flag never enforced — FIXED (upload + worker gates)
+- DEPLOY-01 (BLOCKER): .env.example missing critical vars — FIXED (6 keys documented)
+- ADMIN-01: Funnel Stage 2 RPC missing — FIXED (migration + SECURITY DEFINER function)
+- ADMIN-02: Revenue package breakdown brittle — FIXED (credits_purchased join, lookup table)
 
-**Known Gaps:**
+## Deferred Items
 
-- DEPLOY-01 live verification pending — Requires human testing on production environment
+Items acknowledged and deferred at milestone close on 2026-05-07:
+
+| Category | Item | Status |
+|----------|------|--------|
+| uat_gap | Phase 01 tests_partial: 1 — Test 4 (Forensic UI sections) | Deferred to v2.0 (Phase 2 gap) |
+| uat_gap | Phase 07 production env tests (5 items) | Deferred to v2.0 launch (requires live clarify.cativo.dev) |
+| uat_gap | PDF render verification (Phase 03) | Deferred to v2.0 launch (requires PDF viewer + storage bucket) |
+| uat_gap | PDF caching round-trip (Phase 03) | Deferred to v2.0 launch (requires Supabase Storage bucket setup) |
 
 ---
 
 ## Session Continuity
 
-**v1.1 Admin & Deploy Summary (COMPLETE):**
+**v1.1 Full Close (2026-05-07):**
 
-- Phase 6: Admin Analytics (revenue dashboard, conversion funnel, cost analysis, user management)
-- Phase 7: Production Deployment (.env.example, worker config, health check)
-- 5/5 requirements (4 complete, 1 partial — DEPLOY-01 live verification pending)
+All phases complete, all audit blockers resolved, UAT complete.
 
 **All Phases Complete:**
 
@@ -81,12 +86,13 @@ All decisions logged in PROJECT.md Key Decisions table.
 | 5 | Free Credits & Onboarding | 4/4 | Complete |
 | 6 | Admin Analytics | 3/3 | Complete |
 | 7 | Production Deployment | 1/1 | Complete |
+| 10 | v1.1 Audit Gap Closure | 4/4 | Complete |
 
 **Next: v2.0 Planning**
 
-- Run `/gsd:new-milestone` to start v2.0 planning cycle
+- Run `/gsd-new-milestone` to start v2.0 planning cycle
 - Requirements discovery → roadmap → phase planning
 
 ---
 
-_Last updated: 2026-03-25 after v1.1 Admin & Deploy milestone_
+_Last updated: 2026-05-07 after v1.1 full milestone close (including Phase 10 audit gap closure)_

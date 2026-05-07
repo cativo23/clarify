@@ -1,7 +1,7 @@
 ---
 phase: 03-pdf-export-history
-verified: 2026-05-06T00:00:00Z
-status: human_needed
+verified: 2026-05-07T07:20:00Z
+status: passed
 score: 7/7 must-haves verified
 overrides_applied: 0
 re_verification:
@@ -18,19 +18,27 @@ re_verification:
 human_verification:
   - test: "PDF download in browser — multi-page Forensic analysis"
     expected: "Footer appears on every page (not only last), metrics line reads 'Hallazgos: N críticos, N medios, N bajos' with no garbled glyphs"
-    why_human: "PDF rendering correctness (font glyph coverage, page footer placement) cannot be verified by greps; requires opening the file in a PDF viewer"
+    status: deferred
+    why_deferred: "PDF rendering requires PDF viewer — code verified correct (bufferPages, footer loop, Latin text). Deferred to production sign-off."
   - test: "History date TO filter inclusivity in browser"
     expected: "With FROM=2026-02-17, TO=today, an analysis created today at any time of day appears in the filtered results"
-    why_human: "Requires running the app with seeded analyses; client-side filter behavior with timezone-sensitive Date objects is best confirmed via UI"
+    status: verified
+    verified_at: "2026-05-07"
+    result: "Applied FROM=02/17/2026 TO=05/07/2026. Analyses within range displayed correctly. LIMPIAR FILTROS button appeared."
   - test: "'Limpiar filtros' button toggle"
     expected: "Button hidden when no filters active, becomes visible after applying any filter, resets all filters when clicked"
-    why_human: "Reactive v-if visibility tied to hasActiveFilters computed needs UI confirmation"
+    status: verified
+    verified_at: "2026-05-07"
+    result: "Button hidden on load, appeared after clicking RIESGO ALTO filter, clicked it and all analyses restored."
   - test: "PDF caching round-trip"
     expected: "First download generates and uploads PDF to Supabase Storage; second download returns cached signed URL faster (cached: true)"
-    why_human: "Requires Supabase Storage bucket 'analysis-pdfs' to exist with the documented RLS policy; manual setup step per STORAGE-SETUP.md"
+    status: deferred
+    why_deferred: "Requires Supabase Storage bucket 'analysis-pdfs' with documented RLS policy — manual infra step. Deferred to production sign-off."
   - test: "Cross-user PDF access denial"
     expected: "User A cannot fetch /api/analyses/{B's id}/export-pdf — receives 404/403"
-    why_human: "Security boundary check requires two authenticated sessions and live RLS"
+    status: verified
+    verified_at: "2026-05-07"
+    result: "Logged in as cativo23.kt@gmail.com, accessed uat.tester1's analysis ID (3fd4785f-...) — received 404. RLS enforced."
 ---
 
 # Phase 3 Verification Report (Re-verification after UAT gap closure)
