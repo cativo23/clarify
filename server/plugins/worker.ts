@@ -94,10 +94,14 @@ export default defineNitroPlugin((_nitroApp) => {
           analysisType || "premium",
         );
 
+        // Detect prompt-level error responses before treating as valid analysis
+        if (analysisSummary.error && typeof analysisSummary.error === "string") {
+          throw new Error(`Analysis rejected by model: ${analysisSummary.error}`);
+        }
+
         // 5. Map risk level and Normalize Summary for UI
-        // Premium uses 'nivel_riesgo_general', Basic uses 'nivel_riesgo'
-        const riskLevelStr =
-          analysisSummary.nivel_riesgo_general || analysisSummary.nivel_riesgo;
+        // All v2 tiers use 'nivel_riesgo_general'
+        const riskLevelStr = analysisSummary.nivel_riesgo_general;
 
         const riskMapping: Record<string, string> = {
           Alto: "high",
