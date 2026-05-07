@@ -49,7 +49,10 @@
   2. A Forensic analysis response includes a numeric coverage estimate (percentage of contract clauses analyzed)
   3. Existing analysis history is not broken — older results without the new fields degrade gracefully in the UI
   4. All three tier prompts produce parseable structured output (no free-form text blobs where structured fields are expected)
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 11-01-PLAN.md — Types + Basic/Premium prompt upgrades (confianza, categoria_riesgo, puntaje_riesgo, desglose_riesgo)
+- [ ] 11-02-PLAN.md — Forensic prompt upgrade (same shared fields + clausulas_analizadas/clausulas_total coverage)
 
 ### Phase 12: Analysis Results UI & Confidence Signals
 **Goal**: Users can navigate analysis results with clarity — understanding what was flagged, why, how confident the AI is, and how much of their contract was covered
@@ -87,7 +90,7 @@
 | 6. Admin Analytics | v1.1 | 3/3 | Complete | 2026-03-16 |
 | 7. Production Deploy | v1.1 | 1/1 | Complete | 2026-03-25 |
 | 10. Audit Gap Closure | v1.1 | 4/4 | Complete | 2026-05-07 |
-| 11. Prompt Engineering | v2.0 | 0/? | Not started | - |
+| 11. Prompt Engineering | v2.0 | 0/2 | Not started | - |
 | 12. Analysis Results UI & Confidence Signals | v2.0 | 0/? | Not started | - |
 | 13. Launch Verification | v2.0 | 0/? | Not started | - |
 
