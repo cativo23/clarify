@@ -275,7 +275,7 @@ Cláusulas administrativas sin impacto directo en riesgo:
       "cita_textual": "Sección 3.4: '30 días naturales' / Sección 8.3: '15 días desde primer acceso'",
       "explicacion": "Contradicción directa: 30 días vs 15 días. Ambigüedad puede usarse en tu contra.",
       "riesgo_real": "Reembolso día 20 puede rechazarse citando Sección 8.3.",
-      "mitigacion": "EXIGE eliminar inconsistencia antes de firmar.",
+      "mitigacion": "Considera solicitar que se elimine esta inconsistencia antes de firmar.",
       "confianza": "Alta",
       "categoria_riesgo": "Financiero"
     },
@@ -335,7 +335,7 @@ Cláusulas administrativas sin impacto directo en riesgo:
       "texto_destino": "Anexo B no incluido",
       "inconsistencia": "Refiere a Anexo B que no existe. Sin SLA medible.",
       "impacto": "Medio-Alto - No hay forma de exigir niveles de servicio",
-      "recomendacion": "EXIGE adjuntar Anexo B antes de firmar",
+      "recomendacion": "Evalúa solicitar que adjunten el Anexo B antes de firmar.",
       "severidad": "amarillo"
     }
   ],
