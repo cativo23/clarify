@@ -1,30 +1,32 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: Admin & Deploy
-status: milestone_complete
-last_updated: "2026-05-07T07:30:00.000Z"
+milestone: v2.0
+milestone_name: Analysis Experience
+status: planning
+last_updated: "2026-05-07T00:00:00.000Z"
 progress:
-  total_phases: 3
-  completed_phases: 3
-  total_plans: 8
-  completed_plans: 8
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-07 after v1.1 full close including Phase 10)
+See: .planning/PROJECT.md (updated 2026-05-07 — v2.0 Analysis Experience started)
 
 **Core value:** Democratizing legal advice by making contract analysis accessible and affordable for non-lawyers.
-**Current focus:** v2.0 — Planning required
+**Current focus:** v2.0 — Analysis Experience (clause navigation, confidence signals, prompt improvements)
 
 ## Current Position
 
-Phase: Complete (all v1.1 phases done)
-Next: `/gsd-new-milestone` to start v2.0
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-07 — Milestone v2.0 started
 
 ## Performance Metrics
 
