@@ -249,7 +249,7 @@ ELSE SI (total_rojas = 2):
 
 ELSE SI (total_rojas = 1):
   nivel_riesgo_general = "Medio"
-  veredicto = "Firmar" (con advertencia sobre el riesgo identificado)
+  veredicto = "Negociar primero"
 
 ELSE SI (total_amarillas >= 5):
   nivel_riesgo_general = "Medio"
