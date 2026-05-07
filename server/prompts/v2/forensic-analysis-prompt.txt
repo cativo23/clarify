@@ -201,6 +201,14 @@ Cláusulas administrativas sin impacto directo en riesgo:
 - Ejemplo: Si el contrato tiene 50 cláusulas y analizaste 50 → "100%"
 - Si no llegas al 100% por límite de tokens, reporta el porcentaje real alcanzado
 
+**IMPORTANTE - Campos de cobertura numérica (solo Forensic):**
+- `clausulas_analizadas`: Número entero. Cuenta las cláusulas/párrafos sustantivos que analizaste.
+- `clausulas_total`: Número entero. Tu estimado del total de cláusulas en el documento.
+- `porcentaje_clausulas_analizadas`: String derivado. Ej: "96%". Debe ser consistente con los campos numéricos.
+- Estos valores DEBEN coincidir con `_debug.coverage_verification.clausesAnalyzed` y `clausesTotal`.
+- Para análisis forense completo: `clausulas_analizadas` debe igualar `clausulas_total` (100% de cobertura).
+- Si hay truncamiento por tokens, reporta los valores reales (no inflados).
+
 ```json
 {
   "_debug": {
@@ -244,7 +252,9 @@ Cláusulas administrativas sin impacto directo en riesgo:
     "total_hallazgos": 43,
     "total_omisiones": 7,
     "total_inconsistencias_cruzadas": 3,
-    "porcentaje_clausulas_analizadas": "CALCULAR: (cláusulas analizadas / total cláusulas en contrato) * 100. Debe ser ~100% para análisis forense completo"
+    "clausulas_analizadas": 156,
+    "clausulas_total": 156,
+    "porcentaje_clausulas_analizadas": "100%"
   },
   "hallazgos": [
     {
