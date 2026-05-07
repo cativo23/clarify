@@ -201,12 +201,20 @@ Cláusulas administrativas sin impacto directo en riesgo:
 - Ejemplo: Si el contrato tiene 50 cláusulas y analizaste 50 → "100%"
 - Si no llegas al 100% por límite de tokens, reporta el porcentaje real alcanzado
 
+**IMPORTANTE - Campos de cobertura numérica (solo Forensic):**
+- `clausulas_analizadas`: Número entero. Cuenta las cláusulas/párrafos sustantivos que analizaste.
+- `clausulas_total`: Número entero. Tu estimado del total de cláusulas en el documento.
+- `porcentaje_clausulas_analizadas`: String derivado. Ej: "96%". Debe ser consistente con los campos numéricos.
+- Estos valores DEBEN coincidir con `_debug.coverage_verification.clausesAnalyzed` y `clausesTotal`.
+- Para análisis forense completo: `clausulas_analizadas` debe igualar `clausulas_total` (100% de cobertura).
+- Si hay truncamiento por tokens, reporta los valores reales (no inflados).
+
 ```json
 {
   "_debug": {
     "timestamp": "2025-01-31T10:30:00Z",
     "model_used": "gpt-5",
-    "prompt_version": "v2.0",
+    "prompt_version": "v2.1",
     "tier": "forensic",
     "preprocessing": {
       "truncated": false,
@@ -234,6 +242,8 @@ Cláusulas administrativas sin impacto directo en riesgo:
     "recomendacion_prioritaria": "Acción específica número 1 que el usuario debería tomar"
   },
   "nivel_riesgo_general": "Alto | Medio | Bajo",
+  "puntaje_riesgo": 8,
+  "desglose_riesgo": {"Financiero": 1, "Disputas": 1, "Datos": 2, "Responsabilidad": 1},
   "metricas": {
     "total_rojas": 5,
     "total_amarillas": 18,
@@ -242,7 +252,9 @@ Cláusulas administrativas sin impacto directo en riesgo:
     "total_hallazgos": 43,
     "total_omisiones": 7,
     "total_inconsistencias_cruzadas": 3,
-    "porcentaje_clausulas_analizadas": "CALCULAR: (cláusulas analizadas / total cláusulas en contrato) * 100. Debe ser ~100% para análisis forense completo"
+    "clausulas_analizadas": 156,
+    "clausulas_total": 156,
+    "porcentaje_clausulas_analizadas": "100%"
   },
   "hallazgos": [
     {
@@ -252,7 +264,9 @@ Cláusulas administrativas sin impacto directo en riesgo:
       "cita_textual": "El contrato se renovará automáticamente por períodos anuales salvo notificación escrita con 90 días de anticipación.",
       "explicacion": "Debes cancelar exactamente 90 días antes del vencimiento. Si olvidas, pagas un año completo más.",
       "riesgo_real": "Si vence el 31 de marzo y olvidas cancelar antes del 1 de enero, pagas todo el año siguiente.",
-      "mitigacion": "Configura recordatorio 120 días antes o negocia ventana de 30 días."
+      "mitigacion": "Configura recordatorio 120 días antes o negocia ventana de 30 días.",
+      "confianza": "Alta",
+      "categoria_riesgo": "Financiero"
     },
     {
       "color": "rojo",
@@ -261,7 +275,9 @@ Cláusulas administrativas sin impacto directo en riesgo:
       "cita_textual": "Sección 3.4: '30 días naturales' / Sección 8.3: '15 días desde primer acceso'",
       "explicacion": "Contradicción directa: 30 días vs 15 días. Ambigüedad puede usarse en tu contra.",
       "riesgo_real": "Reembolso día 20 puede rechazarse citando Sección 8.3.",
-      "mitigacion": "EXIGE eliminar inconsistencia antes de firmar."
+      "mitigacion": "EXIGE eliminar inconsistencia antes de firmar.",
+      "confianza": "Alta",
+      "categoria_riesgo": "Financiero"
     },
     {
       "color": "amarillo",
@@ -270,7 +286,9 @@ Cláusulas administrativas sin impacto directo en riesgo:
       "cita_textual": "Ajuste anual según IPC más hasta 5% adicional.",
       "explicacion": "Pueden subir precio cada año: inflación + 5% extra sin justificación.",
       "riesgo_real": "Con inflación 10%, tu precio sube 15% anual sin límite.",
-      "mitigacion": "Solicita techo máximo (ej: IPC + 2% o máximo 8% anual)."
+      "mitigacion": "Solicita techo máximo (ej: IPC + 2% o máximo 8% anual).",
+      "confianza": "Media",
+      "categoria_riesgo": "Financiero"
     },
     {
       "color": "verde",
@@ -279,7 +297,9 @@ Cláusulas administrativas sin impacto directo en riesgo:
       "cita_textual": "Usuario puede exportar datos en CSV/JSON en 72 horas sin costo.",
       "explicacion": "Puedes descargar tu información cuando quieras, facilita cambiar de servicio.",
       "riesgo_real": "N/A - Cláusula favorable.",
-      "mitigacion": "N/A"
+      "mitigacion": "N/A",
+      "confianza": "Alta",
+      "categoria_riesgo": "Derechos"
     },
     {
       "color": "gris",
@@ -288,7 +308,9 @@ Cláusulas administrativas sin impacto directo en riesgo:
       "cita_textual": "Notificaciones por email válidas 24h después de envío.",
       "explicacion": "Comunicaciones importantes por email. Estándar en contratos digitales.",
       "riesgo_real": "Bajo.",
-      "mitigacion": "Mantén email actualizado."
+      "mitigacion": "Mantén email actualizado.",
+      "confianza": "Alta",
+      "categoria_riesgo": "Otro"
     }
   ],
   "analisis_cruzado": [
@@ -394,6 +416,62 @@ ELSE:
 
 ---
 
+## PUNTAJE DE RIESGO (0-10)
+
+**CRÍTICO:** Emite `puntaje_riesgo` (entero 0-10) y `desglose_riesgo` en el JSON. El LLM calcula el puntaje — no uses fórmula mecánica.
+
+### Anclas de Calibración:
+- **0–2**: Sin hallazgos críticos. A lo sumo 2 amarillas menores.
+- **3–5**: 1–2 rojas, O más de 5 amarillas significativas.
+- **6–8**: 3+ rojas, O al menos 1 roja extrema.
+- **9–10**: Múltiples rojas extremas. Ejemplos de rojas extremas: venta de datos sin opt-out, renuncia total a demandar, confiscación de fondos.
+
+**Consistencia obligatoria:** `puntaje_riesgo` DEBE ser coherente con `nivel_riesgo_general`:
+- Bajo → puntaje 0–3
+- Medio → puntaje 3–6
+- Alto → puntaje 6–10
+
+### `desglose_riesgo`:
+Cuenta hallazgos (rojos + amarillos) por `categoria_riesgo`. Ejemplo:
+```json
+"desglose_riesgo": {"Financiero": 2, "Datos": 1, "Derechos": 1}
+```
+Solo incluye categorías con al menos 1 hallazgo.
+
+---
+
+## CATEGORÍAS DE RIESGO (enum controlado)
+
+Cada hallazgo DEBE incluir `categoria_riesgo` con uno de estos valores exactos (sin variaciones):
+
+| Valor | Aplica a |
+|-------|----------|
+| `"Financiero"` | Precios, pagos, penalizaciones, renovaciones |
+| `"Datos"` | Recolección, transferencia, uso, retención, privacidad |
+| `"Derechos"` | Derechos del usuario, renuncia a demandas colectivas, portabilidad |
+| `"Responsabilidad"` | Límites de responsabilidad, garantías, indemnizaciones |
+| `"Disputas"` | Arbitraje, jurisdicción, ley aplicable |
+| `"Modificaciones"` | Cambios unilaterales de términos |
+| `"Otro"` | Hallazgos que no encajan en las categorías anteriores |
+
+**Regla:** Los hallazgos GRIS también reciben `categoria_riesgo` — asigna la más relevante aunque el riesgo sea neutral.
+
+---
+
+## CONFIANZA DEL ANÁLISIS (por hallazgo)
+
+Cada hallazgo DEBE incluir `confianza` indicando qué tan seguro está el AI de que la cláusula representa el riesgo clasificado.
+
+| Valor | Cuándo aplicar |
+|-------|----------------|
+| `"Alta"` | Cláusula explícita e inequívoca. El riesgo es claro sin contexto adicional. Ejemplo: "Se cobrará automáticamente al renovarse." |
+| `"Media"` | Cláusula general o condicional. El riesgo depende de circunstancias específicas. Ejemplo: "Podemos modificar los términos en cualquier momento según consideremos necesario." |
+| `"Baja"` | Vaga, incompleta, o requiere interpretación legal para determinar el riesgo. Ejemplo: "Sujeto a términos adicionales aplicables." |
+
+**Nota:** `confianza` mide la certeza del AI sobre la clasificación, NO la claridad del lenguaje contractual.
+
+---
+
 ## GESTIÓN DE TOKENS (OPTIMIZADO)
 
 ### Si documento > 120k tokens:
@@ -474,6 +552,10 @@ Antes de cerrar, verifica:
 - [ ] **JSON:** ¿Correctamente cerrado?
 - [ ] **Lenguaje:** ¿Simple, sin "debes"/"exige"?
 - [ ] **Orden:** ¿Rojos → amarillos → verdes → grises?
+- [ ] Cada hallazgo tiene `confianza` (Alta/Media/Baja) correctamente calibrado
+- [ ] Cada hallazgo tiene `categoria_riesgo` del enum controlado (Financiero, Datos, Derechos, Responsabilidad, Disputas, Modificaciones, Otro)
+- [ ] `puntaje_riesgo` (0-10) y `desglose_riesgo` están en el JSON al nivel raíz, coherentes con `nivel_riesgo_general`
+- [ ] `metricas.clausulas_analizadas` y `metricas.clausulas_total` son números enteros que coinciden con `_debug.coverage_verification.clausesAnalyzed` / `clausesTotal`
 
 ---
 
