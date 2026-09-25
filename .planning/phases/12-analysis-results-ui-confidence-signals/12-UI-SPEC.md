@@ -96,8 +96,8 @@ Sizing: match `AnalysisStatusBadge`'s `sm` variant (`px-2 py-0.5 text-[9px]`) si
 | Primary CTA | None new this phase. Sidebar entries are navigation links (jump-to-section), not action buttons — no new CTA verb+noun to declare. |
 | Sidebar link label | `{categoria_riesgo} ({count})` — e.g. `Financiero (3)`. Category names are the Phase 11 enum values verbatim (Financiero, Datos, Derechos, Responsabilidad, Disputas, Modificaciones, Otro); do not translate or reformat. |
 | Coverage label | Keep existing copy: label `Cobertura` (10px black uppercase), value from `summary.metricas.porcentaje_clausulas_analizadas` (already formatted, e.g. `"96%"`) — unchanged from current Métricas panel, just repositioned per D-08 to the bottom of the combined panel. |
-| Empty state heading (default — see UI Considerations) | `Sin hallazgos de riesgo` |
-| Empty state body (default — see UI Considerations) | `Este contrato no presentó cláusulas de riesgo detectables. Cobertura del análisis: {porcentaje}%.` |
+| Empty state heading (confirmed — see UI Considerations) | `Sin hallazgos de riesgo` |
+| Empty state body (confirmed — see UI Considerations) | `Este contrato no presentó cláusulas de riesgo detectables. Cobertura del análisis: {porcentaje}%.` |
 | Error state | Not new — reuses the existing page-level failed-analysis block (`analysis.status === 'failed'`, `pages/analyze/[id].vue`). No new error copy needed for missing Phase 11 fields: per D-03, no pre-Phase-11 records exist, so this is not a reachable state. |
 | Destructive confirmation | Not applicable — no destructive actions in this phase (read-only navigation, expand/collapse of already-generated results). |
 
@@ -105,11 +105,11 @@ Sizing: match `AnalysisStatusBadge`'s `sm` variant (`px-2 py-0.5 text-[9px]`) si
 
 ## UI Considerations
 
-Applicable state considerations resolved: 6 covered, 1 backstop, 1 unresolved.
+Applicable state considerations resolved: 7 covered, 1 backstop, 0 unresolved.
 
 | Category | Element(s) | Status | Resolution / Reason |
 |----------|------------|--------|---------------------|
-| empty | Sidebar / risk panel | ⚠ unresolved | Zero-`hallazgos` analyses (e.g. a fully clean contract) have no confirmed UX — default copy proposed in Copywriting Contract ("Empty state heading/body" rows) is a Claude-authored default, not user-confirmed. Planner should treat as an assumption and flag for confirmation, or route through `/gsd-discuss-phase` follow-up if this case is expected to occur in practice. |
+| empty | Sidebar / risk panel | ✅ covered | Zero-`hallazgos` analyses (e.g. a fully clean contract) use the copy in Copywriting Contract ("Empty state heading/body" rows) — confirmed with Carlos during `/gsd-ui-phase 12` (accepted as proposed, 2026-09-25). |
 | loading | Sidebar, risk panel | ✅ covered | Both render only after `analysis`/`summary` finish loading; the existing page-level `LoadingSpinner` (`pages/analyze/[id].vue` lines 7-14) already covers the loading state — no new skeleton needed for this phase's additions. |
 | error | Risk panel, findings grid | ✅ covered | The existing page-level `analysis.status === 'failed'` block (line ~45) already intercepts failed analyses before this phase's UI renders. Missing Phase 11 fields is not a reachable error state per D-03 (no pre-Phase-11 records exist). |
 | populated | Risk panel, sidebar, RiskCard | ✅ covered | Standard case fully specified by `12-CONTEXT.md` D-01–D-10 (combined panel layout, sidebar-by-category, always-visible quote, inline certainty pill). |
@@ -140,12 +140,12 @@ Not applicable — no shadcn or third-party component registry in use (`Tool: no
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
-- [ ] Dimension 7 Inventory Provenance: PASS
+- [x] Dimension 1 Copywriting: FLAG (non-blocking; empty-state copy now confirmed with Carlos)
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
+- [x] Dimension 7 Inventory Provenance: PASS
 
-**Approval:** pending
+**Approval:** approved (2026-09-25)
