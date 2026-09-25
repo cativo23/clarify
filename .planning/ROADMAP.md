@@ -64,7 +64,11 @@ Plans:
   3. User sees the exact AI-quoted source clause text displayed alongside the explanation for each finding
   4. User sees an overall risk score (0–10) with a breakdown by risk category (e.g., Liability, Payment, Termination) at the top of the report
   5. Each clause finding card displays a certainty badge (High / Medium / Low) and a coverage percentage appears somewhere visible on the report
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 12-01-PLAN.md — Tracer: certainty pill end-to-end, always-visible quoted clause, collapse toggle, FindingsSection with anchors + empty state (CONF-02, RESULT-02, RESULT-03)
+- [ ] 12-02-PLAN.md — Secciones index grouped by categoria_riesgo with click-to-scroll, keyboard + reduced-motion support (RESULT-01)
+- [ ] 12-03-PLAN.md — Combined risk panel: 0-10 score + label, severity pills, category breakdown bars, coverage (CONF-01, CONF-03)
 **UI hint**: yes
 
 ### Phase 13: Launch Verification
