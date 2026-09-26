@@ -395,94 +395,13 @@
               </div>
             </div>
 
-            <div
-              class="p-8 bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl relative overflow-hidden"
-            >
-              <div
-                class="absolute top-0 right-0 w-32 h-32 bg-secondary/10 rounded-full blur-3xl -mr-16 -mt-16"
-              ></div>
-              <h3
-                class="text-xs font-black text-slate-500 uppercase tracking-[0.2em] mb-6 text-center"
-              >
-                Métricas
-              </h3>
-              <div class="space-y-6 relative z-10">
-                <div class="flex justify-between items-center group">
-                  <span
-                    class="text-[10px] font-black text-slate-400 uppercase tracking-widest"
-                    >Críticos</span
-                  >
-                  <div class="flex items-center gap-3">
-                    <div
-                      class="w-16 h-1.5 bg-slate-800 rounded-full overflow-hidden"
-                    >
-                      <div
-                        class="h-full bg-risk-high"
-                        :style="{
-                          width: `${(summary.metricas.total_rojas / (summary.metricas.total_rojas + summary.metricas.total_amarillas + summary.metricas.total_verdes || 1)) * 100}%`,
-                        }"
-                      ></div>
-                    </div>
-                    <span class="text-sm font-black text-white">{{
-                      summary.metricas.total_rojas
-                    }}</span>
-                  </div>
-                </div>
-                <div class="flex justify-between items-center group">
-                  <span
-                    class="text-[10px] font-black text-slate-400 uppercase tracking-widest"
-                    >Alertas</span
-                  >
-                  <div class="flex items-center gap-3">
-                    <div
-                      class="w-16 h-1.5 bg-slate-800 rounded-full overflow-hidden"
-                    >
-                      <div
-                        class="h-full bg-risk-medium"
-                        :style="{
-                          width: `${(summary.metricas.total_amarillas / (summary.metricas.total_rojas + summary.metricas.total_amarillas + summary.metricas.total_verdes || 1)) * 100}%`,
-                        }"
-                      ></div>
-                    </div>
-                    <span class="text-sm font-black text-white">{{
-                      summary.metricas.total_amarillas
-                    }}</span>
-                  </div>
-                </div>
-                <div class="flex justify-between items-center group">
-                  <span
-                    class="text-[10px] font-black text-slate-400 uppercase tracking-widest"
-                    >Seguros</span
-                  >
-                  <div class="flex items-center gap-3">
-                    <div
-                      class="w-16 h-1.5 bg-slate-800 rounded-full overflow-hidden"
-                    >
-                      <div
-                        class="h-full bg-risk-low"
-                        :style="{
-                          width: `${(summary.metricas.total_verdes / (summary.metricas.total_rojas + summary.metricas.total_amarillas + summary.metricas.total_verdes || 1)) * 100}%`,
-                        }"
-                      ></div>
-                    </div>
-                    <span class="text-sm font-black text-white">{{
-                      summary.metricas.total_verdes
-                    }}</span>
-                  </div>
-                </div>
-                <div
-                  class="pt-6 border-t border-slate-800 flex justify-between items-center"
-                >
-                  <span
-                    class="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]"
-                    >Cobertura</span
-                  >
-                  <span class="text-xl font-black text-secondary">{{
-                    summary.metricas.porcentaje_clausulas_analizadas
-                  }}</span>
-                </div>
-              </div>
-            </div>
+            <RiskScorePanel
+              :puntaje-riesgo="summary.puntaje_riesgo"
+              :total-rojas="summary.metricas.total_rojas"
+              :total-amarillas="summary.metricas.total_amarillas"
+              :total-verdes="summary.metricas.total_verdes"
+              :coverage="summary.metricas.porcentaje_clausulas_analizadas"
+            />
           </div>
         </div>
 
@@ -677,6 +596,7 @@
 <script setup lang="ts">
 import type { Analysis, AnalysisSummary } from "~/types";
 import FindingsSection from "~/components/analysis/FindingsSection.vue";
+import RiskScorePanel from "~/components/analysis/RiskScorePanel.vue";
 import CrossClauseAnalysis from "~/components/analysis/CrossClauseAnalysis.vue";
 import CriticalOmissions from "~/components/analysis/CriticalOmissions.vue";
 import StructuralMap from "~/components/analysis/StructuralMap.vue";
