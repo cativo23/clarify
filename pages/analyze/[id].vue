@@ -397,6 +397,7 @@
 
             <RiskScorePanel
               :puntaje-riesgo="summary.puntaje_riesgo"
+              :desglose-riesgo="summary.desglose_riesgo"
               :total-rojas="summary.metricas.total_rojas"
               :total-amarillas="summary.metricas.total_amarillas"
               :total-verdes="summary.metricas.total_verdes"

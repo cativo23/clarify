@@ -101,3 +101,63 @@ describe("RiskScorePanel root chrome", () => {
     expect(wrapper.classes()).toContain("border-slate-800");
   });
 });
+
+describe("RiskScorePanel category breakdown", () => {
+  const desgloseRiesgo = { Financiero: 3, Datos: 2, Responsabilidad: 1 };
+
+  it("renders the breakdown list in order with category names and counts", () => {
+    const wrapper = mount(RiskScorePanel, {
+      props: { ...baseProps, puntajeRiesgo: 7, desgloseRiesgo },
+    });
+    const list = wrapper.find(
+      '[aria-label="Desglose de riesgo por categoría"]',
+    );
+    expect(list.exists()).toBe(true);
+    const items = list.findAll("li");
+    expect(items).toHaveLength(3);
+    expect(items[0]?.text()).toContain("Financiero");
+    expect(items[0]?.text()).toContain("3");
+    expect(items[1]?.text()).toContain("Datos");
+    expect(items[1]?.text()).toContain("2");
+    expect(items[2]?.text()).toContain("Responsabilidad");
+    expect(items[2]?.text()).toContain("1");
+  });
+
+  it("fills use bg-secondary on bg-slate-800 tracks with widths 100%, 67%, 33%", () => {
+    const wrapper = mount(RiskScorePanel, {
+      props: { ...baseProps, puntajeRiesgo: 7, desgloseRiesgo },
+    });
+    const fills = wrapper.findAll(".bg-secondary");
+    expect(fills.map((f) => f.attributes("style"))).toEqual([
+      expect.stringContaining("width: 100%"),
+      expect.stringContaining("width: 67%"),
+      expect.stringContaining("width: 33%"),
+    ]);
+    const tracks = wrapper.findAll(".bg-slate-800");
+    expect(tracks.length).toBeGreaterThan(0);
+  });
+
+  it("places the breakdown list after the header row and before the Cobertura row", () => {
+    const wrapper = mount(RiskScorePanel, {
+      props: { ...baseProps, puntajeRiesgo: 7, desgloseRiesgo },
+    });
+    const html = wrapper.html();
+    const listIndex = html.indexOf("Desglose de riesgo por categoría");
+    const coberturaIndex = html.indexOf("Cobertura");
+    const headerIndex = html.indexOf("Hallazgos por severidad");
+    expect(headerIndex).toBeGreaterThanOrEqual(0);
+    expect(listIndex).toBeGreaterThan(headerIndex);
+    expect(coberturaIndex).toBeGreaterThan(listIndex);
+  });
+
+  it("renders no breakdown list when desgloseRiesgo is undefined, while pills and Cobertura still render", () => {
+    const wrapper = mount(RiskScorePanel, {
+      props: { ...baseProps, puntajeRiesgo: 7 },
+    });
+    expect(
+      wrapper.find('[aria-label="Desglose de riesgo por categoría"]').exists(),
+    ).toBe(false);
+    expect(wrapper.text()).toContain("Críticos");
+    expect(wrapper.text()).toContain("Cobertura");
+  });
+});

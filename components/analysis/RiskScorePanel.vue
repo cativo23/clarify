@@ -82,6 +82,28 @@
         </ul>
       </div>
 
+      <ul
+        v-if="bars.length > 0"
+        aria-label="Desglose de riesgo por categoría"
+        class="space-y-4"
+      >
+        <li v-for="bar in bars" :key="bar.category">
+          <span
+            class="block text-[10px] font-black text-slate-400 uppercase tracking-widest"
+            >{{ bar.category }}</span
+          >
+          <div class="mt-2 flex items-center gap-3">
+            <div class="flex-1 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+              <div
+                class="h-full bg-secondary rounded-full"
+                :style="{ width: `${bar.widthPct}%` }"
+              ></div>
+            </div>
+            <span class="text-sm font-black text-white">{{ bar.count }}</span>
+          </div>
+        </li>
+      </ul>
+
       <div
         class="pt-6 border-t border-slate-800 flex justify-between items-center"
       >
@@ -97,10 +119,11 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { getScoreRisk } from "~/composables/useRiskScore";
+import { getScoreRisk, buildBreakdownBars } from "~/composables/useRiskScore";
 
 const props = defineProps<{
   puntajeRiesgo?: number | undefined;
+  desgloseRiesgo?: Record<string, number> | undefined;
   totalRojas: number;
   totalAmarillas: number;
   totalVerdes: number;
@@ -108,6 +131,7 @@ const props = defineProps<{
 }>();
 
 const scoreRisk = computed(() => getScoreRisk(props.puntajeRiesgo));
+const bars = computed(() => buildBreakdownBars(props.desgloseRiesgo));
 
 const scoreLevelClass = computed(() => {
   switch (scoreRisk.value?.level) {
