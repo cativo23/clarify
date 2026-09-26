@@ -74,3 +74,81 @@ describe("RiskCard certainty pill", () => {
     expect(badge.element.children.length).toBe(1);
   });
 });
+
+describe("RiskCard always-visible quote and collapse toggle", () => {
+  const citaTextual =
+    "El proveedor podrá modificar las tarifas sin previo aviso";
+  const clausula = "Cláusula 7.2";
+  const riesgoReal = "Pagarías más cada mes";
+  const mitigacion = "Exige aviso de 30 días";
+
+  it("shows the quote and its label before any click (collapsed)", () => {
+    const wrapper = mount(RiskCard, {
+      props: { ...baseProps, citaTextual },
+    });
+    expect(wrapper.text()).toContain(citaTextual);
+    expect(wrapper.text()).toContain("Referencia del Contrato");
+  });
+
+  it("collapsed: detail fields are hidden, toggle reads Ver más detalles, aria-expanded false", () => {
+    const wrapper = mount(RiskCard, {
+      props: { ...baseProps, citaTextual, clausula, riesgoReal, mitigacion },
+    });
+    expect(wrapper.text()).not.toContain(clausula);
+    expect(wrapper.text()).not.toContain(riesgoReal);
+    expect(wrapper.text()).not.toContain(mitigacion);
+    const toggle = wrapper.find("button");
+    expect(toggle.text()).toContain("Ver más detalles");
+    expect(toggle.attributes("aria-expanded")).toBe("false");
+  });
+
+  it("after one click: detail fields appear, toggle reads Ver menos, aria-expanded true, quote appears once", async () => {
+    const wrapper = mount(RiskCard, {
+      props: { ...baseProps, citaTextual, clausula, riesgoReal, mitigacion },
+    });
+    const toggle = wrapper.find("button");
+    await toggle.trigger("click");
+    expect(wrapper.text()).toContain(clausula);
+    expect(wrapper.text()).toContain(riesgoReal);
+    expect(wrapper.text()).toContain(mitigacion);
+    expect(wrapper.find("button").text()).toContain("Ver menos");
+    expect(wrapper.find("button").attributes("aria-expanded")).toBe("true");
+    const quoteOccurrences = wrapper.html().split(citaTextual).length - 1;
+    expect(quoteOccurrences).toBe(1);
+  });
+
+  it("after a second click: detail fields hide again, quote stays present", async () => {
+    const wrapper = mount(RiskCard, {
+      props: { ...baseProps, citaTextual, clausula, riesgoReal, mitigacion },
+    });
+    const toggle = wrapper.find("button");
+    await toggle.trigger("click");
+    await toggle.trigger("click");
+    expect(wrapper.text()).not.toContain(clausula);
+    expect(wrapper.text()).not.toContain(riesgoReal);
+    expect(wrapper.text()).not.toContain(mitigacion);
+    expect(wrapper.text()).toContain(citaTextual);
+  });
+
+  it("with only citaTextual set: quote renders and no toggle button is rendered", () => {
+    const wrapper = mount(RiskCard, {
+      props: { ...baseProps, citaTextual },
+    });
+    expect(wrapper.text()).toContain(citaTextual);
+    expect(wrapper.find("button").exists()).toBe(false);
+  });
+
+  it("with citaTextual omitted: the quote label never appears", () => {
+    const wrapper = mount(RiskCard, {
+      props: { ...baseProps },
+    });
+    expect(wrapper.text()).not.toContain("Referencia del Contrato");
+  });
+
+  it('the toggle button has type="button"', () => {
+    const wrapper = mount(RiskCard, {
+      props: { ...baseProps, clausula },
+    });
+    expect(wrapper.find("button").attributes("type")).toBe("button");
+  });
+});

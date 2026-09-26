@@ -71,18 +71,42 @@
       {{ description }}
     </p>
 
+    <!-- Quoted source clause, always visible per RESULT-03/D-05 -->
+    <div v-if="props.citaTextual" class="mb-6">
+      <span
+        class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-2"
+        >Referencia del Contrato</span
+      >
+      <div
+        class="relative mt-2 p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800"
+      >
+        <svg
+          class="absolute -left-2 -top-2 w-8 h-8 text-secondary/10"
+          fill="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M14.017 21L14.017 18C14.017 16.899 14.899 16 16.017 16L19.017 16C19.562 16 20.017 15.545 20.017 15L20.017 11C20.017 10.455 19.562 10 19.017 10L15.017 10C14.472 10 14.017 9.545 14.017 9L14.017 6C14.017 5.455 14.472 5 15.017 5L18.017 5C19.135 5 20.017 5.881 20.017 7L20.017 8.5C20.017 8.776 20.241 9 20.517 9L21.517 9C21.793 9 22.017 8.776 22.017 8.5L22.017 7C22.017 4.791 20.226 3 18.017 3L15.017 3C12.808 3 11.017 4.791 11.017 7L11.017 9C11.017 11.209 12.808 13 15.017 13L19.017 13L19.017 15L16.017 15C14.363 15 13.017 16.346 13.017 18L13.017 21L14.017 21ZM4.017 21L4.017 18C4.017 16.899 4.899 16 6.017 16L9.017 16C9.562 16 10.017 15.545 10.017 15L10.017 11C10.017 10.455 9.562 10 9.017 10L5.017 10C4.472 10 4.017 9.545 4.017 9L4.017 6C4.017 5.455 4.472 5 5.017 5L8.017 5C9.135 5 10.017 5.881 10.017 7L10.017 8.5C10.017 8.776 10.241 9 10.517 9L11.517 9C11.793 9 12.017 8.776 12.017 8.5L12.017 7C12.017 4.791 10.226 3 8.017 3L5.017 3C2.808 3 1.017 4.791 1.017 7L1.017 9C1.017 11.209 2.808 13 5.017 13L9.017 13L9.017 15L6.017 15C4.363 15 3.017 16.346 3.017 18L3.017 21L4.017 21Z"
+          />
+        </svg>
+        <p
+          class="text-sm text-slate-500 dark:text-slate-400 italic font-medium leading-relaxed"
+        >
+          {{ props.citaTextual }}
+        </p>
+      </div>
+    </div>
+
     <!-- Details (Expandable) -->
     <div
       v-if="
-        props.clausula ||
-        props.citaTextual ||
-        props.riesgoReal ||
-        props.mitigacion ||
-        props.details
+        props.clausula || props.riesgoReal || props.mitigacion || props.details
       "
     >
       <button
+        type="button"
         class="flex items-center gap-2 text-secondary hover:text-emerald-500 font-bold text-sm transition-colors group/btn"
+        :aria-expanded="isExpanded"
         @click="isExpanded = !isExpanded"
       >
         <span
@@ -139,31 +163,6 @@
           <p class="text-sm text-slate-700 dark:text-slate-300">
             {{ props.mitigacion }}
           </p>
-        </div>
-
-        <div v-if="props.citaTextual">
-          <span
-            class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-2"
-            >Referencia del Contrato</span
-          >
-          <div
-            class="relative mt-2 p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800"
-          >
-            <svg
-              class="absolute -left-2 -top-2 w-8 h-8 text-secondary/10"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                d="M14.017 21L14.017 18C14.017 16.899 14.899 16 16.017 16L19.017 16C19.562 16 20.017 15.545 20.017 15L20.017 11C20.017 10.455 19.562 10 19.017 10L15.017 10C14.472 10 14.017 9.545 14.017 9L14.017 6C14.017 5.455 14.472 5 15.017 5L18.017 5C19.135 5 20.017 5.881 20.017 7L20.017 8.5C20.017 8.776 20.241 9 20.517 9L21.517 9C21.793 9 22.017 8.776 22.017 8.5L22.017 7C22.017 4.791 20.226 3 18.017 3L15.017 3C12.808 3 11.017 4.791 11.017 7L11.017 9C11.017 11.209 12.808 13 15.017 13L19.017 13L19.017 15L16.017 15C14.363 15 13.017 16.346 13.017 18L13.017 21L14.017 21ZM4.017 21L4.017 18C4.017 16.899 4.899 16 6.017 16L9.017 16C9.562 16 10.017 15.545 10.017 15L10.017 11C10.017 10.455 9.562 10 9.017 10L5.017 10C4.472 10 4.017 9.545 4.017 9L4.017 6C4.017 5.455 4.472 5 5.017 5L8.017 5C9.135 5 10.017 5.881 10.017 7L10.017 8.5C10.017 8.776 10.241 9 10.517 9L11.517 9C11.793 9 12.017 8.776 12.017 8.5L12.017 7C12.017 4.791 10.226 3 8.017 3L5.017 3C2.808 3 1.017 4.791 1.017 7L1.017 9C1.017 11.209 2.808 13 5.017 13L9.017 13L9.017 15L6.017 15C4.363 15 3.017 16.346 3.017 18L3.017 21L4.017 21Z"
-              />
-            </svg>
-            <p
-              class="text-sm text-slate-500 dark:text-slate-400 italic font-medium leading-relaxed"
-            >
-              {{ props.citaTextual }}
-            </p>
-          </div>
         </div>
 
         <div v-if="props.details">
