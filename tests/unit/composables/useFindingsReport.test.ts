@@ -3,7 +3,9 @@ import {
   findingAnchorId,
   hallazgoColorToRisk,
   formatCoverageSentence,
+  groupFindingsByCategory,
 } from "@/composables/useFindingsReport";
+import type { Hallazgo } from "@/types";
 
 describe("findingAnchorId", () => {
   it("returns hallazgo-0 for index 0", () => {
@@ -50,5 +52,60 @@ describe("formatCoverageSentence", () => {
     expect(formatCoverageSentence(" 80 % ")).toMatch(
       /Cobertura del análisis: 80%\.$/,
     );
+  });
+});
+
+function makeHallazgo(
+  color: Hallazgo["color"],
+  categoria_riesgo?: string,
+): Hallazgo {
+  return {
+    color,
+    titulo: "Título",
+    explicacion: "Explicación",
+    categoria_riesgo,
+  };
+}
+
+describe("groupFindingsByCategory", () => {
+  it("groups by first-appearance order with counts across colors", () => {
+    const hallazgos = [
+      makeHallazgo("rojo", "Financiero"),
+      makeHallazgo("rojo", "Datos"),
+      makeHallazgo("amarillo", "Financiero"),
+      makeHallazgo("amarillo", "Responsabilidad"),
+      makeHallazgo("verde", "Datos"),
+    ];
+    expect(groupFindingsByCategory(hallazgos)).toEqual([
+      { category: "Financiero", count: 2, firstIndex: 0 },
+      { category: "Datos", count: 2, firstIndex: 1 },
+      { category: "Responsabilidad", count: 1, firstIndex: 3 },
+    ]);
+  });
+
+  it("skips findings whose categoria_riesgo is undefined or whitespace-only, keeping other firstIndex positions", () => {
+    const hallazgos = [
+      makeHallazgo("rojo", undefined),
+      makeHallazgo("rojo", "Financiero"),
+      makeHallazgo("amarillo", "   "),
+      makeHallazgo("verde", "Financiero"),
+    ];
+    expect(groupFindingsByCategory(hallazgos)).toEqual([
+      { category: "Financiero", count: 2, firstIndex: 1 },
+    ]);
+  });
+
+  it('trims categoria_riesgo " Datos " and groups it with "Datos"', () => {
+    const hallazgos = [
+      makeHallazgo("rojo", " Datos "),
+      makeHallazgo("verde", "Datos"),
+    ];
+    expect(groupFindingsByCategory(hallazgos)).toEqual([
+      { category: "Datos", count: 2, firstIndex: 0 },
+    ]);
+  });
+
+  it("returns [] for an empty array", () => {
+    expect(groupFindingsByCategory([])).toEqual([]);
   });
 });

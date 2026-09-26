@@ -21,36 +21,54 @@
       </p>
     </div>
 
-    <div v-else class="grid gap-6">
-      <div
-        v-for="(hallazgo, index) in hallazgos"
-        :id="findingAnchorId(index)"
-        :key="findingAnchorId(index)"
-        class="scroll-mt-24"
-      >
-        <RiskCard
-          :category="hallazgo.titulo"
-          :description="hallazgo.explicacion"
-          :risk="hallazgoColorToRisk(hallazgo.color)"
-          :clausula="hallazgo.clausula"
-          :cita-textual="hallazgo.cita_textual"
-          :riesgo-real="hallazgo.riesgo_real"
-          :mitigacion="hallazgo.mitigacion"
-          :confianza="hallazgo.confianza"
-        />
+    <div
+      v-else
+      class="grid gap-6 items-start"
+      :class="
+        indexEntries.length > 0
+          ? ['lg:grid-cols-[14rem_minmax(0,1fr)]', 'lg:gap-8']
+          : []
+      "
+    >
+      <aside v-if="indexEntries.length > 0" class="lg:sticky lg:top-24">
+        <ReportSidebar :entries="indexEntries" />
+      </aside>
+      <div class="grid gap-6">
+        <div
+          v-for="(hallazgo, index) in hallazgos"
+          :id="findingAnchorId(index)"
+          :key="findingAnchorId(index)"
+          class="scroll-mt-24"
+        >
+          <RiskCard
+            :category="hallazgo.titulo"
+            :description="hallazgo.explicacion"
+            :risk="hallazgoColorToRisk(hallazgo.color)"
+            :clausula="hallazgo.clausula"
+            :cita-textual="hallazgo.cita_textual"
+            :riesgo-real="hallazgo.riesgo_real"
+            :mitigacion="hallazgo.mitigacion"
+            :confianza="hallazgo.confianza"
+          />
+        </div>
       </div>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
 import type { Hallazgo } from "~/types";
 import RiskCard from "~/components/RiskCard.vue";
+import ReportSidebar from "~/components/analysis/ReportSidebar.vue";
 import {
   findingAnchorId,
   hallazgoColorToRisk,
   formatCoverageSentence,
+  groupFindingsByCategory,
 } from "~/composables/useFindingsReport";
 
-defineProps<{ hallazgos: Hallazgo[]; coverage: string }>();
+const props = defineProps<{ hallazgos: Hallazgo[]; coverage: string }>();
+
+const indexEntries = computed(() => groupFindingsByCategory(props.hallazgos));
 </script>
