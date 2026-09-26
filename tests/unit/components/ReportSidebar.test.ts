@@ -75,4 +75,35 @@ describe("ReportSidebar", () => {
     expect(scrollIntoViewMock).toHaveBeenCalledTimes(0);
     wrapper.unmount();
   });
+
+  it("scrolls with behavior auto when prefers-reduced-motion matches", async () => {
+    const originalMatchMedia = window.matchMedia;
+    window.matchMedia = vi.fn().mockReturnValue({ matches: true });
+    const wrapper = mount(ReportSidebar, {
+      props: { entries },
+      attachTo: document.body,
+    });
+    const buttons = wrapper.findAll('button[type="button"]');
+    await buttons[1]?.trigger("click");
+    expect(scrollIntoViewMock).toHaveBeenCalledWith({
+      behavior: "auto",
+      block: "start",
+    });
+    wrapper.unmount();
+    window.matchMedia = originalMatchMedia;
+  });
+
+  it("focuses the target with preventScroll after a click", async () => {
+    const wrapper = mount(ReportSidebar, {
+      props: { entries },
+      attachTo: document.body,
+    });
+    const target = document.getElementById("hallazgo-1") as HTMLElement;
+    const focusSpy = vi.spyOn(target, "focus");
+    const buttons = wrapper.findAll('button[type="button"]');
+    await buttons[1]?.trigger("click");
+    expect(document.activeElement).toBe(target);
+    expect(focusSpy).toHaveBeenCalledWith({ preventScroll: true });
+    wrapper.unmount();
+  });
 });

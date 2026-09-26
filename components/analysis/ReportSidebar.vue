@@ -29,6 +29,13 @@ defineProps<{ entries: CategoryIndexEntry[] }>();
 function scrollToEntry(entry: CategoryIndexEntry): void {
   const target = document.getElementById(findingAnchorId(entry.firstIndex));
   if (!target) return;
-  target.scrollIntoView({ behavior: "smooth", block: "start" });
+  const prefersReducedMotion =
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  target.scrollIntoView({
+    behavior: prefersReducedMotion ? "auto" : "smooth",
+    block: "start",
+  });
+  target.focus({ preventScroll: true });
 }
 </script>

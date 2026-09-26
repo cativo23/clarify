@@ -38,7 +38,8 @@
           v-for="(hallazgo, index) in hallazgos"
           :id="findingAnchorId(index)"
           :key="findingAnchorId(index)"
-          class="scroll-mt-24"
+          tabindex="-1"
+          class="scroll-mt-24 focus:outline-none"
         >
           <RiskCard
             :category="hallazgo.titulo"
