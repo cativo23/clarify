@@ -92,7 +92,16 @@ Plans:
   3. A second request for the same analysis PDF is served from cache — no re-generation occurs (verified via logs or response time)
   4. A Forensic-tier analysis result page displays all UI sections (executive summary, risk breakdown, clause findings) without layout errors or missing sections
 
-**Plans**: TBD
+**Plans**: 7 plans
+Plans:
+
+- [ ] 13-01-PLAN.md — Tracer (local leg): prod compose fixed (real host, polaris2 Traefik entrypoint/resolver, image reference, NUXT_ runtime env) and proven RED/GREEN on the CI-built image; v1.0.0-alpha.20 CHANGELOG, version, DEPLOY.md (LAUNCH-01)
+- [ ] 13-02-PLAN.md — Production ops readiness: pre-flight facts, deploy dir, Carlos fills server env and confirms deploy key, SSH_HOST/SSH_PORT secrets set (LAUNCH-01)
+- [ ] 13-03-PLAN.md — GitFlow release v1.0.0-alpha.20 with go/no-go, first deploy, HTTPS health 200 + TLS + redirect + healthy containers (tracer production leg, LAUNCH-01)
+- [ ] 13-04-PLAN.md — Runtime env, Storage bucket and migration readiness; QA account; Basic job processed exactly once by the worker (LAUNCH-01, LAUNCH-02 precondition)
+- [ ] 13-05-PLAN.md — PDF export renders and is stored privately; second export served from cache with no regeneration, via api-integration-tester (LAUNCH-02, LAUNCH-03)
+- [ ] 13-06-PLAN.md — Forensic analysis in production with every section populated; browser-qa-agent confirms all sections render without layout or console errors (LAUNCH-04)
+- [ ] 13-07-PLAN.md — Sign-off: source-of-truth checklist with fresh re-run, generated evidence HTML rendered to PNG (D-06)
 
 ## Progress
 
@@ -108,7 +117,7 @@ Plans:
 | 10. Audit Gap Closure | v1.1 | 4/4 | Complete | 2026-05-07 |
 | 11. Prompt Engineering | v2.0 | 0/2 | Not started | - |
 | 12. Analysis Results UI & Confidence Signals | v2.0 | 2/3 | In Progress|  |
-| 13. Launch Verification | v2.0 | 0/? | Not started | - |
+| 13. Launch Verification | v2.0 | 0/7 | Planned | - |
 
 ---
 
