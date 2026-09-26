@@ -4,18 +4,18 @@ milestone: v2.0
 milestone_name: Analysis Experience (Phases 11-13)
 current_phase: 12
 current_phase_name: Analysis Results UI & Confidence Signals
-status: in_progress
-stopped_at: Phase 12 context gathered
-last_updated: "2026-09-25T23:01:14.907Z"
-last_activity: 2026-05-07
-last_activity_desc: Phase 11 executed (2/2 plans, all prompts v2.1)
-state_head: 4ad102aa309ac9ff9c37d8009465cb62a8f65696
+status: executing
+stopped_at: Completed 12-01-PLAN.md
+last_updated: "2026-09-26T03:22:29.774Z"
+last_activity: 2026-09-25
+last_activity_desc: Phase 12 execution started
+state_head: abebccfd0e026902f73d0dc70778a853052bbc11
 progress:
   total_phases: 3
   completed_phases: 8
-  total_plans: 2
-  completed_plans: 2
-  percent: 100
+  total_plans: 5
+  completed_plans: 3
+  percent: 60
 ---
 
 # Project State
@@ -25,17 +25,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-07 — v2.0 Analysis Experience started)
 
 **Core value:** Democratizing legal advice by making contract analysis accessible and affordable for non-lawyers.
-**Current focus:** v2.0 — Analysis Experience (clause navigation, confidence signals, prompt improvements, launch verification)
+**Current focus:** Phase 12 — Analysis Results UI & Confidence Signals
 
 ## Current Position
 
-Phase: 12 (Analysis Results UI & Confidence Signals) — not started
-Plan: —
-Status: Phase 11 complete, ready to plan Phase 12
-Last activity: 2026-05-07 — Phase 11 executed (2/2 plans, all prompts v2.1)
+Phase: 12 (Analysis Results UI & Confidence Signals) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
+Last activity: 2026-09-25 — Phase 12 execution started
 
 ```
-Progress: [██████████] 100% — 1/3 phases complete
+Progress: [██████░░░░] 60% — 1/3 phases complete
 ```
 
 ## Performance Metrics
@@ -53,11 +53,21 @@ Progress: [██████████] 100% — 1/3 phases complete
 - Phase 7: Production Deployment (1/1 plans) — infrastructure ready
 - Phase 10: v1.1 Audit Gap Closure (4/4 plans) — all 4 blockers closed, 23 tests pass
 
+**Per-Plan Metrics:**
+
+| Plan | Duration | Tasks | Files |
+|------|----------|-------|-------|
+| Phase 12 P01 | 35m | 3 tasks | 8 files |
+
 ## Accumulated Context
 
 ### Decisions
 
 All decisions logged in PROJECT.md Key Decisions table.
+
+- [Phase 12]: Certainty pill renders inline with the card title, not stacked (D-07)
+- [Phase 12]: cita_textual moved out of the collapsible details block to always-visible markup (D-05); quote-only findings show no empty toggle (D-06)
+- [Phase 12]: Findings grid extracted into FindingsSection with hallazgo-{index} anchors, the scroll-target contract plan 12-02 consumes
 
 ### Blockers/Concerns
 
@@ -78,9 +88,9 @@ Items acknowledged and deferred at v1.1 milestone close on 2026-05-07 — now tr
 
 ## Session Continuity
 
-**Last session:** 2026-09-25T23:01:14.878Z
-**Stopped at:** Phase 12 context gathered
-**Resume file:** .planning/phases/12-analysis-results-ui-confidence-signals/12-CONTEXT.md
+**Last session:** 2026-09-26T03:22:29.747Z
+**Stopped at:** Completed 12-01-PLAN.md
+**Resume file:** None
 
 **v2.0 Roadmap Created (2026-05-07):**
 

@@ -11,13 +11,13 @@ Transform the flat analysis report into a structured, navigable reading experien
 ### Analysis Results UI
 
 - [ ] **RESULT-01**: User can view analysis results with a sidebar index of clause sections, clickable to jump to each section
-- [ ] **RESULT-02**: User can expand/collapse individual clause finding cards to reduce cognitive overload
-- [ ] **RESULT-03**: User can see AI-quoted source clause text alongside each finding's explanation
+- [x] **RESULT-02**: User can expand/collapse individual clause finding cards to reduce cognitive overload
+- [x] **RESULT-03**: User can see AI-quoted source clause text alongside each finding's explanation
 
 ### Confidence Signals
 
 - [ ] **CONF-01**: User can see an overall risk score (0–10) with a breakdown by risk category at the top of each analysis
-- [ ] **CONF-02**: User can see a per-clause certainty badge (High/Medium/Low) indicating AI confidence in each flag
+- [x] **CONF-02**: User can see a per-clause certainty badge (High/Medium/Low) indicating AI confidence in each flag
 - [ ] **CONF-03**: User can see a coverage percentage showing what portion of the contract was analyzed
 
 ### Prompt Engineering
