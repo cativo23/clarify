@@ -352,8 +352,9 @@
                   v-if="summary"
                   :class="[
                     'px-4 py-1 rounded-full text-xs font-bold ring-1 ring-inset',
-                    summary.resumen_ejecutivo?.veredicto?.includes('Rechazar') ||
-                    summary.resumen_ejecutivo?.veredicto?.includes('No')
+                    summary.resumen_ejecutivo?.veredicto?.includes(
+                      'Rechazar',
+                    ) || summary.resumen_ejecutivo?.veredicto?.includes('No')
                       ? 'bg-risk-high/10 text-risk-high ring-risk-high/30'
                       : summary.resumen_ejecutivo?.veredicto?.includes(
                             'Negociar',
@@ -543,6 +544,7 @@
               :cita-textual="hallazgo.cita_textual"
               :riesgo-real="hallazgo.riesgo_real"
               :mitigacion="hallazgo.mitigacion"
+              :confianza="hallazgo.confianza"
             />
           </div>
         </div>

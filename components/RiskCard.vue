@@ -49,9 +49,12 @@
       </div>
 
       <div class="flex-1">
-        <h3 class="text-xl font-black text-slate-900 dark:text-white mb-1">
-          {{ category }}
-        </h3>
+        <div class="flex flex-wrap items-center gap-2 mb-1">
+          <h3 class="text-xl font-black text-slate-900 dark:text-white">
+            {{ category }}
+          </h3>
+          <CertaintyBadge v-if="confianza" :confianza="confianza" />
+        </div>
         <p
           :class="[
             'text-xs font-black uppercase tracking-widest',
@@ -180,6 +183,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import type { RiskLevel } from "~/types";
+import CertaintyBadge from "~/components/CertaintyBadge.vue";
 
 const props = defineProps<{
   category: string;
@@ -189,6 +193,7 @@ const props = defineProps<{
   citaTextual?: string | undefined;
   riesgoReal?: string | undefined;
   mitigacion?: string | undefined;
+  confianza?: "Alta" | "Media" | "Baja" | undefined;
   details?: string | undefined;
 }>();
 
