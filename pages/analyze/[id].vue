@@ -518,36 +518,10 @@
         </div>
 
         <!-- Hallazgos -->
-        <div class="mb-12">
-          <div class="flex items-center gap-4 mb-8">
-            <h2
-              class="text-2xl font-black text-slate-900 dark:text-white tracking-tight"
-            >
-              Análisis por Cláusula
-            </h2>
-            <div class="h-px flex-1 bg-slate-100 dark:bg-slate-800"></div>
-          </div>
-          <div class="grid gap-6">
-            <RiskCard
-              v-for="(hallazgo, index) in summary.hallazgos"
-              :key="index"
-              :category="hallazgo.titulo"
-              :description="hallazgo.explicacion"
-              :risk="
-                hallazgo.color === 'rojo'
-                  ? 'high'
-                  : hallazgo.color === 'amarillo'
-                    ? 'medium'
-                    : 'low'
-              "
-              :clausula="hallazgo.clausula"
-              :cita-textual="hallazgo.cita_textual"
-              :riesgo-real="hallazgo.riesgo_real"
-              :mitigacion="hallazgo.mitigacion"
-              :confianza="hallazgo.confianza"
-            />
-          </div>
-        </div>
+        <FindingsSection
+          :hallazgos="summary.hallazgos ?? []"
+          :coverage="summary.metricas.porcentaje_clausulas_analizadas"
+        />
 
         <!-- Forensic-specific sections -->
         <div v-if="isForensic && analysis.summary_json">
@@ -702,6 +676,7 @@
 
 <script setup lang="ts">
 import type { Analysis, AnalysisSummary } from "~/types";
+import FindingsSection from "~/components/analysis/FindingsSection.vue";
 import CrossClauseAnalysis from "~/components/analysis/CrossClauseAnalysis.vue";
 import CriticalOmissions from "~/components/analysis/CriticalOmissions.vue";
 import StructuralMap from "~/components/analysis/StructuralMap.vue";
