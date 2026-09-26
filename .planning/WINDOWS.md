@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 1
+open_count: 2
 waived_count: 0
 fixed_count: 0
-total_count: 1
-last_updated: 2026-09-26T03:21:37.659Z
+total_count: 2
+last_updated: 2026-09-26T04:01:33.861Z
 ---
 
 # Broken Windows Ledger
@@ -16,6 +16,7 @@ last_updated: 2026-09-26T03:21:37.659Z
 | id | phase | kind | file | line | description | status | reason | recorded_at | resolved_at |
 |----|-------|------|------|------|-------------|--------|--------|-------------|-------------|
 | 1 | 12 | unrun-verify | components/RiskCard.vue |  | Task 2 human-check (long-quote collapsed-card readability) not run: requires uploading a real contract and waiting for a completed Premium/Forensic analysis in the browser, which the executor cannot judge visually headlessly. UI-SPEC line-clamp-3 backstop is on standby if it reads poorly. | open |  | 2026-09-26T03:21:37.659Z |  |
+| 2 | 12 | unrun-verify | components/analysis/ReportSidebar.vue |  | Task 2 human-check (sticky positioning, scroll offset under sticky header, responsive stack below 1024px) not run headlessly; needs a completed multi-category analysis viewed in-browser at 1024px+ and below | open |  | 2026-09-26T04:01:33.861Z |  |
 
 ````json
 [
@@ -29,6 +30,19 @@ last_updated: 2026-09-26T03:21:37.659Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-09-26T03:21:37.659Z",
+    "resolved_at": null,
+    "milestone": "v2.0"
+  },
+  {
+    "id": 2,
+    "kind": "unrun-verify",
+    "phase": "12",
+    "file": "components/analysis/ReportSidebar.vue",
+    "line": null,
+    "description": "Task 2 human-check (sticky positioning, scroll offset under sticky header, responsive stack below 1024px) not run headlessly; needs a completed multi-category analysis viewed in-browser at 1024px+ and below",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-09-26T04:01:33.861Z",
     "resolved_at": null,
     "milestone": "v2.0"
   }

@@ -71,11 +71,11 @@ Plans:
   4. User sees an overall risk score (0–10) with a breakdown by risk category (e.g., Liability, Payment, Termination) at the top of the report
   5. Each clause finding card displays a certainty badge (High / Medium / Low) and a coverage percentage appears somewhere visible on the report
 
-**Plans**: 1/3 plans executed
+**Plans**: 2/3 plans executed
 Plans:
 
 - [x] 12-01-PLAN.md — Tracer: certainty pill end-to-end, always-visible quoted clause, collapse toggle, FindingsSection with anchors + empty state (CONF-02, RESULT-02, RESULT-03)
-- [ ] 12-02-PLAN.md — Secciones index grouped by categoria_riesgo with click-to-scroll, keyboard + reduced-motion support (RESULT-01)
+- [x] 12-02-PLAN.md — Secciones index grouped by categoria_riesgo with click-to-scroll, keyboard + reduced-motion support (RESULT-01)
 - [ ] 12-03-PLAN.md — Combined risk panel: 0-10 score + label, severity pills, category breakdown bars, coverage (CONF-01, CONF-03)
 
 **UI hint**: yes
@@ -107,7 +107,7 @@ Plans:
 | 7. Production Deploy | v1.1 | 1/1 | Complete | 2026-03-25 |
 | 10. Audit Gap Closure | v1.1 | 4/4 | Complete | 2026-05-07 |
 | 11. Prompt Engineering | v2.0 | 0/2 | Not started | - |
-| 12. Analysis Results UI & Confidence Signals | v2.0 | 1/3 | In Progress|  |
+| 12. Analysis Results UI & Confidence Signals | v2.0 | 2/3 | In Progress|  |
 | 13. Launch Verification | v2.0 | 0/? | Not started | - |
 
 ---

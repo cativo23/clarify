@@ -5,17 +5,17 @@ milestone_name: Analysis Experience (Phases 11-13)
 current_phase: 12
 current_phase_name: Analysis Results UI & Confidence Signals
 status: executing
-stopped_at: Completed 12-01-PLAN.md
-last_updated: "2026-09-26T03:22:29.774Z"
+stopped_at: Completed 12-02-PLAN.md
+last_updated: "2026-09-26T04:02:17.079Z"
 last_activity: 2026-09-25
 last_activity_desc: Phase 12 execution started
-state_head: abebccfd0e026902f73d0dc70778a853052bbc11
+state_head: aa6c60066d1f236b867f3984b9339abc908bc92f
 progress:
   total_phases: 3
   completed_phases: 8
   total_plans: 5
-  completed_plans: 3
-  percent: 60
+  completed_plans: 4
+  percent: 80
 ---
 
 # Project State
@@ -30,12 +30,12 @@ See: .planning/PROJECT.md (updated 2026-05-07 — v2.0 Analysis Experience start
 ## Current Position
 
 Phase: 12 (Analysis Results UI & Confidence Signals) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-09-25 — Phase 12 execution started
 
 ```
-Progress: [██████░░░░] 60% — 1/3 phases complete
+Progress: [████████░░] 80% — 1/3 phases complete
 ```
 
 ## Performance Metrics
@@ -58,6 +58,7 @@ Progress: [██████░░░░] 60% — 1/3 phases complete
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|
 | Phase 12 P01 | 35m | 3 tasks | 8 files |
+| Phase 12 P02 | 25m | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -68,6 +69,7 @@ All decisions logged in PROJECT.md Key Decisions table.
 - [Phase 12]: Certainty pill renders inline with the card title, not stacked (D-07)
 - [Phase 12]: cita_textual moved out of the collapsible details block to always-visible markup (D-05); quote-only findings show no empty toggle (D-06)
 - [Phase 12]: Findings grid extracted into FindingsSection with hallazgo-{index} anchors, the scroll-target contract plan 12-02 consumes
+- [Phase 12]: Sidebar index built from summary.hallazgos (not desglose_riesgo) so every category with a card is listed and always has a scroll target
 
 ### Blockers/Concerns
 
@@ -88,8 +90,8 @@ Items acknowledged and deferred at v1.1 milestone close on 2026-05-07 — now tr
 
 ## Session Continuity
 
-**Last session:** 2026-09-26T03:22:29.747Z
-**Stopped at:** Completed 12-01-PLAN.md
+**Last session:** 2026-09-26T04:02:16.968Z
+**Stopped at:** Completed 12-02-PLAN.md
 **Resume file:** None
 
 **v2.0 Roadmap Created (2026-05-07):**

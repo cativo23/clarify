@@ -10,7 +10,7 @@ Transform the flat analysis report into a structured, navigable reading experien
 
 ### Analysis Results UI
 
-- [ ] **RESULT-01**: User can view analysis results with a sidebar index of clause sections, clickable to jump to each section
+- [x] **RESULT-01**: User can view analysis results with a sidebar index of clause sections, clickable to jump to each section
 - [x] **RESULT-02**: User can expand/collapse individual clause finding cards to reduce cognitive overload
 - [x] **RESULT-03**: User can see AI-quoted source clause text alongside each finding's explanation
 
