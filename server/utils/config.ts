@@ -24,17 +24,17 @@ const DEFAULT_CONFIG: PromptConfig = {
   promptVersion: "v2",
   tiers: {
     basic: {
-      model: "gpt-4o-mini",
+      model: "gpt-6-luna",
       credits: 1,
       tokenLimits: { input: 8000, output: 2500 },
     },
     premium: {
-      model: "gpt-5-mini",
+      model: "gpt-6-sol",
       credits: 3,
       tokenLimits: { input: 35000, output: 10000 },
     },
     forensic: {
-      model: "gpt-5",
+      model: "gpt-6-astra",
       credits: 10,
       tokenLimits: { input: 120000, output: 30000 },
     },

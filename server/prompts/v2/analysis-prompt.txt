@@ -227,7 +227,7 @@ Identifica temas críticos AUSENTES:
 {
   "_debug": {
     "timestamp": "2025-01-31T10:30:00Z",
-    "model_used": "gpt-5-mini",
+    "model_used": "gpt-6-sol",
     "prompt_version": "v2.1",
     "tier": "premium",
     "preprocessing": {
@@ -510,7 +510,7 @@ Cada hallazgo DEBE incluir `confianza` indicando qué tan seguro está el AI de 
 | Omisiones | No | Sí (lista corta) | Sí (lista exhaustiva) |
 | Análisis cruzado | No | No | Sí (exhaustivo) |
 | Mapeo estructural | No | Sí | Sí (obligatorio) |
-| Modelo | gpt-4o-mini | gpt-5-mini | gpt-5 |
+| Modelo | gpt-6-luna | gpt-6-sol | gpt-6-astra |
 | Costo | 1 crédito | 3 créditos | 10 créditos |
 | Caso de uso | Usuario se engancha | **Mejor costo-beneficio** | Power users, alto valor |
 

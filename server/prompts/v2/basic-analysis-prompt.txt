@@ -153,7 +153,7 @@ Eres un **Auditor Contractual Express** especializado en detección rápida de c
 {
   "_debug": {
     "timestamp": "2025-01-31T10:30:00Z",
-    "model_used": "gpt-4o-mini",
+    "model_used": "gpt-6-luna",
     "prompt_version": "v2.1",
     "tier": "basic",
     "preprocessing": {
@@ -404,7 +404,7 @@ Esto permite al frontend mostrar primero lo más crítico y lazy-load el resto.
 - NO incluye análisis cruzado ni detección de omisiones
 - Escaneo rápido (~15-30 seg)
 - Contratos hasta 20 páginas (8k tokens)
-- Modelo: gpt-4o-mini
+- Modelo: gpt-6-luna
 - Costo: 1 crédito
 - Caso de uso: Contratos sencillos, usuario se engancha
 
@@ -414,7 +414,7 @@ Esto permite al frontend mostrar primero lo más crítico y lazy-load el resto.
 - Detección de omisiones críticas
 - Estrategias de negociación detalladas
 - Contratos hasta 100 páginas (35k tokens)
-- Modelo: gpt-5-mini (razonamiento avanzado)
+- Modelo: gpt-6-sol (razonamiento avanzado)
 - Costo: 3 créditos
 - Caso de uso: Mejor costo-beneficio, uso estándar
 

@@ -49,7 +49,7 @@ Eres un **Auditor Contractual Forense Élite** con 25 años de experiencia, pote
 - **SÍ digas:** "Considera revisar con asesor legal", "Evalúa negociar X", "Verifica implicaciones"
 
 ### 5. Token Awareness
-- **Input:** Hasta 120k tokens (contexto completo de gpt-5)
+- **Input:** Hasta 120k tokens (contexto completo de gpt-6-astra)
 - **Output target:** 8k-20k tokens (optimizado para evitar timeout)
 - **Límite absoluto output:** 25k tokens
 - **SIEMPRE cierra JSON correctamente** aunque alcanzes límite
@@ -213,7 +213,7 @@ Cláusulas administrativas sin impacto directo en riesgo:
 {
   "_debug": {
     "timestamp": "2025-01-31T10:30:00Z",
-    "model_used": "gpt-5",
+    "model_used": "gpt-6-astra",
     "prompt_version": "v2.1",
     "tier": "forensic",
     "preprocessing": {
@@ -568,7 +568,7 @@ Antes de cerrar, verifica:
 | Análisis cruzado | No | No | Sí |
 | Omisiones | No | Sí | Sí |
 | Mapeo estructural | No | Sí | Sí |
-| Modelo | gpt-4o-mini | gpt-5-mini | gpt-5 |
+| Modelo | gpt-6-luna | gpt-6-sol | gpt-6-astra |
 | Costo | 1 crédito | 3 créditos | 10 créditos |
 | Tiempo estimado | 15-30 seg | 1-2 min | 3-8 min |
 | Caso de uso | Enganche | Costo-beneficio | Alto valor |

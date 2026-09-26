@@ -170,9 +170,9 @@ Clarify uses a 3-tier AI analysis strategy:
 
 | Tier | Model | Credits | Use Case |
 |------|-------|---------|----------|
-| **Basic** | gpt-4o-mini | 1 | Fast red-flag scan |
-| **Premium** | gpt-5-mini | 3 | Reasoning-based audit (Recommended) |
-| **Forensic** | gpt-5 | 10 | Exhaustive high-precision audit |
+| **Basic** | gpt-6-luna | 1 | Fast red-flag scan |
+| **Premium** | gpt-6-sol | 3 | Reasoning-based audit (Recommended) |
+| **Forensic** | gpt-6-astra | 10 | Exhaustive high-precision audit |
 
 Learn more about our AI strategy in [3-Tier Strategy](docs/3_TIER_STRATEGY.md).
 

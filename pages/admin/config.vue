@@ -61,9 +61,12 @@ onMounted(async () => {
             },
           },
           forensic: {
-            model: "gpt-5",
+            model: data.models.forensic || "",
             credits: 10,
-            tokenLimits: { input: 120000, output: 30000 },
+            tokenLimits: data.tokenLimits?.forensic || {
+              input: 120000,
+              output: 30000,
+            },
           },
         },
         features: data.features || { preprocessing: true, tokenDebug: false },
@@ -112,9 +115,12 @@ const saveConfig = async () => {
             },
           },
           forensic: {
-            model: "gpt-5",
+            model: data.models.forensic || "",
             credits: 10,
-            tokenLimits: { input: 120000, output: 30000 },
+            tokenLimits: data.tokenLimits?.forensic || {
+              input: 120000,
+              output: 30000,
+            },
           },
         },
         features: data.features || { preprocessing: true, tokenDebug: false },
@@ -131,17 +137,17 @@ const saveConfig = async () => {
 
 // Available Models List
 const availableModels = [
-  { id: "gpt-5.2", name: "GPT-5.2 (Pro)", type: "reasoning" },
-  { id: "gpt-5.1", name: "GPT-5.1 (Latest)", type: "standard" },
-  { id: "gpt-5", name: "GPT-5 (Standard)", type: "standard" },
-  { id: "gpt-5-mini", name: "GPT-5 mini", type: "standard" },
+  { id: "gpt-6-astra", name: "GPT-6 Astra (Flagship)", type: "reasoning" },
+  { id: "gpt-6-sol", name: "GPT-6 Sol", type: "reasoning" },
+  { id: "gpt-6-luna", name: "GPT-6 Luna", type: "reasoning" },
+  { id: "gpt-5", name: "GPT-5 (retires 2026-12-11)", type: "deprecated" },
+  { id: "gpt-5-mini", name: "GPT-5 mini (retires 2026-12-11)", type: "deprecated" },
   { id: "o3", name: "o3 (Reasoning)", type: "reasoning" },
   { id: "o3-mini", name: "o3-mini", type: "reasoning" },
   { id: "o1", name: "o1 (Reasoning)", type: "reasoning" },
   { id: "o1-mini", name: "o1-mini", type: "reasoning" },
   { id: "gpt-4o", name: "GPT-4o", type: "legacy" },
   { id: "gpt-4o-mini", name: "GPT-4o mini", type: "legacy" },
-  { id: "gpt-4.1", name: "GPT-4.1", type: "legacy" },
 ];
 
 const searchBasic = ref("");

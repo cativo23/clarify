@@ -1,5 +1,6 @@
 import { requireAdmin } from "../../utils/auth";
 import { createClient } from "@supabase/supabase-js";
+import { calculateAiCost } from "../../utils/cost-calculator";
 
 export default defineEventHandler(async (event) => {
   await requireAdmin(event);
@@ -62,9 +63,9 @@ export default defineEventHandler(async (event) => {
 
   // Default tier to model mapping
   const tierModels: Record<string, string> = {
-    basic: "gpt-4o-mini",
-    premium: "gpt-5-mini",
-    forensic: "gpt-5",
+    basic: "gpt-6-luna",
+    premium: "gpt-6-sol",
+    forensic: "gpt-6-astra",
   };
 
   // Fetch completed analyses with summary_json containing usage data
@@ -122,13 +123,12 @@ export default defineEventHandler(async (event) => {
       0;
 
     // Get model used
-    const modelUsed = debug?.model_used || tierModels[tier] || "gpt-4o-mini";
+    const modelUsed = debug?.model_used || tierModels[tier] || "gpt-6-luna";
 
     // Get pricing for this model
     const price = pricingMap.get(modelUsed) || { input: 0, output: 0 };
 
-    // Calculate AI cost: (input_tokens / 1000 * input_cost) + (output_tokens / 1000 * output_cost)
-    const aiCost = (inputTokens / 1000) * price.input + (outputTokens / 1000) * price.output;
+    const aiCost = calculateAiCost(inputTokens, outputTokens, price);
 
     // Calculate revenue from credits used
     const revenue = (analysis.credits_used || 1) * CREDIT_PRICE;

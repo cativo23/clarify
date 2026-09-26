@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { calculateAiCost } from '@/server/utils/cost-calculator'
 
 describe('Cost Analysis API', () => {
   beforeEach(() => {
@@ -52,16 +53,27 @@ describe('Cost Analysis API', () => {
       expect(marginPercent).toBe(85)
     })
 
-    it('includes AI cost calculations from token usage', () => {
-      // Simulate token cost calculation
-      const inputTokens = 1000
-      const outputTokens = 500
-      const inputCostPer1k = 0.00015 // gpt-4o-mini
-      const outputCostPer1k = 0.0006
+    it('calculates AI cost from real per-token pricing (gpt-6-luna)', () => {
+      // pricing_tables stores real per-TOKEN USD rates: gpt-6-luna is
+      // $0.10/1M input, $0.50/1M output.
+      const price = { input: 0.0000001, output: 0.0000005 }
 
-      const totalCost = (inputTokens / 1000 * inputCostPer1k) + (outputTokens / 1000 * outputCostPer1k)
+      const totalCost = calculateAiCost(1_000_000, 1_000_000, price)
 
-      expect(totalCost).toBeCloseTo(0.00045, 6)
+      expect(totalCost).toBeCloseTo(0.6, 6) // $0.10 + $0.50 for 1M tokens each way
+    })
+
+    it('[REGRESSION] does not divide tokens by 1000 before applying per-token pricing', () => {
+      // Bug found 2026-09-26: the handler used to compute
+      // (tokens / 1000) * pricePerToken, silently under-reporting AI cost by
+      // 1000x since pricing_tables' rates are already per-token, not per-1k.
+      const price = { input: 0.0000001, output: 0.0000005 }
+      const buggyCost = (1000 / 1000) * price.input + (500 / 1000) * price.output
+
+      const realCost = calculateAiCost(1000, 500, price)
+
+      expect(realCost).toBeCloseTo(1000 * price.input + 500 * price.output, 10)
+      expect(realCost).not.toBeCloseTo(buggyCost, 10)
     })
 
     it('handles missing usage data gracefully', () => {
@@ -79,14 +91,14 @@ describe('Cost Analysis API', () => {
 
     it('maps tiers correctly from summary_json', () => {
       const tierMapping: Record<string, string> = {
-        basic: 'gpt-4o-mini',
-        premium: 'gpt-5-mini',
-        forensic: 'gpt-5'
+        basic: 'gpt-6-luna',
+        premium: 'gpt-6-sol',
+        forensic: 'gpt-6-astra'
       }
 
-      expect(tierMapping.basic).toBe('gpt-4o-mini')
-      expect(tierMapping.premium).toBe('gpt-5-mini')
-      expect(tierMapping.forensic).toBe('gpt-5')
+      expect(tierMapping.basic).toBe('gpt-6-luna')
+      expect(tierMapping.premium).toBe('gpt-6-sol')
+      expect(tierMapping.forensic).toBe('gpt-6-astra')
     })
 
     it('infers tier from credits_used when tier not in summary', () => {

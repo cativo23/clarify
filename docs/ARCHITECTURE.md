@@ -37,7 +37,7 @@ Clarify is a contract analysis platform that translates complex legal documents 
 | **Database** | Supabase (PostgreSQL) | Data storage, RLS |
 | **Storage** | Supabase Storage | Encrypted PDF storage |
 | **Queue** | BullMQ + Redis | Background job processing |
-| **AI** | OpenAI (gpt-4o-mini, gpt-5-mini, gpt-5) | Contract analysis |
+| **AI** | OpenAI (gpt-6-luna, gpt-6-sol, gpt-6-astra) | Contract analysis |
 | **Payments** | Stripe | Checkout, webhooks |
 
 ---
@@ -125,9 +125,9 @@ server/
 
 | Tier | Model | Credits | Input Limit | Output Limit | Use Case |
 |------|-------|---------|-------------|--------------|----------|
-| **Basic** | gpt-4o-mini | 1 | 8,000 | 2,500 | Simple leases, ToS, privacy policies |
-| **Premium** | gpt-5-mini | 3 | 35,000 | 10,000 | Business contracts (recommended) |
-| **Forensic** | gpt-5 | 10 | 120,000 | 30,000 | High-value audits, complex frameworks |
+| **Basic** | gpt-6-luna | 1 | 8,000 | 2,500 | Simple leases, ToS, privacy policies |
+| **Premium** | gpt-6-sol | 3 | 35,000 | 10,000 | Business contracts (recommended) |
+| **Forensic** | gpt-6-astra | 10 | 120,000 | 30,000 | High-value audits, complex frameworks |
 
 ### Configuration
 
