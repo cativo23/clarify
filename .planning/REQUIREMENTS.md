@@ -16,9 +16,9 @@ Transform the flat analysis report into a structured, navigable reading experien
 
 ### Confidence Signals
 
-- [ ] **CONF-01**: User can see an overall risk score (0–10) with a breakdown by risk category at the top of each analysis
+- [x] **CONF-01**: User can see an overall risk score (0–10) with a breakdown by risk category at the top of each analysis
 - [x] **CONF-02**: User can see a per-clause certainty badge (High/Medium/Low) indicating AI confidence in each flag
-- [ ] **CONF-03**: User can see a coverage percentage showing what portion of the contract was analyzed
+- [x] **CONF-03**: User can see a coverage percentage showing what portion of the contract was analyzed
 
 ### Prompt Engineering
 
@@ -59,9 +59,9 @@ Transform the flat analysis report into a structured, navigable reading experien
 | RESULT-01 | Phase 12 | — |
 | RESULT-02 | Phase 12 | — |
 | RESULT-03 | Phase 12 | — |
-| CONF-01 | Phase 12 | — |
-| CONF-02 | Phase 12 | — |
-| CONF-03 | Phase 12 | — |
+| CONF-01 | Phase 12 | 12-03 |
+| CONF-02 | Phase 12 | 12-01 |
+| CONF-03 | Phase 12 | 12-03 |
 | LAUNCH-01 | Phase 13 | — |
 | LAUNCH-02 | Phase 13 | — |
 | LAUNCH-03 | Phase 13 | — |

@@ -5,17 +5,17 @@ milestone_name: Analysis Experience (Phases 11-13)
 current_phase: 12
 current_phase_name: Analysis Results UI & Confidence Signals
 status: executing
-stopped_at: Completed 12-02-PLAN.md
-last_updated: "2026-09-26T04:02:17.079Z"
-last_activity: 2026-09-25
-last_activity_desc: Phase 12 execution started
-state_head: aa6c60066d1f236b867f3984b9339abc908bc92f
+stopped_at: Completed 12-03-PLAN.md
+last_updated: "2026-09-26T04:10:00.000Z"
+last_activity: 2026-09-26
+last_activity_desc: Phase 12 execution complete (3/3 plans)
+state_head: ba405f1
 progress:
   total_phases: 3
-  completed_phases: 8
+  completed_phases: 9
   total_plans: 5
-  completed_plans: 4
-  percent: 80
+  completed_plans: 5
+  percent: 100
 ---
 
 # Project State
@@ -29,13 +29,13 @@ See: .planning/PROJECT.md (updated 2026-05-07 — v2.0 Analysis Experience start
 
 ## Current Position
 
-Phase: 12 (Analysis Results UI & Confidence Signals) — EXECUTING
+Phase: 12 (Analysis Results UI & Confidence Signals) — COMPLETE (3/3 plans)
 Plan: 3 of 3
-Status: Ready to execute
-Last activity: 2026-09-25 — Phase 12 execution started
+Status: Complete
+Last activity: 2026-09-26 — Phase 12 execution complete
 
 ```
-Progress: [████████░░] 80% — 1/3 phases complete
+Progress: [██████████] 100% — Phase 12 complete (2/3 v2.0 phases)
 ```
 
 ## Performance Metrics
@@ -59,6 +59,7 @@ Progress: [████████░░] 80% — 1/3 phases complete
 |------|----------|-------|-------|
 | Phase 12 P01 | 35m | 3 tasks | 8 files |
 | Phase 12 P02 | 25m | 2 tasks | 6 files |
+| Phase 12 P03 | 30m | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -70,6 +71,7 @@ All decisions logged in PROJECT.md Key Decisions table.
 - [Phase 12]: cita_textual moved out of the collapsible details block to always-visible markup (D-05); quote-only findings show no empty toggle (D-06)
 - [Phase 12]: Findings grid extracted into FindingsSection with hallazgo-{index} anchors, the scroll-target contract plan 12-02 consumes
 - [Phase 12]: Sidebar index built from summary.hallazgos (not desglose_riesgo) so every category with a card is listed and always has a scroll target
+- [Phase 12]: RiskScorePanel rounds and clamps puntaje_riesgo to 0-10 before banding (D-03); breakdown bars filter non-positive/non-finite counts before sizing relative to the max, floored at 6%
 
 ### Blockers/Concerns
 
@@ -90,8 +92,8 @@ Items acknowledged and deferred at v1.1 milestone close on 2026-05-07 — now tr
 
 ## Session Continuity
 
-**Last session:** 2026-09-26T04:02:16.968Z
-**Stopped at:** Completed 12-02-PLAN.md
+**Last session:** 2026-09-26T04:10:00.000Z
+**Stopped at:** Completed 12-03-PLAN.md
 **Resume file:** None
 
 **v2.0 Roadmap Created (2026-05-07):**
