@@ -100,8 +100,90 @@ Both release PRs are open and mergeable ([#46](https://github.com/cativo23/clari
 
 ## Task 2: Go/no-go checkpoint
 
-Pending — awaiting Carlos's decision. See the CHECKPOINT REACHED report returned by this executor for the decision context, options, and undo-cost summary.
+**Carlos said "go."** Proceeding with Task 3.
 
 ## Task 3: Tracer (production leg)
 
-Not started — blocked on Task 2's "go" signal. Will be appended to this file on `develop` after Task 2 resolves, per this plan's action step 8.
+### 1. Merge PRs
+
+```bash
+$ gh pr merge 47 --merge --admin   # release/v1.0.0-alpha.20 -> develop
+mergedAt: 2026-09-28T22:46:19Z, mergeCommit: 11fecefa91e863921e81617f74bc9ad7741584bf
+
+$ gh pr merge 46 --merge --admin   # release/v1.0.0-alpha.20 -> main
+mergedAt: 2026-09-28T22:46:27Z, mergeCommit: e248cc7e4733f043259546d24102bcbd8923396a
+```
+**Result:** PASS — both PRs merged, develop first then main, per the plan's step ordering.
+
+### 2. Auto Release
+
+```bash
+$ gh run list -R cativo23/clarify --workflow=auto-release.yml --limit 1
+36494349485  release/v1.0.0-alpha.20  in_progress
+$ gh run watch 36494349485 --exit-status
+✓ release in 6s (ID 109170284474)
+  ✓ Set up job / Checkout / Extract and validate version / Check tag does not already exist
+  ✓ Parse release notes from CHANGELOG.md / Create GitHub Release
+```
+
+```bash
+$ gh release view v1.0.0-alpha.20 -R cativo23/clarify --json tagName,isPrerelease,body
+{"tagName":"v1.0.0-alpha.20","isPrerelease":true,"body":"### Features\n...### Deploy\n..."}
+```
+**Result:** PASS — auto-release.yml created the release itself as a prerelease, notes match the CHANGELOG `[1.0.0-alpha.20]` section exactly. CLAUDE.md's manual tag/`gh release create` steps (4-5) were **not** run — not needed, avoiding a duplicate release.
+
+### 3. CI/CD — build
+
+```bash
+$ gh run list -R cativo23/clarify --workflow=ci-cd.yml --limit 1
+36494363136  v1.0.0-alpha.20  release event, in_progress
+```
+
+**First attempt (run 36494363136):**
+- `build` job: **success** in 3m23s — image built and pushed to Docker Hub (`cativo23/clarify:v1.0.0-alpha.20`, `:latest`, `:sha-*`).
+- `Deploy to Home Server` job: **failed** at step "Copy compose file to server" (`appleboy/scp-action`). Log tail:
+  ```
+  remote server os type is unix
+  scp file to server.
+  2026/09/28 22:54:42 error copy file to dest: ***, error message: dial tcp ***:***: connect: connection timed out
+  ```
+  The first connection (host-type probe) succeeded; the second connection (the actual file transfer) timed out after ~2m15s.
+
+**Diagnosis attempt 1 (before retrying):** direct SSH from this machine to the server succeeded immediately (`ssh -p 52222 cativo23@cativo.dev` → `SSH_OK`), confirming the `SSH_HOST`/`SSH_PORT`/`SSH_USERNAME`/`SSH_PRIVATE_KEY` secrets are all correct and the server is reachable. This did not look like a credential problem, so per the D-05 fix loop this executor ran ONE rerun of the failed job: `gh run rerun 36494363136 --failed`.
+
+**Second attempt (same run, rerun):**
+- `build` job: **success** again in 3m23s (rebuilt/re-pushed the same tags).
+- `Deploy to Home Server` job: **failed again**, identical symptom:
+  ```
+  remote server os type is unix
+  scp file to server.
+  2026/09/28 23:00:21 error copy file to dest: ***, error message: dial tcp ***:***: connect: connection timed out
+  ```
+  Same ~2m15s timeout on the second connection, same step.
+
+**Result:** **FAIL — two identical failures.** Per this plan's executor notes ("if the same approach fails twice, stop and report"), no third rerun was attempted.
+
+**Additional diagnosis performed (read-only, no server changes):**
+```bash
+$ ssh -p 52222 cativo23@cativo.dev 'sudo -n fail2ban-client status sshd'
+Status for the jail: sshd
+|- Currently banned: 0
+`- Banned IP list:  (empty)
+
+$ ssh -p 52222 cativo23@cativo.dev 'sudo -n grep "2026-09-28 2[23]:" /var/log/fail2ban.log'
+(no output — no ban/unban activity during the failure window 22:50-23:01 UTC)
+
+$ ssh -p 52222 cativo23@cativo.dev 'grep -E "MaxStartups|MaxSessions" /etc/ssh/sshd_config'
+MaxSessions 50
+MaxStartups 20:50:100
+```
+fail2ban is not blocking anything and sshd's connection limits are generous — this rules out a server-side auto-ban or connection-limit cause. `journalctl -u sshd` was not readable by the `cativo23` user (not in `adm`/`systemd-journal` groups), so the exact TCP-level cause on the GitHub Actions → home-server path (ISP/router NAT, ephemeral runner IP, or a transient network condition specific to establishing a *second* connection within the same job) could not be pinned down further from this session.
+
+**Note on the deploy job's actual effect:** because the failure is at "Copy compose file to server" (before "Deploy to server", which was `skipped`), **no `docker compose` command ever ran on the server**. Production is unchanged from its pre-13-03 state (no clarify containers running, per 13-01/13-02's pre-flight evidence) — this is not a partial/broken deploy, it is simply not deployed yet.
+
+**Halting Task 3 here per plan/executor-notes instructions.** The release is published and the image is built and available on Docker Hub; only the SSH-based compose-file copy step is blocked. Steps 4-8 of Task 3 (server health check, HTTPS/TLS checks, image-digest comparison, release-branch cleanup, and this file's own completion) are **not yet done** and depend on a successful deploy job run.
+
+**Recommended next steps for Carlos (not acted on by this executor — outside the D-05 categories and outside D-02's automated-only deploy scope):**
+1. Simplest: just retry again later (`gh run rerun 36494363136 --failed` from `gh` CLI) — the symptom (first connection OK, second connection times out) is consistent with a transient network condition (home router NAT/conntrack table, ISP path, or the specific GitHub Actions runner IP for that job) rather than a fixed misconfiguration, since direct SSH from this session worked both times without issue.
+2. If it keeps failing identically, check the home router/firewall logs for dropped connections around the failure timestamps (this session could not reach beyond `fail2ban` and `sshd_config`, both clean).
+3. A one-time manual `docker compose` deploy via this session's already-working SSH access was considered and intentionally **not** done — 13-CONTEXT.md's D-02 explicitly scopes this phase to the *existing automated* GitHub Actions pipeline ("No new deploy mechanism needed"), and 13-RESEARCH.md flags manual deploy as "not the intended flow" for this phase. Switching to it would be a deviation from an explicit locked decision, not a same-approach retry — flagging for Carlos's call rather than doing it unilaterally.
