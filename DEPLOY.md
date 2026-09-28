@@ -65,7 +65,7 @@ gh secret set RELEASE_PAT <<< "ghp_your-token-here"
 | `SSH_HOST` | Your server IP/hostname | `cativo.dev` |
 | `SSH_USERNAME` | SSH username | `cativo23` |
 | `SSH_PRIVATE_KEY` | SSH private key for deployment | `-----BEGIN OPENSSH PRIVATE KEY-----...` |
-| `SSH_PORT` | SSH port | `22` |
+| `SSH_PORT` | SSH port — polaris2 accepts SSH only on `52222`; port 22 is closed | `52222` |
 
 ### Create Docker Hub Token
 
@@ -82,7 +82,7 @@ gh secret set RELEASE_PAT <<< "ghp_your-token-here"
 ssh-keygen -t ed25519 -f github-deploy -C "github-actions-deploy"
 
 # Copy public key to server
-ssh-copy-id -i github-deploy.pub cativo23@cativo.dev
+ssh-copy-id -p 52222 -i github-deploy.pub cativo23@cativo.dev
 
 # Add private key as GitHub secret
 cat github-deploy | gh secret set SSH_PRIVATE_KEY
@@ -101,7 +101,7 @@ rm github-deploy github-deploy.pub
 
 ```bash
 # SSH into your server
-ssh cativo23@cativo.dev
+ssh -p 52222 cativo23@cativo.dev
 
 # Create deployment directory
 mkdir -p /home/cativo23/deploy/clarify-deploy
@@ -114,6 +114,32 @@ cd /home/cativo23/deploy/clarify-deploy
 cp /path/to/clarify/.env.example .env
 nano .env  # Edit with production values
 ```
+
+### Runtime environment contract
+
+The image is built without env, so Nuxt's `runtimeConfig` only honors `NUXT_`-prefixed
+variables at runtime (see `nuxt.config.ts`'s `process.env` defaults, which are frozen at
+build time). `docker-compose.prod.yml` maps these from the plain names, so the server
+`.env` file keeps the plain names already documented in `.env.example` — you do not need
+to add `NUXT_`-prefixed keys to `.env` yourself. Omitting the `REDIS_*` lines selects the
+bundled `redis` container instead of an external one (e.g. Upstash).
+
+`CLARIFY_IMAGE_TAG` pins the deployed image to a specific tag, or rolls back to a prior
+one, without cutting a new release: set it in the server's `.env` (e.g.
+`CLARIFY_IMAGE_TAG=v1.0.0-alpha.19`), then run
+`docker compose -f docker-compose.prod.yml up -d`.
+
+### Traefik conventions on polaris2
+
+- Entrypoints: `web` (`:80`, redirects globally to `websecure` at the Traefik static
+  config level — no per-project scheme-redirect middleware needed) and `websecure`
+  (`:443`, TLS termination)
+- ACME certificate resolver: `letsencryptresolver`
+- Docker network: `space-server_web` (external, shared with every other project on the
+  host)
+- Every router, middleware, and service name this project defines via Docker labels is
+  `clarify`-prefixed, to avoid colliding with the ~20 other projects sharing the same
+  Traefik instance
 
 ### Trigger a Deployment
 
@@ -153,7 +179,7 @@ git push origin main
 # Check "Deploy to Home Server" job output
 
 # On server, check deployment status
-ssh cativo23@cativo.dev
+ssh -p 52222 cativo23@cativo.dev
 docker compose -f /home/cativo23/deploy/clarify-deploy/docker-compose.prod.yml ps
 docker compose -f /home/cativo23/deploy/clarify-deploy/docker-compose.prod.yml logs -f
 ```
@@ -173,7 +199,7 @@ docker compose -f /home/cativo23/deploy/clarify-deploy/docker-compose.prod.yml l
 #### 1. Clone repository on server
 
 ```bash
-ssh cativo23@cativo.dev
+ssh -p 52222 cativo23@cativo.dev
 cd ~
 git clone https://github.com/cativo23/clarify.git
 cd clarify
@@ -278,7 +304,7 @@ worker:
 The GitHub Actions workflow copies `.env.example` to the server. On first deploy:
 
 ```bash
-ssh cativo23@cativo.dev
+ssh -p 52222 cativo23@cativo.dev
 cd /home/cativo23/deploy/clarify-deploy
 cp .env.example .env
 nano .env  # Fill in real values
