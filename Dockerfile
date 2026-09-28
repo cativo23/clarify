@@ -55,6 +55,17 @@ ENV NUXT_PORT=3000
 COPY --from=builder --chown=nuxtjs:nodejs /app/.output ./.output
 COPY --from=builder --chown=nuxtjs:nodejs /app/package.json ./package.json
 
+# pdf-parse -> pdfjs-dist requires "@napi-rs/canvas" at runtime to polyfill
+# DOMMatrix/ImageData/Path2D (see server/utils/pdf-parser.ts). Nitro's
+# node-file-trace does not follow that try/catch-wrapped require() into
+# node_modules, so the native binary is silently absent from .output even
+# though it installs correctly in the deps stage. Copy only the musl-target
+# binary this Alpine runner actually needs, placed where Node's module
+# resolution finds it from pdfjs-dist's traced location
+# (.output/server/node_modules/pdfjs-dist/...).
+COPY --from=builder --chown=nuxtjs:nodejs /app/node_modules/@napi-rs/canvas ./.output/server/node_modules/@napi-rs/canvas
+COPY --from=builder --chown=nuxtjs:nodejs /app/node_modules/@napi-rs/canvas-linux-x64-musl ./.output/server/node_modules/@napi-rs/canvas-linux-x64-musl
+
 # Switch to non-root user
 USER nuxtjs
 
