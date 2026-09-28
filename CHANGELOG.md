@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-alpha.20] - 2026-09-28
+
+### Features
+- Structured clause-level prompts v2.1 for Basic, Premium, and Forensic tiers, with Forensic-only numeric coverage fields (`nota_upgrade`, `error`, coverage percentage)
+- Analysis results UI: category section index with click-to-scroll navigation and keyboard/reduced-motion support, always-visible quoted clause with accessible collapse toggle, per-finding certainty pill, and a combined 0-10 risk score panel with category breakdown bars
+
+### Security
+- Suspended users are rejected at both `/api/upload` and worker job pickup (ADMIN-04), closing the v1.1 audit gap
+- Removed prescriptive legal directives from the Forensic tier's example JSON prompt
+
+### Changed
+- Migrated the 3-tier analysis strategy to gpt-6-luna/sol/astra, including the pricing migration
+- Fixed a 1000x unit error in the admin cost dashboard
+- Funnel Stage 2 now sources from a dedicated RPC (`get_email_verified_users_in_range`) with a warn-on-fallback path
+- Revenue package breakdown now maps from `credits_purchased` instead of amount-range inference, decoupling it from Stripe price changes
+- Added a proprietary license
+
+### Fixed
+- Aligned the Basic tier's risk algorithm with Premium/Forensic for the single-red-finding case
+- Eliminated overlapping `puntaje_riesgo` boundary values at 3 and 6
+- Worker now detects `DOCUMENT_TOO_LARGE` explicitly and no longer falls back to a dead `nivel_riesgo` path
+
+### Deploy
+- First production deploy: `docker-compose.prod.yml` is aligned to the polaris2 Traefik conventions (entrypoints `web`/`websecure`, resolver `letsencryptresolver`), references the CI-built image with a `CLARIFY_IMAGE_TAG` rollback seam, and adds the full `NUXT_`-prefixed runtime env contract so the image's baked-in build-time defaults no longer apply in production
+- Fixed a pre-existing production blocker found while proving the deploy locally: `pdf-parse`'s `@napi-rs/canvas` DOMMatrix polyfill was silently dropped by Nitro's build tracer, crashing every container on boot — pinned as an explicit dependency and copied into the runtime image directly
+- CI Docker actions upgraded for the Node 24 GitHub Actions runner (lands through this release's merge to `main`)
+
+---
+
 ## [1.0.0-alpha.18] - 2026-05-06
 
 ### Security
