@@ -36,6 +36,21 @@ export default defineNitroPlugin((_nitroApp) => {
       const supabase = getWorkerSupabaseClient();
 
       try {
+        // [ADMIN-04] Reject jobs from suspended users at pickup.
+        // Jobs may have been queued before the admin suspended the account, so
+        // we MUST gate at pickup (not at enqueue). Early return with
+        // status=failed and no credit refund — no work was done, so no debit
+        // to reverse.
+        if (await supabase.isUserSuspended(userId)) {
+          console.warn(
+            `[Worker] Rejecting analysis ${analysisId}: user ${userId} is suspended`,
+          );
+          await supabase.updateAnalysisStatus(analysisId, "failed", {
+            error_message: "account_suspended",
+          });
+          return;
+        }
+
         // 1. Update status to processing
         const updateResult = await supabase.updateAnalysisStatus(
           analysisId,
@@ -79,10 +94,14 @@ export default defineNitroPlugin((_nitroApp) => {
           analysisType || "premium",
         );
 
+        // Detect prompt-level error responses before treating as valid analysis
+        if (analysisSummary.error && typeof analysisSummary.error === "string") {
+          throw new Error(`Analysis rejected by model: ${analysisSummary.error}`);
+        }
+
         // 5. Map risk level and Normalize Summary for UI
-        // Premium uses 'nivel_riesgo_general', Basic uses 'nivel_riesgo'
-        const riskLevelStr =
-          analysisSummary.nivel_riesgo_general || analysisSummary.nivel_riesgo;
+        // All v2 tiers use 'nivel_riesgo_general'
+        const riskLevelStr = analysisSummary.nivel_riesgo_general;
 
         const riskMapping: Record<string, string> = {
           Alto: "high",

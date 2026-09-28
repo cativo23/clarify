@@ -24,6 +24,9 @@ const ALLOWED_MODELS = [
   "gpt-4o",
   "gpt-5-mini",
   "gpt-5",
+  "gpt-6-luna",
+  "gpt-6-sol",
+  "gpt-6-astra",
   "o1-mini",
   "o1",
   "o3-mini",
@@ -164,7 +167,7 @@ ${processedText}
     // Debug logging for Forensic tier
     if (analysisType === "forensic") {
       console.log(
-        "[Forensic] Forensic tier selected - using gpt-5 with 120k input / 30k output tokens",
+        `[Forensic] Forensic tier selected - using ${model} with 120k input / 30k output tokens`,
       );
       console.log(
         "[Forensic] Optimized prompt v2.0 - target 8k-20k output for faster completion",
@@ -172,8 +175,14 @@ ${processedText}
     }
     console.log("Using model:", model);
     console.log("Using limits:", limits);
-    const isReasoningOrGpt5 =
-      model.startsWith("o") || model.startsWith("gpt-5");
+    // gpt-6 (Luna/Sol/Astra) reasons by default and rejects the call outright
+    // if temperature/top_p are sent while reasoning is on — unlike gpt-5,
+    // which merely ignores an explicit temperature. Omitting the param
+    // entirely (rather than setting it to the default) is correct for both.
+    const isReasoningModel =
+      model.startsWith("o") ||
+      model.startsWith("gpt-5") ||
+      model.startsWith("gpt-6");
 
     const completionParams: any = {
       model: model,
@@ -190,9 +199,8 @@ ${processedText}
       response_format: { type: "json_object" },
     };
 
-    if (isReasoningOrGpt5) {
+    if (isReasoningModel) {
       completionParams.max_completion_tokens = limits.output;
-      completionParams.temperature = 1;
     } else {
       completionParams.max_tokens = limits.output;
       completionParams.temperature = 0.1;

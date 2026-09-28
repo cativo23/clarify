@@ -41,33 +41,36 @@ _For detailed milestone archive, see `.planning/milestones/v1.0-mvp-ROADMAP.md`_
 
 ---
 
-## v1.1 Admin & Deploy — 2026-03-25
+## v1.1 Admin & Deploy — 2026-03-25 (fully closed 2026-05-07)
 
-**Phases:** 6-7 | **Plans:** 4 | **Status:** ✅ SHIPPED
+**Phases:** 6, 7, 10 | **Plans:** 8 | **Status:** ✅ SHIPPED + AUDIT GAPS CLOSED
 
 ### Key Accomplishments
 
 1. **Admin Revenue Dashboard** — Daily/weekly/monthly/quarterly revenue charts with gross/net comparison and package breakdown
 2. **Conversion Funnel Tracking** — 4-stage funnel (Signups → Email Verified → First Analysis → First Purchase) with conversion rates
 3. **Cost Analysis by Tier** — Profit margin tracking for Basic/Premium/Forensic with AI cost calculations
-4. **User Management** — Credit adjustments and account suspension with audit trail logging
+4. **User Management** — Credit adjustments and account suspension with audit trail logging (16/16 UAT passed)
 5. **Production Infrastructure** — `.env.example` template, configurable worker concurrency, Redis health check
+6. **Suspension Enforcement** (Phase 10) — Upload and BullMQ worker gates reject suspended users (ADMIN-04 BLOCKER closed)
+7. **Funnel Stage 2 RPC** (Phase 10) — PostgreSQL SECURITY DEFINER function for email-verified counts (ADMIN-01 closed)
+8. **Complete `.env.example`** (Phase 10) — 6 missing critical vars documented with consequence-if-missing (DEPLOY-01 closed)
+9. **Revenue Package Join** (Phase 10) — credits_purchased join replaces brittle price-band inference (ADMIN-02 closed)
 
 ### Stats
 
-- **Timeline:** 2026-03-16 → 2026-03-25 (9 days)
-- **Files Modified:** 15+
-- **Test Coverage:** 43 admin tests (14 costs, 16 user-management, 6 revenue, 7 funnel)
-- **Requirements:** 4/5 complete (80%)
+- **Timeline:** 2026-03-16 → 2026-05-07 (52 days including Phase 10)
+- **Phase 6-7 Files:** 15+ | **Phase 10 Files:** 42, +3324/-282 LOC
+- **Test Coverage:** 43 admin tests + 23 Phase 10 tests (suspension, funnel RPC, revenue breakdown)
+- **Requirements:** 5/5 complete (100%) — all v1.1 audit gaps closed
 
-### Known Gaps
+### Deferred Items
 
-- **DEPLOY-01** — Deployment artifacts complete, live verification pending (HTTPS, health endpoint, worker processing, Traefik routing)
+- DEPLOY-01 live verification (HTTPS, health, worker, Traefik) — deferred to v2.0 launch (requires live server)
+- Phase 07 production UAT (5 tests) — deferred to v2.0 launch
+- Phase 01 Test 4 (Forensic UI sections) — deferred to v2.0 (known Phase 2 gap)
 
-### Tech Debt
-
-- Phase 06 missing VERIFICATION.md file
-- Database migrations for user suspension require manual Supabase execution
+### Known Deferred items at close: 3 (see STATE.md Deferred Items)
 
 ---
 

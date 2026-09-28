@@ -2,6 +2,17 @@ import { requireAdmin } from "../../utils/auth";
 import { getAdminSupabaseClient } from "../../utils/admin-supabase";
 import { createClient } from "@supabase/supabase-js";
 
+// Package breakdown mapping (decoupled from Stripe price changes — see ADMIN-02 audit fix).
+// 5  credits_purchased → "5 credits"
+// 10 credits_purchased → "10 credits"
+// 25 credits_purchased → "25 credits"
+// null / unknown      → "other"
+const PACKAGE_LABEL: Record<number, string> = {
+  5: "5 credits",
+  10: "10 credits",
+  25: "25 credits",
+};
+
 export default defineEventHandler(async (event) => {
   // Require admin authentication
   await requireAdmin(event);
@@ -141,16 +152,13 @@ export default defineEventHandler(async (event) => {
     const amount = Number(tx.amount);
     let packageName: string;
 
-    // Infer package from amount
-    if (amount >= 4.49 && amount <= 5.49) {
-      packageName = "5 credits";
-    } else if (amount >= 8.49 && amount <= 9.49) {
-      packageName = "10 credits";
-    } else if (amount >= 19.49 && amount <= 20.49) {
-      packageName = "25 credits";
-    } else {
-      packageName = "other";
-    }
+    // Map package from credit_transactions.credits_purchased (decoupled from Stripe pricing).
+    // Legacy/unknown rows bucket as "other".
+    const credits = tx.credits_purchased ?? null;
+    packageName =
+      credits != null && PACKAGE_LABEL[credits]
+        ? PACKAGE_LABEL[credits]
+        : "other";
 
     if (!byPackage[packageName]) {
       byPackage[packageName] = {

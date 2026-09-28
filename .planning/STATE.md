@@ -1,43 +1,65 @@
 ---
-gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: Admin & Deploy
-status: ready_to_plan
-last_updated: "2026-05-06T22:57:57.618Z"
+gsd_state_version: "1.0"
+milestone: v2.0
+milestone_name: Analysis Experience (Phases 11-13)
+current_phase: 13
+current_phase_name: Launch Verification
+status: executing
+stopped_at: Phase 13 context gathered
+last_updated: "2026-09-28T18:20:28.658Z"
+last_activity: 2026-09-28
+last_activity_desc: Phase 13 execution started
+state_head: 80adc648ffc97f60ccd232b0ff1cacce30777044
 progress:
-  total_phases: 7
-  completed_phases: 7
-  total_plans: 26
-  completed_plans: 26
-  percent: 100
+  total_phases: 3
+  completed_phases: 9
+  total_plans: 12
+  completed_plans: 5
+  percent: 42
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-25 after v1.1 Admin & Deploy)
+See: .planning/PROJECT.md (updated 2026-05-07 — v2.0 Analysis Experience started)
 
 **Core value:** Democratizing legal advice by making contract analysis accessible and affordable for non-lawyers.
-**Current focus:** Phase 03 — pdf-export-history
+**Current focus:** Phase 13 — Launch Verification
 
 ## Current Position
 
-Phase: 04
-Plan: Not started
+Phase: 13 (Launch Verification) — EXECUTING
+Plan: 1 of 7
+Status: Executing Phase 13
+Last activity: 2026-09-28 — Phase 13 execution started
+
+```
+Progress: [████░░░░░░] 42% — Phase 12 complete (2/3 v2.0 phases)
+```
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 29
+- Total plans completed: 43
 - v1.0: 22 plans across 5 phases
-- v1.1: 4 plans across 2 phases
+- v1.1: 8 plans across 3 phases (Phases 6, 7, 10)
+- v1.1 Phase 10: 4 plans (audit gap closure)
 
-**v1.1 Admin & Deploy (COMPLETE):**
+**v1.1 Admin & Deploy + Audit Gap Closure (COMPLETE):**
 
-- Phase 6: Admin Analytics (3/3 plans) — 43 tests
+- Phase 6: Admin Analytics (3/3 plans) — 43 tests, all 16 UAT passed
 - Phase 7: Production Deployment (1/1 plans) — infrastructure ready
+- Phase 10: v1.1 Audit Gap Closure (4/4 plans) — all 4 blockers closed, 23 tests pass
+
+**Per-Plan Metrics:**
+
+| Plan | Duration | Tasks | Files |
+|------|----------|-------|-------|
+| Phase 12 P01 | 35m | 3 tasks | 8 files |
+| Phase 12 P02 | 25m | 2 tasks | 6 files |
+| Phase 12 P03 | 30m | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -45,28 +67,46 @@ Plan: Not started
 
 All decisions logged in PROJECT.md Key Decisions table.
 
+- [Phase 12]: Certainty pill renders inline with the card title, not stacked (D-07)
+- [Phase 12]: cita_textual moved out of the collapsible details block to always-visible markup (D-05); quote-only findings show no empty toggle (D-06)
+- [Phase 12]: Findings grid extracted into FindingsSection with hallazgo-{index} anchors, the scroll-target contract plan 12-02 consumes
+- [Phase 12]: Sidebar index built from summary.hallazgos (not desglose_riesgo) so every category with a card is listed and always has a scroll target
+- [Phase 12]: RiskScorePanel rounds and clamps puntaje_riesgo to 0-10 before banding (D-03); breakdown bars filter non-positive/non-finite counts before sizing relative to the max, floored at 6%
+
 ### Blockers/Concerns
 
-**Resolved:**
+None — all v1.1 blockers resolved in Phase 10.
 
-- Admin analytics dashboard — Complete (Phase 6)
-- Production deployment infrastructure — Complete (Phase 7)
+## Deferred Items
 
-**Known Gaps:**
+Items acknowledged and deferred at v1.1 milestone close on 2026-05-07 — now tracked as v2.0 requirements:
 
-- DEPLOY-01 live verification pending — Requires human testing on production environment
+| Category | Item | Status |
+|----------|------|--------|
+| uat_gap | Phase 01 Test 4 (Forensic UI sections) | → LAUNCH-04 (Phase 13) |
+| uat_gap | Phase 07 production env tests (5 items) | → LAUNCH-01 (Phase 13) |
+| uat_gap | PDF render verification (Phase 03) | → LAUNCH-02 (Phase 13) |
+| uat_gap | PDF caching round-trip (Phase 03) | → LAUNCH-03 (Phase 13) |
 
 ---
 
 ## Session Continuity
 
-**v1.1 Admin & Deploy Summary (COMPLETE):**
+**Last session:** 2026-09-26T08:02:04.620Z
+**Stopped at:** Phase 13 context gathered
+**Resume file:** .planning/phases/13-launch-verification/13-CONTEXT.md
 
-- Phase 6: Admin Analytics (revenue dashboard, conversion funnel, cost analysis, user management)
-- Phase 7: Production Deployment (.env.example, worker config, health check)
-- 5/5 requirements (4 complete, 1 partial — DEPLOY-01 live verification pending)
+**v2.0 Roadmap Created (2026-05-07):**
 
-**All Phases Complete:**
+3 phases defined, 12 requirements mapped (100% coverage).
+
+| Phase | Name | Requirements | Status |
+|-------|------|--------------|--------|
+| 11 | Prompt Engineering | PROMPT-02, PROMPT-03 | ✅ Complete (2026-05-07) |
+| 12 | Analysis Results UI & Confidence Signals | RESULT-01-03, CONF-01-03 | Not started |
+| 13 | Launch Verification | LAUNCH-01-04 | Not started |
+
+**Previously Complete (v1.0 + v1.1):**
 
 | Phase | Name | Plans | Status |
 |-------|------|-------|--------|
@@ -77,12 +117,10 @@ All decisions logged in PROJECT.md Key Decisions table.
 | 5 | Free Credits & Onboarding | 4/4 | Complete |
 | 6 | Admin Analytics | 3/3 | Complete |
 | 7 | Production Deployment | 1/1 | Complete |
+| 10 | v1.1 Audit Gap Closure | 4/4 | Complete |
 
-**Next: v2.0 Planning**
-
-- Run `/gsd:new-milestone` to start v2.0 planning cycle
-- Requirements discovery → roadmap → phase planning
+**Next: `/gsd-plan-phase 12`**
 
 ---
 
-_Last updated: 2026-03-25 after v1.1 Admin & Deploy milestone_
+_Last updated: 2026-05-07 — Phase 11 complete (2/2 plans, all prompts v2.1, PROMPT-02 + PROMPT-03 satisfied)_

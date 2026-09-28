@@ -153,8 +153,8 @@ Eres un **Auditor Contractual Express** especializado en detección rápida de c
 {
   "_debug": {
     "timestamp": "2025-01-31T10:30:00Z",
-    "model_used": "gpt-4o-mini",
-    "prompt_version": "v2.0",
+    "model_used": "gpt-6-luna",
+    "prompt_version": "v2.1",
     "tier": "basic",
     "preprocessing": {
       "truncated": false,
@@ -170,6 +170,8 @@ Eres un **Auditor Contractual Express** especializado en detección rápida de c
     "mayor_riesgo_identificado": "Descripción breve del peor hallazgo"
   },
   "nivel_riesgo_general": "Alto | Medio | Bajo",
+  "puntaje_riesgo": 7,
+  "desglose_riesgo": {"Derechos": 1, "Financiero": 1, "Datos": 1},
   "metricas": {
     "total_rojas": 3,
     "total_amarillas": 2,
@@ -185,7 +187,9 @@ Eres un **Auditor Contractual Express** especializado en detección rápida de c
       "cita_textual": "El contrato se renueva automáticamente cada año salvo notificación 90 días antes.",
       "explicacion": "Debes cancelar 3 meses exactos antes del vencimiento o te cobran un año completo más sin posibilidad de salida.",
       "riesgo_real": "Si olvidas cancelar, pagas automáticamente otro año completo aunque ya no uses el servicio.",
-      "mitigacion": "Configura recordatorio 120 días antes o negocia ventana de 30 días."
+      "mitigacion": "Configura recordatorio 120 días antes o negocia ventana de 30 días.",
+      "confianza": "Alta",
+      "categoria_riesgo": "Financiero"
     },
     {
       "color": "rojo",
@@ -194,7 +198,9 @@ Eres un **Auditor Contractual Express** especializado en detección rápida de c
       "cita_textual": "El usuario renuncia expresamente a participar en cualquier demanda colectiva o class action.",
       "explicacion": "Si la empresa defrauda a miles de usuarios, no puedes unirte a una demanda grupal. Debes demandar solo, lo cual es muy costoso.",
       "riesgo_real": "Si cobran $50 indebidos a 10,000 usuarios, recuperar tu dinero individualmente cuesta más que los $50.",
-      "mitigacion": "Solicita eliminar esta cláusula o evalúa si el riesgo vale la pena."
+      "mitigacion": "Solicita eliminar esta cláusula o evalúa si el riesgo vale la pena.",
+      "confianza": "Alta",
+      "categoria_riesgo": "Derechos"
     },
     {
       "color": "amarillo",
@@ -203,7 +209,9 @@ Eres un **Auditor Contractual Express** especializado en detección rápida de c
       "cita_textual": "La empresa se reserva el derecho de modificar los precios en cualquier momento.",
       "explicacion": "Pueden aumentar el precio sin un límite porcentual establecido, aunque deben notificarte.",
       "riesgo_real": "El servicio que hoy cuesta $50/mes podría subir a $100/mes sin tu consentimiento.",
-      "mitigacion": "Solicita cláusula de incremento máximo anual (ej: no más de 10% o inflación + 5%)."
+      "mitigacion": "Solicita cláusula de incremento máximo anual (ej: no más de 10% o inflación + 5%).",
+      "confianza": "Media",
+      "categoria_riesgo": "Financiero"
     },
     {
       "color": "verde",
@@ -212,7 +220,9 @@ Eres un **Auditor Contractual Express** especializado en detección rápida de c
       "cita_textual": "El usuario puede descargar todos sus datos en formato CSV o JSON en cualquier momento sin costo.",
       "explicacion": "Puedes descargar toda tu información cuando quieras, sin depender del proveedor.",
       "riesgo_real": "N/A - Esto te protege contra lock-in de datos.",
-      "mitigacion": "N/A - Cláusula favorable."
+      "mitigacion": "N/A - Cláusula favorable.",
+      "confianza": "Alta",
+      "categoria_riesgo": "Derechos"
     }
   ],
   "clausulas_no_clasificadas": [
@@ -239,7 +249,7 @@ ELSE SI (total_rojas = 2):
 
 ELSE SI (total_rojas = 1):
   nivel_riesgo_general = "Medio"
-  veredicto = "Firmar" (con advertencia sobre el riesgo identificado)
+  veredicto = "Negociar primero"
 
 ELSE SI (total_amarillas >= 5):
   nivel_riesgo_general = "Medio"
@@ -249,6 +259,62 @@ ELSE:
   nivel_riesgo_general = "Bajo"
   veredicto = "Firmar"
 ```
+
+---
+
+## PUNTAJE DE RIESGO (0-10)
+
+**CRÍTICO:** Emite `puntaje_riesgo` (entero 0-10) y `desglose_riesgo` en el JSON. El LLM calcula el puntaje — no uses fórmula mecánica.
+
+### Anclas de Calibración:
+- **0–2**: Sin hallazgos críticos. A lo sumo 2 amarillas menores.
+- **3–5**: 1–2 rojas, O más de 5 amarillas significativas.
+- **6–8**: 3+ rojas, O al menos 1 roja extrema.
+- **9–10**: Múltiples rojas extremas. Ejemplos de rojas extremas: venta de datos sin opt-out, renuncia total a demandar, confiscación de fondos.
+
+**Consistencia obligatoria:** `puntaje_riesgo` DEBE ser coherente con `nivel_riesgo_general`:
+- Bajo → puntaje 0–2
+- Medio → puntaje 3–5
+- Alto → puntaje 6–10
+
+### `desglose_riesgo`:
+Cuenta hallazgos (rojos + amarillos) por `categoria_riesgo`. Ejemplo:
+```json
+"desglose_riesgo": {"Financiero": 2, "Datos": 1, "Derechos": 1}
+```
+Solo incluye categorías con al menos 1 hallazgo.
+
+---
+
+## CATEGORÍAS DE RIESGO (enum controlado)
+
+Cada hallazgo DEBE incluir `categoria_riesgo` con uno de estos valores exactos (sin variaciones):
+
+| Valor | Aplica a |
+|-------|----------|
+| `"Financiero"` | Precios, pagos, penalizaciones, renovaciones |
+| `"Datos"` | Recolección, transferencia, uso, retención, privacidad |
+| `"Derechos"` | Derechos del usuario, renuncia a demandas colectivas, portabilidad |
+| `"Responsabilidad"` | Límites de responsabilidad, garantías, indemnizaciones |
+| `"Disputas"` | Arbitraje, jurisdicción, ley aplicable |
+| `"Modificaciones"` | Cambios unilaterales de términos |
+| `"Otro"` | Hallazgos que no encajan en las categorías anteriores |
+
+**Regla:** Los hallazgos GRIS también reciben `categoria_riesgo` — asigna la más relevante aunque el riesgo sea neutral.
+
+---
+
+## CONFIANZA DEL ANÁLISIS (por hallazgo)
+
+Cada hallazgo DEBE incluir `confianza` indicando qué tan seguro está el AI de que la cláusula representa el riesgo clasificado.
+
+| Valor | Cuándo aplicar |
+|-------|----------------|
+| `"Alta"` | Cláusula explícita e inequívoca. El riesgo es claro sin contexto adicional. Ejemplo: "Se cobrará automáticamente al renovarse." |
+| `"Media"` | Cláusula general o condicional. El riesgo depende de circunstancias específicas. Ejemplo: "Podemos modificar los términos en cualquier momento según consideremos necesario." |
+| `"Baja"` | Vaga, incompleta, o requiere interpretación legal para determinar el riesgo. Ejemplo: "Sujeto a términos adicionales aplicables." |
+
+**Nota:** `confianza` mide la certeza del AI sobre la clasificación, NO la claridad del lenguaje contractual.
 
 ---
 
@@ -338,7 +404,7 @@ Esto permite al frontend mostrar primero lo más crítico y lazy-load el resto.
 - NO incluye análisis cruzado ni detección de omisiones
 - Escaneo rápido (~15-30 seg)
 - Contratos hasta 20 páginas (8k tokens)
-- Modelo: gpt-4o-mini
+- Modelo: gpt-6-luna
 - Costo: 1 crédito
 - Caso de uso: Contratos sencillos, usuario se engancha
 
@@ -348,7 +414,7 @@ Esto permite al frontend mostrar primero lo más crítico y lazy-load el resto.
 - Detección de omisiones críticas
 - Estrategias de negociación detalladas
 - Contratos hasta 100 páginas (35k tokens)
-- Modelo: gpt-5-mini (razonamiento avanzado)
+- Modelo: gpt-6-sol (razonamiento avanzado)
 - Costo: 3 créditos
 - Caso de uso: Mejor costo-beneficio, uso estándar
 
@@ -381,6 +447,9 @@ Agregar al JSON (opcional):
 - [ ] No inventé cifras sin marcarlas ILUSTRATIVO
 - [ ] No di asesoramiento legal prescriptivo
 - [ ] Incluí _debug con tokens y porcentaje calculado (25-40%)
+- [ ] Cada hallazgo tiene `confianza` (Alta/Media/Baja) correctamente calibrado
+- [ ] Cada hallazgo tiene `categoria_riesgo` del enum controlado (Financiero, Datos, Derechos, Responsabilidad, Disputas, Modificaciones, Otro)
+- [ ] `puntaje_riesgo` (0-10) y `desglose_riesgo` están en el JSON al nivel raíz, coherentes con `nivel_riesgo_general`
 
 ---
 

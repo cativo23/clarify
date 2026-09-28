@@ -2,11 +2,21 @@
 
 ## Current State
 
-**v1.1 Admin & Deploy: SHIPPED** ✅ (2026-03-25)
+**v1.1 Admin & Deploy: SHIPPED** ✅ (2026-03-25, fully closed 2026-05-07)
+**v2.0 Analysis Experience: IN PROGRESS** 🔄 (planning started 2026-05-07)
 
 Clarify is a shipped AI-powered contract analysis platform with 3-tier pricing, Stripe payments, free credits onboarding, interactive demo, and admin analytics dashboard.
 
-**Next Milestone: v2.0** — TBD (planning required)
+**Phase 10 complete (2026-05-07):** All 4 v1.1 audit gaps closed — suspension enforcement (ADMIN-04 BLOCKER), funnel Stage 2 RPC (ADMIN-01), .env.example completeness (DEPLOY-01 BLOCKER), revenue package mapping (ADMIN-02). 21/21 DB migrations applied. 23/23 tests pass.
+
+## Current Milestone: v2.0 Analysis Experience
+
+**Goal:** Transform the flat analysis report into a structured, navigable reading experience with confidence signals that help non-lawyers know what to trust and what to scrutinize.
+
+**Target features:**
+- Clause navigation — sidebar jump links + expandable clause cards + AI-quoted source clause text (all tiers)
+- Confidence signals — risk score (0–10) with category breakdown + per-clause certainty badges (high/medium/low) + coverage percentage
+- Prompt improvements — updated prompts to emit structured clause-level data powering the new UI
 
 ---
 
@@ -97,4 +107,4 @@ Individual consumers who need to understand contracts — renters, freelancers, 
 | Suspension requires mandatory reason field | Compliance and accountability | ✓ Validated v1.1 |
 
 ---
-*Last updated: 2026-03-25 after v1.1 Admin & Deploy milestone*
+*Last updated: 2026-05-07 after Phase 10 v1.1 audit gap closure*

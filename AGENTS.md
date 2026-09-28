@@ -10,7 +10,7 @@ Clarify is an AI-powered contract auditing platform (Micro-SaaS) that analyzes l
 | :--- | :--- | :--- |
 | **Framework** | **Nuxt 3** | Vue 3, Composition API, TypeScript everywhere. |
 | **Database** | **Supabase** | PostgreSQL. **Strict Row Level Security (RLS)**. |
-| **AI** | **OpenAI API** | 3-tier strategy (gpt-4o-mini, gpt-5-mini, gpt-5). |
+| **AI** | **OpenAI API** | 3-tier strategy (gpt-6-luna, gpt-6-sol, gpt-6-astra). |
 | **Payments** | **Stripe** | Webhook-based credit fulfillment. |
 | **Queue** | **BullMQ/Redis** | Async job processing (Upstash in production). |
 | **Styling** | **Tailwind CSS** | "Premium" aesthetic (glassmorphism/dark mode). |
@@ -18,9 +18,9 @@ Clarify is an AI-powered contract auditing platform (Micro-SaaS) that analyzes l
 ## 🏗️ Architecture & Core Flows
 
 ### 3-Tier Analysis Strategy
-- **Basic**: `gpt-4o-mini` (1 credit) - Fast red-flag scan.
-- **Premium**: `gpt-5-mini` (3 credits) - Reasoning-based audit (Recommended).
-- **Forensic**: `gpt-5` (10 credits) - Exhaustive high-precision audit.
+- **Basic**: `gpt-6-luna` (1 credit) - Fast red-flag scan.
+- **Premium**: `gpt-6-sol` (3 credits) - Reasoning-based audit (Recommended).
+- **Forensic**: `gpt-6-astra` (10 credits) - Exhaustive high-precision audit.
 
 ### Core Flows
 1.  **Analysis**: Client upload -> `/api/upload` (Magic Byte Validation) -> Supabase Storage -> BullMQ Task -> OpenAI -> DB.

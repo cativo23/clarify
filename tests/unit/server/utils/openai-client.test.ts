@@ -114,6 +114,49 @@ describe('OpenAI Client Utils', () => {
             }))
         })
 
+        it('should omit temperature and use max_completion_tokens for reasoning models (gpt-5)', async () => {
+            // forensic tier is mocked to gpt-5 in beforeEach
+            await analyzeContract('Contract Text', 'forensic')
+
+            const callArgs = mockChatCreate.mock.calls[0][0]
+            expect(callArgs.max_completion_tokens).toBe(2000)
+            expect(callArgs).not.toHaveProperty('temperature')
+            expect(callArgs).not.toHaveProperty('max_tokens')
+        })
+
+        it('should omit temperature and use max_completion_tokens for gpt-6 reasoning models', async () => {
+            // [REGRESSION] gpt-6 (Luna/Sol/Astra) rejects the API call outright if
+            // temperature is sent while reasoning is on (unlike gpt-5, which merely
+            // ignores it) — this pins the fix in place.
+            vi.mocked(getPromptConfig).mockResolvedValueOnce({
+                promptVersion: 'v2',
+                tiers: {
+                    basic: { model: 'gpt-6-luna', credits: 1, tokenLimits: { input: 1000, output: 500 } },
+                    premium: { model: 'gpt-6-sol', credits: 3, tokenLimits: { input: 2000, output: 1000 } },
+                    forensic: { model: 'gpt-6-astra', credits: 10, tokenLimits: { input: 5000, output: 2000 } }
+                },
+                features: { preprocessing: true, tokenDebug: false }
+            })
+
+            await analyzeContract('Contract Text', 'forensic')
+
+            const callArgs = mockChatCreate.mock.calls[0][0]
+            expect(callArgs.model).toBe('gpt-6-astra')
+            expect(callArgs.max_completion_tokens).toBe(2000)
+            expect(callArgs).not.toHaveProperty('temperature')
+            expect(callArgs).not.toHaveProperty('max_tokens')
+        })
+
+        it('should include temperature and max_tokens for non-reasoning models (gpt-4o)', async () => {
+            // premium tier is mocked to gpt-4o in beforeEach
+            await analyzeContract('Contract Text', 'premium')
+
+            const callArgs = mockChatCreate.mock.calls[0][0]
+            expect(callArgs.max_tokens).toBe(1000)
+            expect(callArgs.temperature).toBe(0.1)
+            expect(callArgs).not.toHaveProperty('max_completion_tokens')
+        })
+
         it('should strip json markdown from response', async () => {
             mockChatCreate.mockResolvedValue({
                 choices: [{

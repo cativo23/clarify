@@ -7,9 +7,9 @@ Configurar Clarify para ofrecer tres niveles de análisis, optimizando el margen
 
 | Nivel | Modelo | Créditos | Estrategia de Upselling (Trigger) |
 | :--- | :--- | :---: | :--- |
-| **Basic** | `gpt-4o-mini` | 1 | Base. Disponible para documentos cortos. |
-| **Premium** | `gpt-5-mini` | 3 | **RECOMENDADO.** Sugerir si tokens > 8k. Destacado en UI. |
-| **Forensic**| `gpt-5` | 10 | **AUDITORÍA CRÍTICA.** Sugerir si tokens > 40k. |
+| **Basic** | `gpt-6-luna` | 1 | Base. Disponible para documentos cortos. |
+| **Premium** | `gpt-6-sol` | 3 | **RECOMENDADO.** Sugerir si tokens > 8k. Destacado en UI. |
+| **Forensic**| `gpt-6-astra` | 10 | **AUDITORÍA CRÍTICA.** Sugerir si tokens > 40k. |
 
 > **Nota sobre el Prompt:** El tier **Forensic** usará el mismo prompt v2 (profundo), pero al ejecutarse en **GPT-5 (Grande)**, la precisión y el rigor del análisis serán significativamente superiores al Mini, justificando el costo para contratos de alto valor.
 

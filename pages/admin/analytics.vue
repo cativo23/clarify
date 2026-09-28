@@ -135,7 +135,7 @@ const estimateUserCost = async (userId: string) => {
         debug.usage.output ||
         0;
       const model =
-        debug.model_used || promptConfig?.tiers?.premium?.model || "gpt-5-mini";
+        debug.model_used || promptConfig?.tiers?.premium?.model || "gpt-6-sol";
       const priceRow =
         pricing.value.find((p: any) => p.model === model) || pricing.value[0];
       const inputCost = priceRow?.input_cost || 0;

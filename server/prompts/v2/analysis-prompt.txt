@@ -227,8 +227,8 @@ Identifica temas críticos AUSENTES:
 {
   "_debug": {
     "timestamp": "2025-01-31T10:30:00Z",
-    "model_used": "gpt-5-mini",
-    "prompt_version": "v2.0",
+    "model_used": "gpt-6-sol",
+    "prompt_version": "v2.1",
     "tier": "premium",
     "preprocessing": {
       "truncated": false,
@@ -244,6 +244,8 @@ Identifica temas críticos AUSENTES:
     "mayor_riesgo_identificado": "Descripción breve del hallazgo más grave"
   },
   "nivel_riesgo_general": "Alto | Medio | Bajo",
+  "puntaje_riesgo": 5,
+  "desglose_riesgo": {"Financiero": 2, "Derechos": 1},
   "metricas": {
     "total_rojas": 3,
     "total_amarillas": 8,
@@ -260,7 +262,9 @@ Identifica temas críticos AUSENTES:
       "cita_textual": "El contrato se renovará automáticamente por períodos anuales salvo notificación escrita con 90 días de anticipación al vencimiento.",
       "explicacion": "Debes recordar cancelar con 3 meses de anticipación exactos. Si olvidas, te comprometes a pagar un año completo más sin posibilidad de salida temprana.",
       "riesgo_real": "Si el contrato vence el 1 de marzo y olvidas cancelar antes del 1 de diciembre, pagarás automáticamente todo el año siguiente.",
-      "mitigacion": "Configura recordatorio 120 días antes del vencimiento o negocia ventana de cancelación más corta (30-45 días)."
+      "mitigacion": "Configura recordatorio 120 días antes del vencimiento o negocia ventana de cancelación más corta (30-45 días).",
+      "confianza": "Alta",
+      "categoria_riesgo": "Financiero"
     },
     {
       "color": "amarillo",
@@ -269,7 +273,9 @@ Identifica temas críticos AUSENTES:
       "cita_textual": "La empresa se reserva el derecho de modificar los precios en cualquier momento.",
       "explicacion": "Pueden aumentar el precio sin límite porcentual ni obligación de avisarte con anticipación.",
       "riesgo_real": "El servicio que hoy cuesta $50/mes podría subir a $150/mes sin previo aviso.",
-      "mitigacion": "Solicita cláusula de incremento máximo anual (ej: no más de 10% o inflación + 5%) y notificación mínima de 30 días."
+      "mitigacion": "Solicita cláusula de incremento máximo anual (ej: no más de 10% o inflación + 5%) y notificación mínima de 30 días.",
+      "confianza": "Media",
+      "categoria_riesgo": "Financiero"
     },
     {
       "color": "verde",
@@ -278,7 +284,9 @@ Identifica temas críticos AUSENTES:
       "cita_textual": "El usuario podrá exportar todos sus datos en formato CSV o JSON en cualquier momento sin costo adicional.",
       "explicacion": "Puedes descargar toda tu información cuando quieras, sin depender del proveedor.",
       "riesgo_real": "N/A - Esto te protege contra lock-in de datos.",
-      "mitigacion": "N/A - Cláusula favorable."
+      "mitigacion": "N/A - Cláusula favorable.",
+      "confianza": "Alta",
+      "categoria_riesgo": "Derechos"
     },
     {
       "color": "gris",
@@ -287,7 +295,9 @@ Identifica temas críticos AUSENTES:
       "cita_textual": "Las notificaciones enviadas al email registrado se considerarán válidas 24 horas después de su envío.",
       "explicacion": "El proveedor puede notificarte cambios o facturas por email. Se considera recibido 24h después.",
       "riesgo_real": "Bajo - Es estándar en contratos digitales.",
-      "mitigacion": "Configura filtros en tu email para no perder comunicaciones importantes."
+      "mitigacion": "Configura filtros en tu email para no perder comunicaciones importantes.",
+      "confianza": "Alta",
+      "categoria_riesgo": "Otro"
     }
   ],
   "omisiones": [
@@ -340,6 +350,62 @@ ELSE:
 
 * roja_extrema = confiscación de fondos, renuncia total a demandar, venta de datos sin consentimiento
 ```
+
+---
+
+## PUNTAJE DE RIESGO (0-10)
+
+**CRÍTICO:** Emite `puntaje_riesgo` (entero 0-10) y `desglose_riesgo` en el JSON. El LLM calcula el puntaje — no uses fórmula mecánica.
+
+### Anclas de Calibración:
+- **0–2**: Sin hallazgos críticos. A lo sumo 2 amarillas menores.
+- **3–5**: 1–2 rojas, O más de 5 amarillas significativas.
+- **6–8**: 3+ rojas, O al menos 1 roja extrema.
+- **9–10**: Múltiples rojas extremas. Ejemplos de rojas extremas: venta de datos sin opt-out, renuncia total a demandar, confiscación de fondos.
+
+**Consistencia obligatoria:** `puntaje_riesgo` DEBE ser coherente con `nivel_riesgo_general`:
+- Bajo → puntaje 0–2
+- Medio → puntaje 3–5
+- Alto → puntaje 6–10
+
+### `desglose_riesgo`:
+Cuenta hallazgos (rojos + amarillos) por `categoria_riesgo`. Ejemplo:
+```json
+"desglose_riesgo": {"Financiero": 2, "Datos": 1, "Derechos": 1}
+```
+Solo incluye categorías con al menos 1 hallazgo.
+
+---
+
+## CATEGORÍAS DE RIESGO (enum controlado)
+
+Cada hallazgo DEBE incluir `categoria_riesgo` con uno de estos valores exactos (sin variaciones):
+
+| Valor | Aplica a |
+|-------|----------|
+| `"Financiero"` | Precios, pagos, penalizaciones, renovaciones |
+| `"Datos"` | Recolección, transferencia, uso, retención, privacidad |
+| `"Derechos"` | Derechos del usuario, renuncia a demandas colectivas, portabilidad |
+| `"Responsabilidad"` | Límites de responsabilidad, garantías, indemnizaciones |
+| `"Disputas"` | Arbitraje, jurisdicción, ley aplicable |
+| `"Modificaciones"` | Cambios unilaterales de términos |
+| `"Otro"` | Hallazgos que no encajan en las categorías anteriores |
+
+**Regla:** Los hallazgos GRIS también reciben `categoria_riesgo` — asigna la más relevante aunque el riesgo sea neutral.
+
+---
+
+## CONFIANZA DEL ANÁLISIS (por hallazgo)
+
+Cada hallazgo DEBE incluir `confianza` indicando qué tan seguro está el AI de que la cláusula representa el riesgo clasificado.
+
+| Valor | Cuándo aplicar |
+|-------|----------------|
+| `"Alta"` | Cláusula explícita e inequívoca. El riesgo es claro sin contexto adicional. Ejemplo: "Se cobrará automáticamente al renovarse." |
+| `"Media"` | Cláusula general o condicional. El riesgo depende de circunstancias específicas. Ejemplo: "Podemos modificar los términos en cualquier momento según consideremos necesario." |
+| `"Baja"` | Vaga, incompleta, o requiere interpretación legal para determinar el riesgo. Ejemplo: "Sujeto a términos adicionales aplicables." |
+
+**Nota:** `confianza` mide la certeza del AI sobre la clasificación, NO la claridad del lenguaje contractual.
 
 ---
 
@@ -401,6 +467,9 @@ ELSE:
 - [ ] No di asesoramiento legal prescriptivo
 - [ ] Omisiones están documentadas con cláusula sugerida
 - [ ] Hallazgos ordenados por severidad (rojos → amarillos → verdes → grises)
+- [ ] Cada hallazgo tiene `confianza` (Alta/Media/Baja) correctamente calibrado
+- [ ] Cada hallazgo tiene `categoria_riesgo` del enum controlado (Financiero, Datos, Derechos, Responsabilidad, Disputas, Modificaciones, Otro)
+- [ ] `puntaje_riesgo` (0-10) y `desglose_riesgo` están en el JSON al nivel raíz, coherentes con `nivel_riesgo_general`
 
 ---
 
@@ -441,7 +510,7 @@ ELSE:
 | Omisiones | No | Sí (lista corta) | Sí (lista exhaustiva) |
 | Análisis cruzado | No | No | Sí (exhaustivo) |
 | Mapeo estructural | No | Sí | Sí (obligatorio) |
-| Modelo | gpt-4o-mini | gpt-5-mini | gpt-5 |
+| Modelo | gpt-6-luna | gpt-6-sol | gpt-6-astra |
 | Costo | 1 crédito | 3 créditos | 10 créditos |
 | Caso de uso | Usuario se engancha | **Mejor costo-beneficio** | Power users, alto valor |
 

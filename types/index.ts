@@ -55,13 +55,23 @@ export interface AnalysisSummary {
     justificacion: string;
     clausulas_criticas_totales: number;
     mayor_riesgo_identificado: string;
+    recomendacion_prioritaria?: string; // Forensic-only
   };
   nivel_riesgo_general: "Alto" | "Medio" | "Bajo";
+  puntaje_riesgo?: number;
+  desglose_riesgo?: Record<string, number>;
   metricas: {
     total_rojas: number;
     total_amarillas: number;
     total_verdes: number;
+    total_grises?: number;
     porcentaje_clausulas_analizadas: string;
+    // Forensic-only
+    total_omisiones?: number;
+    total_inconsistencias_cruzadas?: number;
+    total_hallazgos?: number;
+    clausulas_analizadas?: number;
+    clausulas_total?: number;
   };
   hallazgos: Hallazgo[];
 
@@ -80,6 +90,12 @@ export interface AnalysisSummary {
   analisis_cruzado?: AnalisisCruzadoItem[];
   omisiones?: OmisionCritic[];
   mapa_estructural?: MapaEstructural;
+
+  // Upgrade nudge (basic tier only — emitted when upgrade is recommended)
+  nota_upgrade?: string;
+
+  // Prompt-level error response (e.g. DOCUMENT_TOO_LARGE_FOR_BASIC)
+  error?: string;
 
   _debug?: any;
 }
@@ -119,13 +135,15 @@ export interface MapaEstructural {
 }
 
 export interface Hallazgo {
-  color: "rojo" | "amarillo" | "verde";
+  color: "rojo" | "amarillo" | "verde" | "gris";
   titulo: string;
   explicacion: string;
   clausula?: string;
   cita_textual?: string;
   riesgo_real?: string;
   mitigacion?: string;
+  confianza?: "Alta" | "Media" | "Baja";
+  categoria_riesgo?: string;
 }
 
 export interface Transaction {
