@@ -61,6 +61,47 @@ $ gh pr view 46 --json number,url,mergeable,mergeStateStatus,baseRefName,headRef
 ```
 **Result:** PASS — CLEAN / MERGEABLE.
 
-**PR to `develop`:** could not be opened at first attempt — GitHub rejected it with `No commits between develop and release/v1.0.0-alpha.20`, because the release branch was cut directly from `develop`'s exact HEAD with no new commits yet. Resolved by committing this evidence file on the release branch first (this commit), which gives the branches a diff, then opening the `develop` PR immediately after. See the "Resolution" subsection below for the PR URL/number and mergeable state, appended after that commit.
+**PR to `develop`:** could not be opened at first attempt — GitHub rejected it with `No commits between develop and release/v1.0.0-alpha.20`, because the release branch was cut directly from `develop`'s exact HEAD with no new commits yet. Resolved by committing this evidence file on the release branch first (commit `f9d98e7`, "📝 docs(13-03): record release PRs"), pushing it, and then opening the `develop` PR immediately after — that commit is what creates the diff GitHub requires. This is a pre-existing quirk of this specific release (13-01/13-02 already landed all the release content directly on `develop`, so the release branch started with zero diff from `develop`), not a plan defect; no code changes were made to work around it, only the ordering of "commit evidence" vs. "open develop PR" was swapped from the plan's literal step order.
 
-<!-- gsd:write-continue -->
+**PR to `develop`:** [#47](https://github.com/cativo23/clarify/pull/47) — `release: v1.0.0-alpha.20`
+
+```bash
+$ gh pr view 47 --json number,url,mergeable,mergeStateStatus,baseRefName,headRefName
+{"baseRefName":"develop","headRefName":"release/v1.0.0-alpha.20","mergeStateStatus":"CLEAN","mergeable":"MERGEABLE","number":47,"url":"https://github.com/cativo23/clarify/pull/47"}
+```
+**Result:** PASS — CLEAN / MERGEABLE.
+
+Re-checked PR #46 (main) after the evidence-file push — still CLEAN / MERGEABLE:
+```bash
+$ gh pr view 46 --json number,url,mergeable,mergeStateStatus,baseRefName,headRefName
+{"baseRefName":"main","headRefName":"release/v1.0.0-alpha.20","mergeStateStatus":"CLEAN","mergeable":"MERGEABLE","number":46,"url":"https://github.com/cativo23/clarify/pull/46"}
+```
+
+### 5. Task 1 plan-level `<verify>` re-run
+
+```bash
+$ git fetch -q origin
+$ gh pr list -R cativo23/clarify --head release/v1.0.0-alpha.20 --state open --json baseRefName --jq '[.[].baseRefName] | sort | join(",")'
+develop,main
+$ git merge-base --is-ancestor 23174ee origin/release/v1.0.0-alpha.20 && echo ANCESTOR
+ANCESTOR
+$ git show origin/release/v1.0.0-alpha.20:docker-compose.prod.yml | grep -q 'NUXT_REDIS_HOST' && echo PASS
+PASS
+$ gh release view v1.0.0-alpha.20 -R cativo23/clarify
+release not found
+```
+**Result:** PASS — all four conditions of the plan's Task 1 `<verify>` block hold: both PRs open (develop, main), the release branch has the Node 24 CI commit, the compose file has the 13-01 NUXT_REDIS_HOST fix, and no v1.0.0-alpha.20 release exists yet.
+
+### 6. Task 1 outcome
+
+Both release PRs are open and mergeable ([#46](https://github.com/cativo23/clarify/pull/46) to `main`, [#47](https://github.com/cativo23/clarify/pull/47) to `develop`). Nothing is merged or published. Task 2 (go/no-go checkpoint) is next — this executor halts here and returns control to the orchestrator per this plan's `autonomous: false` frontmatter and the checkpoint's blocking gate; Task 3 (merge, release, deploy, verify) runs only after Carlos says "go".
+
+---
+
+## Task 2: Go/no-go checkpoint
+
+Pending — awaiting Carlos's decision. See the CHECKPOINT REACHED report returned by this executor for the decision context, options, and undo-cost summary.
+
+## Task 3: Tracer (production leg)
+
+Not started — blocked on Task 2's "go" signal. Will be appended to this file on `develop` after Task 2 resolves, per this plan's action step 8.
