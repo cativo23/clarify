@@ -77,6 +77,7 @@
             <NuxtLink
               v-if="!user"
               to="/login"
+              external
               class="group relative px-8 py-4 bg-secondary text-white rounded-2xl font-bold text-lg hover:shadow-glow hover:scale-105 transition-all duration-300"
             >
               Comenzar Gratis
@@ -509,6 +510,7 @@
         <NuxtLink
           v-if="!user"
           to="/login"
+          external
           class="inline-block px-12 py-5 bg-secondary text-white rounded-[2rem] font-black text-xl hover:shadow-glow hover:scale-105 transition-all duration-300 transform"
         >
           Empezar Ahora - Gratis
