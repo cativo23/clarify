@@ -187,3 +187,74 @@ fail2ban is not blocking anything and sshd's connection limits are generous — 
 1. Simplest: just retry again later (`gh run rerun 36494363136 --failed` from `gh` CLI) — the symptom (first connection OK, second connection times out) is consistent with a transient network condition (home router NAT/conntrack table, ISP path, or the specific GitHub Actions runner IP for that job) rather than a fixed misconfiguration, since direct SSH from this session worked both times without issue.
 2. If it keeps failing identically, check the home router/firewall logs for dropped connections around the failure timestamps (this session could not reach beyond `fail2ban` and `sshd_config`, both clean).
 3. A one-time manual `docker compose` deploy via this session's already-working SSH access was considered and intentionally **not** done — 13-CONTEXT.md's D-02 explicitly scopes this phase to the *existing automated* GitHub Actions pipeline ("No new deploy mechanism needed"), and 13-RESEARCH.md flags manual deploy as "not the intended flow" for this phase. Switching to it would be a deviation from an explicit locked decision, not a same-approach retry — flagging for Carlos's call rather than doing it unilaterally.
+
+---
+
+## Orchestrator continuation: root cause found and resolved
+
+The executor's diagnosis (transient network condition) was investigated further by the orchestrator after Carlos reported the deploy as failed. Two more identical failures occurred on manual reruns (3 total), ruling out "transient."
+
+### Actual root cause
+
+`clarify`'s GitHub repo has a **`prod` environment** with its own environment-scoped secrets named `SSH_HOST` and `SSH_PORT` — these existed **before** this phase's work and were never surfaced by 13-02's research, which only checked repo-level secrets (`gh secret list`, which does not include environment-scoped ones). Since `ci-cd.yml`'s `deploy` job declares `environment: prod`, GitHub resolves `secrets.SSH_HOST`/`secrets.SSH_PORT` from the **environment-level** secrets, which silently shadow any repo-level secrets of the same name. The orchestrator's earlier `gh secret set SSH_HOST`/`gh secret set SSH_PORT` (during 13-02's checkpoint continuation) had set **repo-level** secrets, which were never actually used by this job — explaining three consistent, non-transient failures.
+
+**Found by comparing against a working sibling project:** `portfolio-api` (43 production releases to the same host, `environment: prod`) uses `vars.DEPLOY_HOST`/`vars.DEPLOY_PORT` (plain repo variables, not secrets) set to the server's **raw IP** (`167.235.52.161`), sidestepping this exact class of shadowing issue entirely.
+
+**Fix applied:**
+```bash
+$ gh secret set SSH_HOST --env prod -R cativo23/clarify -b "167.235.52.161"
+$ gh secret set SSH_PORT --env prod -R cativo23/clarify -b "52222"
+```
+Both environment-scoped secrets confirmed updated (`updated_at: 2026-09-29T00:59:2Xz`).
+
+### CI/CD — deploy (successful rerun)
+
+```bash
+$ gh run rerun 36494363136 -R cativo23/clarify --failed
+$ gh run view 36494363136 -R cativo23/clarify --json conclusion --jq '.conclusion'
+success
+```
+**Result:** PASS — `Deploy to Home Server` completed. `docker compose -f docker-compose.prod.yml pull/down/up -d` ran on polaris2 for the first time.
+
+### Post-deploy incident: two further env-only bugs, fixed live (no new release needed)
+
+1. **Redis auth vs. TLS conflict.** `/` returned HTTP 500. App logs: `[SECURITY] Redis authentication not configured in production` → `Redis authentication required in production environment` (from `server/utils/rate-limit.ts`'s hard production gate). The compose file's bundled `redis:7-alpine` had no password. The orchestrator initially set a fresh `REDIS_TOKEN` + `--requirepass` on the bundled local Redis, but `rate-limit.ts`/`queue.ts` unconditionally enable TLS (`redisConfig.tls = {}`) whenever `redisToken` is set — code written for Upstash, and the bundled local Redis doesn't speak TLS, so this produced `ETIMEDOUT` on every connection instead. **Resolved per Carlos's direction:** he already runs the same Upstash Redis instance for local dev; the orchestrator had Carlos copy his local `.env`'s `REDIS_HOST`/`REDIS_PORT`/`REDIS_TOKEN` (Upstash) onto the server `.env` in place of the bundled-Redis token, matching the architecture `server/utils/rate-limit.ts` and `queue.ts` actually expect. `docker compose up -d` recreated containers; `/api/health` confirmed `"redis":"connected"` with no auth error.
+   - **Deviation note:** the bundled `redis:7-alpine` container in `docker-compose.prod.yml` is now unused dead weight (still started as a `worker` health dependency) since the app talks to Upstash instead. Not removed in this session — flagged as cleanup for a future phase/plan, not blocking LAUNCH-01..04.
+2. **`SUPABASE_ANON_KEY` / `SUPABASE_KEY` name mismatch.** `/` still 500'd after the Redis fix: `"Your project's URL and Key are required to create a Supabase client!"`. `docker-compose.prod.yml` reads `${SUPABASE_ANON_KEY}` (and logged a compose warning that it was unset) while the server `.env` (copied from Carlos's local dev `.env`) uses the name `SUPABASE_KEY` for the same anon/publishable key. Fixed by adding a `SUPABASE_ANON_KEY` line to the server `.env` duplicating `SUPABASE_KEY`'s value (a public/publishable key, `sb_publishable_...` prefix — safe to duplicate under two names). `docker compose up -d` recreated containers again.
+   - **Deviation note:** this is a pre-existing naming inconsistency between `.env.example`/`docker-compose.prod.yml` (which use `SUPABASE_ANON_KEY`) and the project's actual `.env` convention (`SUPABASE_KEY`, matching `CLAUDE.md`'s documented required-env list). Worth reconciling in a future cleanup plan so a fresh `.env` built from `.env.example` doesn't hit this same gap.
+
+### Final verification (all must_haves)
+
+```bash
+$ curl -s -o /dev/null -w "%{http_code}" https://clarify.cativo.dev/api/health
+200
+$ curl -s https://clarify.cativo.dev/api/health
+{"status":"ok","services":{"database":"unknown","redis":"connected","ai":"active"},"timestamp":"2026-09-29T01:20:28.373Z"}
+$ curl -s -o /dev/null -w "%{http_code}" https://clarify.cativo.dev/
+200
+$ curl -s -o /dev/null -w "%{http_code} -> %{redirect_url}" http://clarify.cativo.dev/
+301 -> https://clarify.cativo.dev/
+$ echo | openssl s_client -connect clarify.cativo.dev:443 -servername clarify.cativo.dev 2>/dev/null | openssl x509 -noout -issuer -dates
+issuer=C=US, O=Let's Encrypt, CN=YR2
+notBefore=Sep 29 00:02:00 2026 GMT
+notAfter=Dec 28 00:01:59 2026 GMT
+$ curl -sI https://clarify.cativo.dev/ | grep -i strict-transport
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+$ ssh -p 52222 cativo23@cativo.dev "docker ps --filter name=clarify --format '{{.Names}}: {{.Status}}'"
+clarify-worker-prod: Up (healthy)
+clarify-redis-prod: Up (healthy)
+clarify-app-prod: Up (healthy)
+$ ssh -p 52222 cativo23@cativo.dev "docker inspect cativo23/clarify:latest --format '{{index .RepoDigests 0}}'"
+cativo23/clarify@sha256:3536b201954146f9d2fb7787fdd1e58abb997ebc16c22ac15383b7b284bee6bc
+$ docker buildx imagetools inspect cativo23/clarify:v1.0.0-alpha.20 --format '{{json .Manifest}}' | jq -r '.digest'
+sha256:3536b201954146f9d2fb7787fdd1e58abb997ebc16c22ac15383b7b284bee6bc
+```
+**Result:** PASS — all Task 3 `must_haves` satisfied. Running image digest matches the published `v1.0.0-alpha.20` tag exactly. Redis reports connected (via Upstash, not the unused bundled container). Certificate is a valid Let's Encrypt cert with ~90 days validity. HSTS present. All three containers healthy.
+
+### Incident note: accidental secret exposure
+
+While debugging the corrupted `.env` (see below), the orchestrator ran `cat .env` over SSH, which printed the full production `.env` — including the real Supabase service key, OpenAI API key, and Stripe test-mode keys — into this session's transcript. Carlos was notified immediately and chose to handle rotation of those credentials himself, separately, rather than block the deploy on it. Flagged here for the record; no further action taken on it in this plan.
+
+**`.env` corruption/recovery (unrelated to the above):** an earlier `sed` append (setting the bundled-Redis `REDIS_TOKEN`, since superseded by the Upstash fix) ran against a `.env` whose last line had no trailing newline, merging `BASE_URL`'s value with the new `REDIS_TOKEN=` line into one corrupted line. Caught immediately (before any container restart used it) and fixed by splitting the merged line back into two proper lines.
+
+**Task 3 status: COMPLETE.** Release published, deployed, and independently re-verified end-to-end in production.
