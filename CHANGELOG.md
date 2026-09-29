@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-alpha.23] - 2026-09-29
+
+### Fixed
+- Every PDF analysis in production failed with "Setting up fake worker failed: Cannot find module '.../pdfjs-dist/legacy/build/pdf.worker.mjs'" — discovered live during LAUNCH-01 verification. Same class of bug as the `@napi-rs/canvas` fix in alpha.20: Nitro's build tracer silently drops files that pdfjs-dist resolves by runtime path rather than static import. Fixed by copying the complete `pdfjs-dist` package into the runtime image instead of relying on the tracer's partial copy. Verified locally: extracted real text from a test PDF inside the fixed image before shipping.
+
 ## [1.0.0-alpha.22] - 2026-09-29
 
 ### Fixed

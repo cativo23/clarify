@@ -66,6 +66,17 @@ COPY --from=builder --chown=nuxtjs:nodejs /app/package.json ./package.json
 COPY --from=builder --chown=nuxtjs:nodejs /app/node_modules/@napi-rs/canvas ./.output/server/node_modules/@napi-rs/canvas
 COPY --from=builder --chown=nuxtjs:nodejs /app/node_modules/@napi-rs/canvas-linux-x64-musl ./.output/server/node_modules/@napi-rs/canvas-linux-x64-musl
 
+# Same node-file-trace gap as above, different file: pdfjs-dist dynamically
+# resolves its worker script (legacy/build/pdf.worker.mjs) by path at
+# runtime rather than a static import/require, so the tracer never follows
+# it either. Found live in production (13-04 LAUNCH-01 verification): every
+# PDF analysis failed with "Setting up fake worker failed: Cannot find
+# module '.../pdfjs-dist/legacy/build/pdf.worker.mjs'". Rather than
+# cherry-picking files one at a time as the tracer's gaps in this package
+# keep surfacing, replace the whole traced (partial) pdfjs-dist directory
+# with the real, complete package from the deps stage.
+COPY --from=builder --chown=nuxtjs:nodejs /app/node_modules/pdfjs-dist ./.output/server/node_modules/pdfjs-dist
+
 # Switch to non-root user
 USER nuxtjs
 
