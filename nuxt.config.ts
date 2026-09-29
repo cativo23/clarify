@@ -25,6 +25,14 @@ export default defineNuxtConfig({
           "'self'",
           "https://js.stripe.com",
           "https://challenges.cloudflare.com",
+          // nuxt-security's per-request nonce (see 50-updateCsp.js) only gets
+          // substituted into the CSP header when this exact placeholder is
+          // present in the directive array. Omitting it (as this override
+          // previously did) silently drops the nonce from the response
+          // header even though it's still stamped onto every <script> tag,
+          // which blocks all inline scripts — including Nuxt's own payload
+          // hydration script — under CSP.
+          "'nonce-{{nonce}}'",
           // Allow unsafe scripts ONLY in development for HMR and hydration
           ...(process.env.NODE_ENV !== "production"
             ? ["'unsafe-inline'", "'unsafe-eval'"]
