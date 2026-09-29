@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-alpha.25] - 2026-09-29
+
+### Fixed
+- Every analysis failed with "System configuration error" (`CRITICAL: Failed to load prompt from /app/server/prompts/v2/basic-analysis-prompt.txt`) — the Dockerfile's runtime stage copied nothing under `/app/server` at all, so the prompt files this project keeps out of TS source (per CLAUDE.md) never made it into the production image. Fixed by copying `server/prompts` into the runner stage.
+
 ## [1.0.0-alpha.24] - 2026-09-29
 
 ### Fixed
