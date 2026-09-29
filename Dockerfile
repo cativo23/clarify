@@ -55,6 +55,16 @@ ENV NUXT_PORT=3000
 COPY --from=builder --chown=nuxtjs:nodejs /app/.output ./.output
 COPY --from=builder --chown=nuxtjs:nodejs /app/package.json ./package.json
 
+# CLAUDE.md's own convention ("Prompt Management: Do not hardcode prompts in
+# TS; use server/prompts/") means these are read via fs.readFile at runtime
+# (server/utils/openai-client.ts, resolved from process.cwd()), not statically
+# imported, so Nitro's build never bundles them into .output. The runner
+# stage previously copied nothing under /app/server at all, so this path
+# never existed in the image — found live in production (13-04 LAUNCH-01
+# verification) as "CRITICAL: Failed to load prompt from
+# /app/server/prompts/v2/basic-analysis-prompt.txt", failing every analysis.
+COPY --from=builder --chown=nuxtjs:nodejs /app/server/prompts ./server/prompts
+
 # pdf-parse -> pdfjs-dist requires "@napi-rs/canvas" at runtime to polyfill
 # DOMMatrix/ImageData/Path2D (see server/utils/pdf-parser.ts). Nitro's
 # node-file-trace does not follow that try/catch-wrapped require() into
