@@ -1,5 +1,5 @@
 import { Worker } from "bullmq";
-import { getRedisConnection } from "../utils/queue";
+import { getRedisConnection, queuePrefix } from "../utils/queue";
 import { extractTextFromPDF } from "../utils/pdf-parser";
 import { analyzeContract } from "../utils/openai-client";
 import { getWorkerSupabaseClient } from "../utils/worker-supabase";
@@ -166,6 +166,7 @@ export default defineNitroPlugin((_nitroApp) => {
     },
     {
       connection: getRedisConnection() as any, // Cast to any to resolve ioredis version mismatch
+      prefix: queuePrefix, // must match getAnalysisQueue()'s prefix in ../utils/queue
       concurrency: parseInt(process.env.BULLMQ_CONCURRENCY || '2', 10),
       defaultJobOptions: {
         attempts: 3,

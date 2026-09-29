@@ -4,6 +4,16 @@ import { Redis } from "ioredis";
 let analysisQueue: Queue | null = null;
 let redisConnection: Redis | null = null;
 
+// [LAUNCH-01 FIX] Namespaces BullMQ's Redis keys per environment. Local dev
+// and production point at the same Upstash instance (same REDIS_HOST/TOKEN
+// copied from .env for convenience), so without this both a locally running
+// `nuxt dev` and the production worker race to claim jobs from the same
+// unprefixed "analysis-queue" — discovered live when a production job was
+// silently stolen and failed by a 3-day-old local dev process. Must match
+// the prefix used when constructing the Worker in server/plugins/worker.ts.
+export const queuePrefix =
+  process.env.NODE_ENV === "production" ? "prod" : "dev";
+
 export const getRedisConnection = () => {
   if (!redisConnection) {
     const config = useRuntimeConfig();
@@ -31,6 +41,7 @@ export const getAnalysisQueue = () => {
   if (!analysisQueue) {
     analysisQueue = new Queue("analysis-queue", {
       connection: getRedisConnection() as any, // Cast to any to resolve ioredis version mismatch
+      prefix: queuePrefix,
       defaultJobOptions: {
         attempts: 3,
         backoff: {
