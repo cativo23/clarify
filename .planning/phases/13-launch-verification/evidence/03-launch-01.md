@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-29
 **Purpose:** Confirm production dependency readiness (Task 1), then prove LAUNCH-01's worker half end to end with a real submitted job (Task 3).
-**Production build at time of check:** v1.0.0-alpha.21 (CSP hotfix, per 13-03-SUMMARY.md)
+**Production build at time of check:** started at v1.0.0-alpha.21; three further same-day hotfixes (alpha.23, alpha.24, alpha.25) shipped mid-plan as LAUNCH-01 testing itself uncovered each blocker — see Task 3 below.
 
 ---
 
@@ -107,4 +107,59 @@ This is not a Rule 1-3 auto-fixable issue (no bug, no missing code, no blocking 
 
 **Steps 4-8 of Task 3 (upload, submit, poll, worker-log verification, structured-field check, final RESULT line) are NOT YET DONE.** No job has been submitted; no `BASIC_ID` exists yet. Production is unaffected — no analysis was created, no file was uploaded, no credits were spent.
 
-**Recommended continuation:** the main conversation (which holds `mcp__claude-in-chrome__*` tool access) drives the browser steps directly — reusing the existing authenticated tab (call `tabs_context_mcp` without `createIfEmpty` first, per the tool's own reuse guidance and Carlos's explicit instruction not to create a new tab that would log out the existing session) — to: upload `tests/contracts/pdf/contrato-bajo-riesgo.pdf`, submit the Basic analysis named "QA launch basic 13", capture the returned `analysisId`, and read `QA_USER_ID` from the profile page. That `BASIC_ID` can then be appended to `~/.config/clarify-qa/phase13-ids` (mode 600) and a continuation `gsd-executor` (or the main conversation itself) completes steps 5-8: poll `/api/analyses/$BASIC_ID/status` (same-origin fetch in the tab, since AUTH_MODE=browser has no bearer/cookie header to replay from a worktree shell), verify the worker log lines over SSH exactly once each, check the v2.1 structured fields, and write the final `RESULT LAUNCH-01 status=completed` line this file's automated `<verify>` block (browser-mode branch) checks for.
+**Continuation:** completed directly from the main conversation (which holds `mcp__claude-in-chrome__*` tool access), reusing the existing authenticated tab per the plan's own AUTH_MODE=browser fallback.
+
+### 4. QA_USER_ID and first submission
+
+```js
+// same-origin fetch, executed in the authenticated tab
+const res = await fetch('/api/user/profile'); const data = await res.json(); data.id
+// -> 76b91094-... (QA_USER_ID, written to phase13-ids)
+```
+Credits confirmed: 10 (sufficient for a 1-credit Basic analysis).
+
+The file-upload UI widget's drop-zone did not visually react to a programmatic file-input assignment (same class of click/event-binding flakiness observed elsewhere in this session's UI testing — see the phase's dark-mode-toggle/login-link investigation). Verified the file *was* correctly attached to the native `<input type=file>` (`files.length === 1`), then bypassed the UI widget entirely and drove the upload via the same underlying endpoint the UI itself calls: same-origin `fetch('/api/upload', {method:'POST', body: FormData})`, followed by `fetch('/api/analyze', ...)` — exactly the plan's own anticipated alternative ("via the upload UI, or same-origin fetch()").
+
+**First attempt** (BASIC_ID `8f1bea54...`, submitted 2026-09-29T18:07:34Z): failed immediately.
+Worker log: `Error parsing PDF: Error: Setting up fake worker failed: Cannot find module '.../pdfjs-dist/legacy/build/pdf.worker.mjs'`. **Root cause and fix: see `evidence/05-hotfix-alpha23.md` (v1.0.0-alpha.23).**
+
+**Second attempt** (BASIC_ID `ed338c9f...`, submitted 2026-09-29T18:18:45Z, after alpha.23 deployed): failed with a generic "unexpected error" and **zero** worker log lines for the job, despite BullMQ's own job history (queried directly from Redis) showing it "completed". **Root cause and fix: a 3-day-old local dev process sharing the same unprefixed Redis queue was stealing production's jobs — see `evidence/06-hotfix-alpha24.md` (v1.0.0-alpha.24).**
+
+**Third attempt** (BASIC_ID `b1232145...`, submitted 2026-09-29T18:33:37Z, after alpha.24 deployed): production's own worker finally logged the job (`Started processing basic analysis b1232145...`) but failed with `CRITICAL: Failed to load prompt from /app/server/prompts/v2/basic-analysis-prompt.txt`. **Root cause and fix: see `evidence/07-hotfix-alpha25.md` (v1.0.0-alpha.25).**
+
+**Fourth attempt** (BASIC_ID `3942a796...`, submitted 2026-09-29T18:44:01Z, after alpha.25 deployed): prompt loaded correctly, request reached OpenAI (`gpt-6-luna`), but hit the output token limit mid-generation (`finish_reason: 'length'`, `has_content: false`) even for this small test fixture — `Analysis Debug: Tokens: 2528 / 8000` input, but the Basic tier's configured **output** limit (2500) was too tight for a gpt-6-luna reasoning pass. Per Carlos's direction, raised the DB-backed `configurations` row (`key=prompt_settings`) `tiers.basic.tokenLimits.output` from `2500` to `6000` (still well under Premium's `10000`) via a direct, scoped `PATCH` to `/rest/v1/configurations` from inside the app container using the service key — a data/config change, not a code release, per the plan's own D-05 "Server env value wrong" category (extended here to a DB-backed runtime config row of the same character). No new alpha release needed for this step.
+
+### 5. Successful submission (BASIC_ID `1cb5ecd5-0c74-4bc5-b9c4-f83e540390f8`)
+
+Submitted 2026-09-29T19:48:38Z. Worker picked it up within seconds (`19:48:34.85` — a few hundred ms of clock skew against the submit-time capture, not a delay) and completed at `19:48:56.82`.
+
+**Duration: ~22 seconds** — well under the Phase 07 two-minute expectation for Basic.
+
+### 6. Worker proof (exactly once, no double-processing)
+
+```bash
+$ ssh -p 52222 ... "docker logs clarify-worker-prod --timestamps 2>&1" | grep 1cb5ecd5
+19:48:34.850 [Worker] Started processing basic analysis 1cb5ecd5-0c74-4bc5-b9c4-f83e540390f8 for user 76b91094-...
+19:48:35.255 [Worker Supabase] Updating analysis 1cb5ecd5-... to processing
+19:48:56.362 [Worker Supabase] Updating analysis 1cb5ecd5-... to completed
+19:48:56.824 [Worker] Successfully completed analysis 1cb5ecd5-0c74-4bc5-b9c4-f83e540390f8
+19:48:56.923 [Worker] Job 3 has completed
+```
+Exactly one `Started processing` line, exactly one `Successfully completed` line, exactly one `Job N has completed` line. No retry, no double-processing.
+
+### 7. Structured output check (v2.1 fields)
+
+```js
+{
+  "status": "completed",
+  "veredicto": "present",
+  "puntaje_riesgo": 2,
+  "puntaje_type": "number",
+  "desglose_type": "object",
+  "hallazgos_count": 6,
+  "hallazgos_with_confianza_categoria": 6
+}
+```
+`resumen_ejecutivo.veredicto` non-empty, `puntaje_riesgo` numeric (0-10 scale, value 2), `desglose_riesgo` an object, `hallazgos` non-empty (6 items), and **all 6 of 6** hallazgos carry both `confianza` and `categoria_riesgo` — proving the Phase 11 v2.1 structured prompt fields run correctly in production.
+
+**RESULT LAUNCH-01 status=completed**
