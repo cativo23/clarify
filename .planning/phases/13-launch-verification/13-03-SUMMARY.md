@@ -70,24 +70,38 @@ coverage:
     verification:
       - kind: integration
         ref: "gh run view 36494363136 — Deploy to Home Server job, step 'Copy compose file to server'"
-        status: fail
-    human_judgment: true
-    rationale: "Failed identically twice (connection timed out on the second SSH connection within the job, after the first connection succeeded); root cause not fully diagnosable from this session (no journalctl access, fail2ban confirmed clean) — needs Carlos's judgment on whether to retry, investigate the network path, or accept a deviation from the automated-only deploy decision (D-02)"
+        status: pass
+    human_judgment: false
+    rationale: "Root cause found (not transient, not network-path): the 'prod' GitHub environment had its own environment-scoped SSH_HOST/SSH_PORT secrets that shadowed the repo-level ones set during 13-02, invisible to gh secret list. Fixed by setting the environment-scoped secrets to the correct values (matching working sibling project portfolio-api's pattern of a raw IP, not a hostname). Deploy job succeeded on the next rerun."
   - id: D5
     description: "Production HTTPS health, container health, and image-digest checks (the actual tracer-completing checks)"
     requirement: LAUNCH-01
-    verification: []
-    human_judgment: true
-    rationale: "Blocked entirely on D4 — no deploy has succeeded yet, so there is nothing to check against clarify.cativo.dev"
+    verification:
+      - kind: integration
+        ref: "curl https://clarify.cativo.dev/{,/api/health}, openssl s_client, docker ps, docker inspect vs. docker buildx imagetools inspect — see evidence/02-deploy.md 'Final verification' section"
+        status: pass
+    human_judgment: false
+    rationale: "All must_haves confirmed: / and /api/health both 200, redis connected, HTTP->HTTPS 301, valid Let's Encrypt cert, HSTS present, all 3 containers healthy, running image digest matches the published v1.0.0-alpha.20 tag exactly. Two further env-only bugs surfaced and were fixed live post-deploy (Redis auth/TLS conflict resolved by pointing at Carlos's existing Upstash instance instead of the unauthenticated bundled Redis; SUPABASE_ANON_KEY/SUPABASE_KEY naming mismatch in .env) — see evidence file for detail."
 
-duration: ~40min
-completed: 2026-09-28
-status: halted
+duration: ~40min (plan) + ~35min (orchestrator deploy-fix continuation) + ~25min (CSP hotfix release v1.0.0-alpha.21)
+completed: 2026-09-29
+status: complete
 ---
 
-# Phase 13 Plan 03: Release Cut and First Production Deploy (Halted) Summary
+# Phase 13 Plan 03: Release Cut and First Production Deploy Summary
 
-**v1.0.0-alpha.20 is cut, merged, and published as a GitHub prerelease with a correctly-built and Docker-Hub-pushed image — but the CI/CD deploy job's SSH file-copy step to polaris2 failed identically twice (connection timeout on the second of two connections within the job) with secrets and server health independently confirmed good, so the actual production deploy and all downstream HTTPS/health/container checks remain undone.**
+**v1.0.0-alpha.20 is cut, merged, published, deployed to polaris2, and independently re-verified end-to-end in production.** The executor's own run halted after two identical deploy-job SSH timeouts; the orchestrator found and fixed the real root cause (GitHub environment-scoped secrets shadowing the repo-level ones), completed the deploy, and fixed two further post-deploy env-only bugs live. A same-day hotfix release (v1.0.0-alpha.21) then shipped for an unrelated CSP/nonce bug Carlos found by hand testing the live site.
+
+## Orchestrator continuation (after this executor's halt)
+
+1. **Deploy-job root cause and fix.** Compared against `portfolio-api`, a sibling project with 43 successful production releases to the same host. Found the `clarify` GitHub repo's `prod` environment already had its own `SSH_HOST`/`SSH_PORT` secrets (pre-existing, never surfaced by 13-02's repo-level-only `gh secret list`), which take precedence over repo-level secrets for any job declaring `environment: prod` — exactly this project's `deploy` job. Set the environment-scoped secrets correctly (raw IP, matching the working sibling project's pattern); the next rerun of `ci-cd.yml` succeeded.
+2. **Two post-deploy env bugs, fixed live (no new release needed):**
+   - Rate-limit code (`server/utils/rate-limit.ts`) hard-requires a Redis token in production and force-enables TLS whenever one is set — written for Upstash, incompatible with the compose file's unauthenticated, non-TLS bundled `redis:7-alpine`. Resolved by pointing the server `.env` at Carlos's existing Upstash Redis instance (same one used in local dev) instead of the bundled container.
+   - `docker-compose.prod.yml` reads `${SUPABASE_ANON_KEY}`, but the project's actual `.env` convention (and `CLAUDE.md`'s documented env list) uses `SUPABASE_KEY` for the same value — added an explicit `SUPABASE_ANON_KEY` alias to the server `.env`.
+3. **Full verification:** `/` and `/api/health` both 200, Redis connected, HTTP→HTTPS redirect, valid Let's Encrypt cert (~90 days), HSTS present, all 3 containers healthy, running image digest byte-for-byte matches the published `v1.0.0-alpha.20` tag.
+4. **Hotfix v1.0.0-alpha.21 (same day):** Carlos hand-tested the deployed site and found the dark-mode toggle broken plus CSP `script-src` console errors and a `Cannot read properties of undefined (reading 'app')` TypeError. Root cause: the project's custom CSP `script-src` override (added for Stripe/Cloudflare) dropped `nuxt-security`'s `'nonce-{{nonce}}'` placeholder, so the module never substituted a real nonce into the response header even though it correctly stamped one onto every `<script>` tag — the browser blocked all inline scripts, including Nuxt's own hydration payload, breaking client-side reactivity site-wide. Fixed in `nuxt.config.ts`, PR #48, released same-day as v1.0.0-alpha.21 through the identical GitFlow process, redeployed, and independently re-verified (CSP header's nonce now matches the HTML's nonce within a single response — confirmed false before the fix, true after).
+
+Full command-by-command evidence for all of the above: `evidence/02-deploy.md` and `evidence/03-hotfix-alpha21.md`.
 
 ## Performance
 
@@ -170,10 +184,11 @@ None new. All deploy secrets/scaffolding from 13-02 remain valid and were indepe
 
 ## Next Phase Readiness
 
-- **BLOCKER, not ready:** LAUNCH-01 (and therefore LAUNCH-02/03/04, all of which depend on a live deployment) cannot be verified until the CI/CD deploy job actually completes successfully. The release, tag, and Docker Hub image are all correctly published and waiting — only the SSH copy-to-server step is failing.
-- **Recommended next action for Carlos:** simplest first — just retry the deploy job again (`gh run rerun 36494363136 --failed -R cativo23/clarify`, or via the GitHub UI); the symptom pattern (first connection fine, second times out) reads as transient rather than a fixed misconfiguration. If it fails a third consecutive time in the same way, the network path between GitHub Actions and polaris2 itself (not credentials, not compose file, not this project's code) likely needs investigation — router/ISP logs beyond what `fail2ban`/`sshd_config` could show from inside this session.
-- **Do not re-cut a new alpha release to work around this.** Per the plan's own D-05 fix loop, a new version bump is only for compose-file/code problems on develop, which this is not — the same `v1.0.0-alpha.20` tag/image should be redeployed once the network issue clears, via `gh run rerun`.
-- Plan 13-03's own remaining steps (server container health, HTTPS/TLS/redirect/HSTS checks, image-digest comparison, release-branch cleanup, and this evidence file's final "Complete" section) are all still pending and depend entirely on the deploy job succeeding. A continuation executor picking this back up should start from Task 3 step 4 (`docker compose ps` health check) once a `gh run view <id>` shows the `Deploy to Home Server` job as `success`.
+- **READY.** Production is deployed, verified end-to-end, and running `v1.0.0-alpha.21` (the CSP hotfix). LAUNCH-01's deploy/tracer prerequisite is satisfied — 13-04 (worker end-to-end) can proceed against `https://clarify.cativo.dev`.
+- **Known non-blocking cleanup items for a future plan (not LAUNCH-01..04 blockers):**
+  1. The bundled `redis:7-alpine` service in `docker-compose.prod.yml` is now dead weight — the app/worker use Carlos's external Upstash Redis instead, per the `rate-limit.ts`/`queue.ts` TLS-on-token design. The unused container still starts (as a `worker` health dependency) but does nothing.
+  2. `docker-compose.prod.yml` reads `${SUPABASE_ANON_KEY}`; the project's actual `.env`/`CLAUDE.md` convention is `SUPABASE_KEY`. Currently papered over by a duplicate `SUPABASE_ANON_KEY` line in the server `.env` — reconcile the naming so a fresh `.env` built from `.env.example` doesn't hit this gap again.
+  3. `nuxt.config.ts`'s `nitro.preset` is still set to `"vercel"`, overridden at runtime by the Dockerfile's `ENV NITRO_PRESET=node-server` — harmless today but a latent footgun if that Dockerfile line ever moves or changes.
 
 ## Self-Check: PASSED
 
@@ -187,5 +202,5 @@ None new. All deploy secrets/scaffolding from 13-02 remain valid and were indepe
 
 ---
 *Phase: 13-launch-verification*
-*Completed: 2026-09-28*
-*Status: halted — Task 3 blocked on a deploy-job network-timeout requiring Carlos's decision on retry vs. investigation*
+*Completed: 2026-09-29*
+*Status: complete — deployed, verified in production, and a same-day CSP hotfix (v1.0.0-alpha.21) shipped and verified*

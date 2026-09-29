@@ -96,6 +96,7 @@
             <NuxtLink
               v-if="$route.path !== '/login'"
               to="/login"
+              external
               class="px-5 py-2 font-bold transition-all border bg-secondary/10 text-secondary border-secondary/20 rounded-xl hover:bg-secondary/20"
             >
               Iniciar Sesión

@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-alpha.22] - 2026-09-29
+
+### Fixed
+- The header's "Iniciar Sesión" link and the two homepage login CTAs went intermittently unresponsive (roughly 50% of clicks, uncorrelated with time since page load). Root cause: those `NuxtLink`s sit inside a `v-if`/`v-else` pair keyed on `useSupabaseUser()`'s `user` ref, and a brief SSR/client mismatch in that value triggers Vue to discard and remount the nav subtree post-hydration — until the remount lands, the server-rendered anchor carries no click binding. Fixed by marking the three `/login` links `external`, bypassing Vue Router's client-side interception entirely.
+
 ## [1.0.0-alpha.21] - 2026-09-29
 
 ### Fixed
