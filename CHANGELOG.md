@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-alpha.21] - 2026-09-29
+
+### Fixed
+- Restored `nuxt-security`'s `'nonce-{{nonce}}'` placeholder in the custom `script-src` CSP directive. Its absence silently disabled nonce substitution in the response header, so every inline `<script>` on the page — including Nuxt's own hydration payload — was blocked by CSP in production. This broke client-side hydration entirely (dark mode toggle and other client reactivity silently no-op'd, with `Cannot read properties of undefined (reading 'app')` in the console).
+
 ## [1.0.0-alpha.20] - 2026-09-28
 
 ### Features
