@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-alpha.24] - 2026-09-29
+
+### Fixed
+- Local dev and production shared the same unprefixed BullMQ "analysis-queue" on the same Upstash Redis instance, so a long-running local `nuxt dev` process raced production's worker for the same jobs and sometimes claimed and failed them before production ever saw them — discovered live during LAUNCH-01 verification via BullMQ's own job history showing jobs "completed" that the production worker's logs never mentioned. Fixed by namespacing BullMQ's Redis keys with an environment-derived `prefix` (`prod` vs `dev`).
+
 ## [1.0.0-alpha.23] - 2026-09-29
 
 ### Fixed
