@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Clarify v2.0 — launch verification</title>
+<style>
+  :root {
+    --bg: #0b1220; --panel: #121b2e; --border: #253248; --text: #e6edf7;
+    --text-dim: #93a2ba; --pass: #34d399; --accent: #60a5fa;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--text); margin: 0; padding: 32px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 14px; line-height: 1.5;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .subtitle { color: var(--text-dim); margin: 0 0 24px; }
+  .meta {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 24px;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+    padding: 16px 20px; margin-bottom: 24px; font-size: 13px;
+  }
+  .meta div span.k { color: var(--text-dim); display: inline-block; min-width: 120px; }
+  h2 { font-size: 16px; margin: 28px 0 10px; color: var(--accent); }
+  table { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); font-size: 12.5px; vertical-align: top; }
+  th { background: #0e1626; color: var(--text-dim); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.03em; }
+  tr:last-child td { border-bottom: none; }
+  .pass { color: var(--pass); font-weight: 700; }
+  .thumb { display: flex; gap: 16px; align-items: flex-start; margin-top: 10px; }
+  .thumb img { width: 220px; border: 1px solid var(--border); border-radius: 6px; }
+  ul.flags { margin: 8px 0 0; padding-left: 20px; color: var(--text-dim); font-size: 12.5px; }
+  ul.flags li { margin-bottom: 6px; }
+  code { background: #0e1626; padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+  .footer { margin-top: 28px; color: var(--text-dim); font-size: 11.5px; border-top: 1px solid var(--border); padding-top: 12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Clarify v2.0 — Launch Verification</h1>
+  <p class="subtitle">Phase 13 sign-off — exercised path: <code>https://clarify.cativo.dev</code> — generated 2026-09-30</p>
+
+  <div class="meta">
+    <div><span class="k">Release tag</span> v1.0.0-alpha.26 (prerelease)</div>
+    <div><span class="k">Published</span> 2026-09-30T07:21:46Z</div>
+    <div><span class="k">Main SHA</span> <code>be1f782</code></div>
+    <div><span class="k">Image digest</span> <code>sha256:40474a05...</code></div>
+    <div><span class="k">Containers</span> app / worker / redis — all healthy</div>
+    <div><span class="k">TLS</span> Let's Encrypt, valid through 2026-12-28</div>
+  </div>
+
+  <h2>LAUNCH-01 — Deploy tracer &amp; worker end-to-end</h2>
+  <table>
+    <tr><th>What was tested</th><th>Result</th><th>Evidence</th></tr>
+    <tr><td>HTTPS health (200), HTTP→HTTPS redirect (301), HSTS, valid TLS cert</td><td class="pass">PASS</td><td><code>evidence/02-deploy.md</code></td></tr>
+    <tr><td>Basic analysis submitted over HTTPS, processed exactly once by the production BullMQ worker, v2.1 structured fields present</td><td class="pass">PASS</td><td><code>evidence/03-launch-01.md</code></td></tr>
+  </table>
+
+  <h2>LAUNCH-02 / LAUNCH-03 — PDF export &amp; caching</h2>
+  <table>
+    <tr><th>What was tested</th><th>Result</th><th>Evidence</th></tr>
+    <tr><td>First export (<code>cached=false</code>) renders a valid, legible 2-page PDF stored privately; unauthenticated / public-bucket access rejected</td><td class="pass">PASS</td><td><code>evidence/04-launch-02-03.md</code></td></tr>
+    <tr><td>Second export (<code>cached=true</code>) served byte-identical (sha256 match), unchanged stored-object metadata — no regeneration</td><td class="pass">PASS</td><td><code>evidence/04-launch-02-03.md</code></td></tr>
+  </table>
+  <div class="thumb">
+    <img src="pdf-page1.png" alt="Page 1 of the production-generated PDF report">
+    <div>
+      <strong>Rendered PDF, page 1</strong><br>
+      <span style="color:var(--text-dim)">Clarify report title, executive summary, clause-level findings, legal disclaimer — all present and legible.</span>
+    </div>
+  </div>
+
+  <h2>LAUNCH-04 — Forensic UI (Phase 01 UAT Test 4 closure)</h2>
+  <table>
+    <tr><th>What was tested</th><th>Result</th><th>Evidence</th></tr>
+    <tr><td>Completed Forensic analysis with every section populated (37 hallazgos, 3 cross-clause findings, 14 omissions, full structural map, 100% coverage)</td><td class="pass">PASS</td><td><code>evidence/05-launch-04.md</code></td></tr>
+    <tr><td>All 11 UI checks (C1-C11): executive summary, risk panel, clause findings, section index + click-to-scroll, cross-clause analysis, critical omissions, structural map, coverage %, no horizontal overflow, zero console errors</td><td class="pass">PASS</td><td><code>evidence/05-launch-04.md</code></td></tr>
+  </table>
+
+  <h2>Flagged assumptions &amp; deviations</h2>
+  <ul class="flags">
+    <li>24-hour signed-URL expiry window not exercised — only the immediate round-trip was verified.</li>
+    <li>Concurrent first-time exports are idempotent by design (storage upsert), not independently load-tested.</li>
+    <li>Mobile-width (390px) layout check not performed — no resize tool available this session.</li>
+    <li><strong>Auth mechanism:</strong> AUTH_MODE=browser throughout — all authenticated calls driven as same-origin fetch from an already-authenticated session, not a stored token.</li>
+    <li><code>/api/health</code> proves Redis connectivity only; its <code>database</code>/<code>ai</code> fields are hardcoded, not live checks.</li>
+    <li>Six same-day hotfix releases (v1.0.0-alpha.21–26) and one database migration were shipped during this phase's verification, each for a real bug found live — see <code>13-LAUNCH-CHECKLIST.md</code> for the full list.</li>
+    <li>Stripe live webhook / live price IDs are out of LAUNCH scope and not verified — production currently runs Stripe test-mode keys.</li>
+  </ul>
+
+  <div class="footer">Full checklist: <code>13-LAUNCH-CHECKLIST.md</code> — every value above is transcribed from committed evidence files or a timestamped fresh re-run at sign-off.</div>
+</div>
+</body>
+</html>
