@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-alpha.26] - 2026-09-30
+
+### Fixed
+- Forensic-tier analyses failed twice in a row with "Request timed out" after ~15 minutes despite a 10-minute configured timeout — the OpenAI SDK's default automatic retries (maxRetries: 2) were re-waiting the full timeout on each attempt. Set `maxRetries: 0` and raised the forensic timeout to 12 minutes (queue/worker job timeouts to 13 minutes) so a single attempt's timeout is a real ceiling, not a multiplier.
+
 ## [1.0.0-alpha.25] - 2026-09-29
 
 ### Fixed
