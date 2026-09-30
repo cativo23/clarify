@@ -65,7 +65,7 @@ export const analyzeContract = async (
   const timeouts = {
     basic: 120000, // 2 minutes
     premium: 300000, // 5 minutes
-    forensic: 600000, // 10 minutes
+    forensic: 720000, // 12 minutes (was 10 — see maxRetries note below)
   };
   const timeout = timeouts[analysisType];
 
@@ -74,6 +74,16 @@ export const analyzeContract = async (
   const openai = new OpenAI({
     apiKey: config.openaiApiKey,
     timeout,
+    // [LAUNCH-04 FIX] The OpenAI SDK defaults to 2 automatic retries on timeout.
+    // For a single expensive, non-idempotent generation call, each retry
+    // re-waits the FULL `timeout` again — observed live in production: a
+    // forensic-tier request configured with a 10-minute timeout actually
+    // took ~15 minutes to surface its "Request timed out" error, twice in a
+    // row, consistent with at least one silent retry cycle. Disabling
+    // retries here makes the configured timeout the real wall-clock ceiling
+    // instead of a multiplier, and keeps failures fast enough to stay under
+    // BullMQ's own job timeout (650s) for basic/premium at least.
+    maxRetries: 0,
   });
 
   // 1. Load Dynamic Configuration
